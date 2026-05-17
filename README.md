@@ -1,5 +1,10 @@
 # mobx-data
 
+[![build](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/IAmJulianAcosta/mobx-data/release/build-badge.json)](https://github.com/IAmJulianAcosta/mobx-data)
+[![coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/IAmJulianAcosta/mobx-data/release/coverage-badge.json)](https://github.com/IAmJulianAcosta/mobx-data)
+[![version](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/IAmJulianAcosta/mobx-data/release/version-badge.json)](https://github.com/IAmJulianAcosta/mobx-data/releases)
+[![license](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/IAmJulianAcosta/mobx-data/release/license-badge.json)](./LICENSE)
+
 A feature-complete port of Ember Data to MobX — framework-agnostic, TypeScript-first, fully observable.
 
 ---
