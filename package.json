@@ -1,5 +1,5 @@
 {
-  "name": "mobx-data",
+  "name": "@iamjulianacosta/mobx-data",
   "version": "1.0.0",
   "description": "Ember Data feature-complete clone for MobX",
   "type": "module",
