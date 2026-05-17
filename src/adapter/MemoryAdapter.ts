@@ -1,3 +1,15 @@
+/**
+ * In-memory adapter for testing and server-side rendering.
+ *
+ * `MemoryAdapter` stores records in plain `Map` structures with no network I/O.
+ * It implements the full adapter interface (findRecord, findAll, findMany, query,
+ * queryRecord, createRecord, updateRecord, deleteRecord) so it can serve as a
+ * drop-in replacement for `RestAdapter` in unit tests or SSR hydration scenarios.
+ *
+ * Use `seed()` to pre-populate data and `reset()` to clear all state between
+ * test cases.
+ */
+
 import { injectable } from 'tsyringe';
 import { Adapter, type AdapterSnapshot } from './Adapter.js';
 
@@ -28,6 +40,14 @@ export class MemoryAdapter extends Adapter {
     return String(current);
   }
 
+  /**
+   * Pre-populates the adapter with records for a given model type.
+   * Auto-increments the internal ID counter to avoid collisions with
+   * subsequently created records.
+   *
+   * @param modelName - The model type to seed.
+   * @param records - Array of plain objects; each must have an `id` key.
+   */
   seed(modelName: string, records: Array<{ id: string; [key: string]: unknown }>): void {
     const collection = this.getCollection(modelName);
     for (const record of records) {
@@ -43,6 +63,7 @@ export class MemoryAdapter extends Adapter {
     }
   }
 
+  /** Clears all stored records and resets ID counters. */
   reset(): void {
     this.storage.clear();
     this.nextId.clear();
@@ -94,6 +115,7 @@ export class MemoryAdapter extends Adapter {
     return { data };
   }
 
+  /** Filters records by exact attribute match on all query keys. */
   override async query(
     _store: unknown,
     modelName: string,
@@ -117,6 +139,7 @@ export class MemoryAdapter extends Adapter {
     return { data };
   }
 
+  /** Returns the first record matching the query, or `null`. */
   override async queryRecord(
     _store: unknown,
     modelName: string,
@@ -124,6 +147,18 @@ export class MemoryAdapter extends Adapter {
   ): Promise<unknown> {
     const result = await this.query(_store, modelName, query) as { data: unknown[] };
     return { data: result.data[0] ?? null };
+  }
+
+  private static safeAssign(
+    target: Record<string, unknown>,
+    source: Record<string, unknown>,
+  ): void {
+    for (const [key, value] of Object.entries(source)) {
+      if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+        continue;
+      }
+      target[key] = value;
+    }
   }
 
   override async createRecord(
@@ -135,7 +170,7 @@ export class MemoryAdapter extends Adapter {
     const attributes: Record<string, unknown> = {};
     const record = snapshot.record as { _data?: Record<string, unknown> };
     if (record._data) {
-      Object.assign(attributes, record._data);
+      MemoryAdapter.safeAssign(attributes, record._data);
     }
     const entry: MemoryRecord = { id, type: modelName, attributes };
     this.getCollection(modelName).set(id, entry);
@@ -161,7 +196,7 @@ export class MemoryAdapter extends Adapter {
     }
     const record = snapshot.record as { _data?: Record<string, unknown> };
     if (record._data) {
-      Object.assign(existing.attributes, record._data);
+      MemoryAdapter.safeAssign(existing.attributes, record._data);
     }
     return { data: { id, type: modelName, attributes: { ...existing.attributes } } };
   }

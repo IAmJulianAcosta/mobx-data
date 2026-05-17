@@ -282,7 +282,7 @@ export abstract class Model {
     | '_applyServerData'
     | '_setState'
     >(this, {
-      _data: observable.deep,
+      _data: observable.shallow,
       _originalData: observable.ref,
       _relationships: observable.shallow,
       _id: observable,

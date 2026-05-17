@@ -32,7 +32,12 @@ export class RestAdapter extends Adapter {
     const record = snapshot.record as { _data?: Record<string, unknown> };
     const data = record._data;
     if (data) {
-      Object.assign(body, data);
+      for (const [key, value] of Object.entries(data)) {
+        if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+          continue;
+        }
+        body[key] = value;
+      }
     }
     return body;
   }

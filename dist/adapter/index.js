@@ -1,6 +1,8 @@
-import { A as r, R as t } from "../RestAdapter-8NLgCOQ1.js";
+import { A as a, R as t } from "../RestAdapter-B4aRvs4m.js";
+import { M as p } from "../MemoryAdapter-Bx1e7ndV.js";
 export {
-  r as Adapter,
+  a as Adapter,
+  p as MemoryAdapter,
   t as RestAdapter
 };
 //# sourceMappingURL=index.js.map

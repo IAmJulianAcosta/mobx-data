@@ -16,7 +16,8 @@
  */
 import type { Model } from '@mobx-data/model';
 export declare class IdentityMap {
-    private buckets;
+    /** @internal */
+    readonly _buckets: Map<string, Map<string, Model>>;
     constructor();
     /**
      * Returns the bucket for `modelName`, optionally creating it when absent.

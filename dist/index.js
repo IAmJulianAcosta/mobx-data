@@ -1,48 +1,50 @@
-import { A as s, M as e, R as o } from "./types-C9NB2gRj.js";
+import { A as e, M as s, R as o } from "./types-C9NB2gRj.js";
 import { a as n, b as p, h as A } from "./decorators-Zr35qr6A.js";
-import { S } from "./SchemaService-DZwkFgZu.js";
-import { A as d, a as i, E as M, M as E, b as T, S as x, c as R } from "./relationships-6nIWIH-v.js";
-import { A as l, I as y, R as h, S as _ } from "./Store-CLC0v7IQ.js";
-import { A as B, R as I } from "./RestAdapter-8NLgCOQ1.js";
-import { S as g } from "./Serializer-FxJbsZ50.js";
-import { E as D, J as H, R as N } from "./EmbeddedRecordsMixin-VoHluHCT.js";
-import { B as u, a as K, D as Y, N as C, S as F } from "./date-Bj4O2W1F.js";
-import { C as P, F as q, R as v } from "./CacheHandler-BTU_rYkv.js";
-import { J as j, a as k } from "./JsonApiSerializer-ChSwDsJ5.js";
-import { O as G } from "./ODataAdapter-B2DLLpYp.js";
+import { S as f } from "./SchemaService-DZwkFgZu.js";
+import { A as d, a as M, E as i, M as x, b as E, S as T, c as R } from "./relationships-BEXANmWg.js";
+import { A as l, I as y, R as h, S as _ } from "./Store-CZ7Z-Nme.js";
+import { A as B, R as I } from "./RestAdapter-B4aRvs4m.js";
+import { M as g } from "./MemoryAdapter-Bx1e7ndV.js";
+import { S as D } from "./Serializer-FxJbsZ50.js";
+import { E as N, J as O, R as u } from "./EmbeddedRecordsMixin-VoHluHCT.js";
+import { B as Y, a as C, D as F, N as L, S as P } from "./date-Bj4O2W1F.js";
+import { C as v, F as U, R as j } from "./CacheHandler-BTU_rYkv.js";
+import { J as w, a as G } from "./JsonApiSerializer-CC5HXp4b.js";
+import { O as V } from "./ODataAdapter-C4IHK4BK.js";
 export {
-  s as ATTRIBUTES_META_KEY,
+  e as ATTRIBUTES_META_KEY,
   B as Adapter,
   l as AdapterPopulatedRecordArray,
   d as AsyncBelongsTo,
-  i as AsyncHasMany,
-  u as BaseTransform,
-  K as BooleanTransform,
-  P as CacheHandler,
-  Y as DateTransform,
-  D as EmbeddedRecordsMixin,
-  M as Errors,
-  q as FetchHandler,
+  M as AsyncHasMany,
+  Y as BaseTransform,
+  C as BooleanTransform,
+  v as CacheHandler,
+  F as DateTransform,
+  N as EmbeddedRecordsMixin,
+  i as Errors,
+  U as FetchHandler,
   y as IdentityMap,
-  j as JsonApiAdapter,
-  k as JsonApiSerializer,
-  H as JsonSerializer,
-  e as MODEL_NAME_META_KEY,
-  E as ManyArray,
-  T as Model,
-  C as NumberTransform,
-  G as ODataAdapter,
+  w as JsonApiAdapter,
+  G as JsonApiSerializer,
+  O as JsonSerializer,
+  s as MODEL_NAME_META_KEY,
+  x as ManyArray,
+  g as MemoryAdapter,
+  E as Model,
+  L as NumberTransform,
+  V as ODataAdapter,
   o as RELATIONSHIPS_META_KEY,
   h as RecordArray,
-  v as RequestManager,
+  j as RequestManager,
   I as RestAdapter,
-  N as RestSerializer,
-  S as SchemaService,
-  g as Serializer,
-  x as Snapshot,
+  u as RestSerializer,
+  f as SchemaService,
+  D as Serializer,
+  T as Snapshot,
   R as StateMachine,
   _ as Store,
-  F as StringTransform,
+  P as StringTransform,
   n as attr,
   p as belongsTo,
   A as hasMany

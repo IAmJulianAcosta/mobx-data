@@ -31,6 +31,12 @@ export interface RecordArrayOptions<T extends Model> {
   source: () => T[];
   /** Optional async callback invoked by `update()`. */
   update?: () => Promise<void>;
+  /**
+   * When `true`, the internal MobX computed retains its cached value even when
+   * no observers are actively subscribed.  Prevents expensive recomputation
+   * for long-lived filtered views (e.g. `liveQuery` results).
+   */
+  keepAlive?: boolean;
 }
 
 /**
@@ -50,7 +56,7 @@ export class RecordArray<T extends Model = Model> implements Iterable<T> {
   constructor(opts: RecordArrayOptions<T>) {
     this.opts = opts;
     makeObservable<this, 'resolved' | 'updating'>(this, {
-      resolved: computed,
+      resolved: opts.keepAlive ? computed({ keepAlive: true }) : computed,
       updating: observable,
       length: computed,
       modelName: computed,

@@ -217,6 +217,10 @@ export declare class Store implements ModelStoreLike {
     /**
      * Finds a single record by id.  Returns the cached record immediately when
      * `options.reload` is not set; otherwise re-fetches.
+     *
+     * When the adapter has `coalesceFindRequests: true` and `findMany` is
+     * implemented, multiple concurrent `findRecord` calls for the same type
+     * are batched into a single `findMany` network request.
      */
     findRecord<T extends Model = Model>(modelName: string, id: string, options?: FindOptions): Promise<T>;
     /**
@@ -301,6 +305,91 @@ export declare class Store implements ModelStoreLike {
      * the inverse.  Pending members are removed from the pending set.
      */
     _hasManyRemove(record: Model, name: string, meta: RelationshipDef, value: Model): void;
+    private coalescePending;
+    private coalesceScheduled;
+    private scheduleCoalescedFind;
+    private flushCoalescedFind;
+    /**
+     * Returns a reactive `RecordArray` that auto-updates whenever records matching
+     * the predicate are added, removed, or mutated in the identity map.
+     *
+     * The underlying computed uses `keepAlive: true` so it remains cached even
+     * without active MobX observers — useful for long-lived filtered views.
+     *
+     * @param modelName - The registered model type to query.
+     * @param predicate - Filter function applied to each record of `modelName`.
+     * @returns A live `RecordArray` containing only records that satisfy `predicate`.
+     */
+    liveQuery<T extends Model = Model>(modelName: string, predicate: (record: T) => boolean): RecordArray<T>;
+    /**
+     * Applies attribute changes to a record immediately (optimistically), then
+     * executes `persistFn`.  If `persistFn` throws, the record is automatically
+     * rolled back to its state before the optimistic update.
+     *
+     * @param record - The record to update optimistically.
+     * @param optimisticAttributes - Attributes to apply before persistence.
+     * @param persistFn - Async function that persists the change (e.g. `record.save()`).
+     * @returns The record on success.
+     * @throws Re-throws the error from `persistFn` after rollback.
+     */
+    optimisticUpdate<T extends Model>(record: T, optimisticAttributes: Partial<Record<string, unknown>>, persistFn: () => Promise<unknown>): Promise<T>;
+    /**
+     * Executes multiple store mutations as a single MobX action, guaranteeing
+     * that observers (and therefore UI renders) react only once — after all
+     * mutations have been applied.
+     *
+     * @param callback - Synchronous function containing one or more store mutations.
+     */
+    runInTransaction(callback: () => void): void;
+    /**
+     * Produces a JSON-serializable snapshot of all records in the identity map.
+     * Designed for server-side rendering: serialize on the server, transfer as
+     * JSON, then `hydrate()` on the client to restore the full store state
+     * without network requests.
+     *
+     * @param options.exclude - Per-model-type list of attribute keys to omit
+     *   (e.g. `{ user: ['password', 'token'] }`) to prevent leaking sensitive
+     *   data in SSR payloads.
+     * @returns A snapshot object safe to pass through `JSON.stringify`.
+     */
+    serialize(options?: {
+        exclude?: Record<string, string[]>;
+    }): {
+        records: Record<string, Array<{
+            id: string;
+            attributes: Record<string, unknown>;
+            relationships?: Record<string, RelationshipRef>;
+        }>>;
+    };
+    /**
+     * Restores records from a snapshot produced by `serialize()` into this store
+     * instance.  All records are pushed into the identity map in `loaded.saved`
+     * state — no network requests are issued.
+     *
+     * @param snapshot - A snapshot object previously returned by `serialize()`.
+     */
+    hydrate(snapshot: {
+        records: Record<string, Array<{
+            id: string;
+            attributes: Record<string, unknown>;
+            relationships?: Record<string, RelationshipRef>;
+        }>>;
+    }): void;
+    /**
+     * Factory method that creates a new `Store` and immediately hydrates it from
+     * the given snapshot.  Convenience for SSR client-side bootstrap.
+     *
+     * @param schema - SchemaService with all model types registered.
+     * @param snapshot - A snapshot object previously returned by `serialize()`.
+     * @returns A fully populated `Store` instance ready for use.
+     */
+    static hydrate(schema: SchemaService, snapshot: {
+        records: Record<string, Array<{
+            id: string;
+            attributes: Record<string, unknown>;
+            relationships?: Record<string, RelationshipRef>;
+        }>>;
+    }): Store;
 }
 export {};
 //# sourceMappingURL=Store.d.ts.map

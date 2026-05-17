@@ -28,6 +28,12 @@ export interface RecordArrayOptions<T extends Model> {
     source: () => T[];
     /** Optional async callback invoked by `update()`. */
     update?: () => Promise<void>;
+    /**
+     * When `true`, the internal MobX computed retains its cached value even when
+     * no observers are actively subscribed.  Prevents expensive recomputation
+     * for long-lived filtered views (e.g. `liveQuery` results).
+     */
+    keepAlive?: boolean;
 }
 /**
  * Live, read-only view of all records of a given type.

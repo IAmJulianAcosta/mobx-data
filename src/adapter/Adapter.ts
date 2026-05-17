@@ -219,7 +219,7 @@ export abstract class Adapter {
 
   /** URL for a `findRecord` request.  Default: `<collection>/<id>`. */
   urlForFindRecord(id: string, modelName: string, _snapshot: AdapterSnapshot): string {
-    return this._composeURL(`${this.pathForType(modelName)}/${id}`);
+    return this._composeURL(`${this.pathForType(modelName)}/${encodeURIComponent(id)}`);
   }
 
   /** URL for a `findAll` request.  Default: `<collection>`. */
@@ -257,7 +257,7 @@ export abstract class Adapter {
     modelName: string,
     _snapshot: AdapterSnapshot,
   ): string {
-    return this._composeURL(`${this.pathForType(modelName)}/${id}`);
+    return this._composeURL(`${this.pathForType(modelName)}/${encodeURIComponent(id)}`);
   }
 
   /** URL for a `deleteRecord` request.  Default: `<collection>/<id>`. */
@@ -266,7 +266,7 @@ export abstract class Adapter {
     modelName: string,
     _snapshot: AdapterSnapshot,
   ): string {
-    return this._composeURL(`${this.pathForType(modelName)}/${id}`);
+    return this._composeURL(`${this.pathForType(modelName)}/${encodeURIComponent(id)}`);
   }
 
   /**

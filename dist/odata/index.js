@@ -1,4 +1,4 @@
-import { O as t } from "../ODataAdapter-B2DLLpYp.js";
+import { O as t } from "../ODataAdapter-C4IHK4BK.js";
 export {
   t as ODataAdapter
 };
