@@ -1,0 +1,139 @@
+{
+  "name": "mobx-data",
+  "version": "0.1.0",
+  "description": "Ember Data feature-complete clone for MobX",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./adapter": {
+      "types": "./dist/adapter/index.d.ts",
+      "import": "./dist/adapter/index.js",
+      "require": "./dist/adapter/index.cjs"
+    },
+    "./model": {
+      "types": "./dist/model/index.d.ts",
+      "import": "./dist/model/index.js",
+      "require": "./dist/model/index.cjs"
+    },
+    "./store": {
+      "types": "./dist/store/index.d.ts",
+      "import": "./dist/store/index.js",
+      "require": "./dist/store/index.cjs"
+    },
+    "./schema": {
+      "types": "./dist/schema/index.d.ts",
+      "import": "./dist/schema/index.js",
+      "require": "./dist/schema/index.cjs"
+    },
+    "./serializer": {
+      "types": "./dist/serializer/index.d.ts",
+      "import": "./dist/serializer/index.js",
+      "require": "./dist/serializer/index.cjs"
+    },
+    "./transforms": {
+      "types": "./dist/transforms/index.d.ts",
+      "import": "./dist/transforms/index.js",
+      "require": "./dist/transforms/index.cjs"
+    },
+    "./request": {
+      "types": "./dist/request/index.d.ts",
+      "import": "./dist/request/index.js",
+      "require": "./dist/request/index.cjs"
+    },
+    "./json-api": {
+      "types": "./dist/json-api/index.d.ts",
+      "import": "./dist/json-api/index.js",
+      "require": "./dist/json-api/index.cjs"
+    },
+    "./odata": {
+      "types": "./dist/odata/index.d.ts",
+      "import": "./dist/odata/index.js",
+      "require": "./dist/odata/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "test:e2e:coverage": "playwright test && nyc report --temp-dir=coverage/playwright --report-dir=coverage/playwright-report --reporter=text",
+    "test:all": "vitest run --coverage && playwright test",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint \"src/**/*.ts\"",
+    "lint:fix": "eslint \"src/**/*.ts\" --fix",
+    "build": "vite build --config vite.config.build.ts && tsc -p tsconfig.build.json",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "typedoc && vitepress build docs",
+    "docs:preview": "vitepress preview docs",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "mobx",
+    "data",
+    "orm",
+    "ember-data",
+    "identity-map",
+    "adapter",
+    "serializer",
+    "json-api",
+    "odata",
+    "state-management"
+  ],
+  "author": "Julián Acosta <iam@julianacosta.me>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nicojuicy/mobx-data.git"
+  },
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
+  "peerDependencies": {
+    "mobx": "^6.0.0",
+    "reflect-metadata": "^0.2.0"
+  },
+  "dependencies": {
+    "change-case": "^5.4.4",
+    "pluralize": "^8.0.0",
+    "tsyringe": "^4.8.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.60.0",
+    "@types/node": "^22.10.0",
+    "@types/pluralize": "^0.0.33",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "@vitest/coverage-v8": "^2.1.8",
+    "eslint": "^8.57.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-airbnb-typescript": "^18.0.0",
+    "eslint-import-resolver-typescript": "^3.7.0",
+    "eslint-plugin-import": "^2.31.0",
+    "mobx": "^6.13.5",
+    "nyc": "^18.0.0",
+    "reflect-metadata": "^0.2.2",
+    "simple-odata-server": "^1.2.2",
+    "typedoc": "^0.28.19",
+    "typedoc-plugin-markdown": "^4.11.0",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.3",
+    "vite-plugin-dts": "^4.3.0",
+    "vite-plugin-istanbul": "^9.0.0",
+    "vitepress": "^1.6.4",
+    "vitest": "^2.1.8"
+  },
+  "packageManager": "pnpm@9.14.4"
+}
