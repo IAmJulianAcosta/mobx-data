@@ -1,2 +1,0 @@
-"use strict";Object.defineProperty(exports,Symbol.toStringTag,{value:"Module"});const e=require("../RestAdapter-CJOwTsKK.cjs"),r=require("../MemoryAdapter-D1cTyydm.cjs");exports.Adapter=e.Adapter;Object.defineProperty(exports,"RestAdapter",{enumerable:!0,get:()=>e.RestAdapter});Object.defineProperty(exports,"MemoryAdapter",{enumerable:!0,get:()=>r.MemoryAdapter});
-//# sourceMappingURL=index.cjs.map

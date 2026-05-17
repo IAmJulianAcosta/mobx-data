@@ -1,2 +1,0 @@
-"use strict";Object.defineProperty(exports,Symbol.toStringTag,{value:"Module"});const e=require("../types-uWOXMPWW.cjs"),r=require("../decorators-HQ1KnRdh.cjs"),E=require("../SchemaService-Di_yjVzU.cjs");exports.ATTRIBUTES_META_KEY=e.ATTRIBUTES_META_KEY;exports.MODEL_NAME_META_KEY=e.MODEL_NAME_META_KEY;exports.RELATIONSHIPS_META_KEY=e.RELATIONSHIPS_META_KEY;exports.attr=r.attr;exports.belongsTo=r.belongsTo;exports.hasMany=r.hasMany;Object.defineProperty(exports,"SchemaService",{enumerable:!0,get:()=>E.SchemaService});
-//# sourceMappingURL=index.cjs.map

@@ -1,2 +1,0 @@
-"use strict";Object.defineProperty(exports,Symbol.toStringTag,{value:"Module"});const r=require("../Serializer-95gi5edy.cjs"),e=require("../EmbeddedRecordsMixin-CBvqNdgC.cjs");exports.Serializer=r.Serializer;exports.EmbeddedRecordsMixin=e.EmbeddedRecordsMixin;Object.defineProperty(exports,"JsonSerializer",{enumerable:!0,get:()=>e.JsonSerializer});Object.defineProperty(exports,"RestSerializer",{enumerable:!0,get:()=>e.RestSerializer});
-//# sourceMappingURL=index.cjs.map
