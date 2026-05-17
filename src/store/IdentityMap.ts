@@ -19,11 +19,12 @@ import { makeObservable, observable, action } from 'mobx';
 import type { Model } from '@mobx-data/model';
 
 export class IdentityMap {
-  private buckets: Map<string, Map<string, Model>> = new Map();
+  /** @internal */
+  readonly _buckets: Map<string, Map<string, Model>> = new Map();
 
   constructor() {
-    makeObservable<this, 'buckets'>(this, {
-      buckets: observable.shallow,
+    makeObservable<this, '_buckets'>(this, {
+      _buckets: observable.shallow,
       set: action,
       delete: action,
       clear: action,
@@ -35,10 +36,10 @@ export class IdentityMap {
    * Internal helper — not part of the public API.
    */
   private bucket(modelName: string, create = false): Map<string, Model> | undefined {
-    let existing = this.buckets.get(modelName);
+    let existing = this._buckets.get(modelName);
     if (!existing && create) {
       existing = observable.map<string, Model>({}, { deep: false });
-      this.buckets.set(modelName, existing);
+      this._buckets.set(modelName, existing);
     }
     return existing;
   }
@@ -86,7 +87,7 @@ export class IdentityMap {
     if (modelName) {
       this.bucket(modelName)?.clear();
     } else {
-      for (const bucket of this.buckets.values()) {
+      for (const bucket of this._buckets.values()) {
         bucket.clear();
       }
     }
@@ -101,7 +102,7 @@ export class IdentityMap {
       return this.bucket(modelName)?.size ?? 0;
     }
     let total = 0;
-    for (const bucket of this.buckets.values()) {
+    for (const bucket of this._buckets.values()) {
       total += bucket.size;
     }
     return total;

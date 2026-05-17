@@ -5,6 +5,7 @@ export type {
   SerializerLike,
   FindOptions,
   NormalizedDocument,
+  NormalizedResource,
 } from './Store.js';
 export { IdentityMap } from './IdentityMap.js';
 export { RecordArray, AdapterPopulatedRecordArray } from './RecordArray.js';

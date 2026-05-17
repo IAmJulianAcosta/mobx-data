@@ -38,7 +38,7 @@
 import {
   singleton, inject, injectable,
 } from 'tsyringe';
-import { runInAction, observable } from 'mobx';
+import { runInAction, observable, computed, makeObservable } from 'mobx';
 import {
   SchemaService,
   type RelationshipDef,
@@ -594,6 +594,10 @@ export class Store implements ModelStoreLike {
   /**
    * Finds a single record by id.  Returns the cached record immediately when
    * `options.reload` is not set; otherwise re-fetches.
+   *
+   * When the adapter has `coalesceFindRequests: true` and `findMany` is
+   * implemented, multiple concurrent `findRecord` calls for the same type
+   * are batched into a single `findMany` network request.
    */
   async findRecord<T extends Model = Model>(
     modelName: string,
@@ -605,6 +609,11 @@ export class Store implements ModelStoreLike {
       return cached;
     }
     const adapter = this.adapterFor(modelName);
+
+    if (adapter.coalesceFindRequests && adapter.findMany && !options.include) {
+      return this.scheduleCoalescedFind(modelName, id) as Promise<T>;
+    }
+
     const snapshot = cached ? this.createSnapshot(cached) : this.createEmptySnapshot(modelName, id);
     const adapterOptions: AdapterFetchOptions | undefined = options.include
       ? { include: options.include, adapterOptions: options.adapterOptions }
@@ -1116,5 +1125,197 @@ export class Store implements ModelStoreLike {
     if (meta.options.inverse) {
       this.removeInverse(value.modelName, value.id, meta.options.inverse, record);
     }
+  }
+
+  // --- coalesceFindRequests ---
+
+  private coalescePending: Map<string, Map<string, {
+    resolve: (record: Model) => void;
+    reject: (error: unknown) => void;
+  }[]>> = new Map();
+
+  private coalesceTimers: Map<string, ReturnType<typeof setTimeout>> = new Map();
+
+  private scheduleCoalescedFind(modelName: string, id: string): Promise<Model> {
+    return new Promise((resolve, reject) => {
+      let byId = this.coalescePending.get(modelName);
+      if (!byId) {
+        byId = new Map();
+        this.coalescePending.set(modelName, byId);
+      }
+      let callbacks = byId.get(id);
+      if (!callbacks) {
+        callbacks = [];
+        byId.set(id, callbacks);
+      }
+      callbacks.push({ resolve, reject });
+
+      if (!this.coalesceTimers.has(modelName)) {
+        const timer = setTimeout(() => this.flushCoalescedFind(modelName), 0);
+        this.coalesceTimers.set(modelName, timer);
+      }
+    });
+  }
+
+  private async flushCoalescedFind(modelName: string): Promise<void> {
+    this.coalesceTimers.delete(modelName);
+    const byId = this.coalescePending.get(modelName);
+    if (!byId || byId.size === 0) {
+      return;
+    }
+    const pendingEntries = new Map(byId);
+    byId.clear();
+
+    const ids = Array.from(pendingEntries.keys());
+    const adapter = this.adapterFor(modelName);
+
+    try {
+      const snapshots = ids.map((id) => {
+        const cached = this.peekRecord(modelName, id);
+        return cached
+          ? this.createSnapshot(cached)
+          : this.createEmptySnapshot(modelName, id);
+      });
+      const response = await adapter.findMany!(this, modelName, ids, snapshots);
+      const doc = this.serializerFor(modelName).normalizeResponse(
+        this,
+        this.schema.modelFor(modelName),
+        response,
+        null,
+        'findMany',
+      ) as NormalizedDocument;
+      this.push(doc);
+
+      for (const id of ids) {
+        const record = this.peekRecord(modelName, id);
+        const callbacks = pendingEntries.get(id);
+        if (callbacks) {
+          for (const callback of callbacks) {
+            if (record) {
+              callback.resolve(record);
+            } else {
+              callback.reject(new Error(`Record not found after findMany: ${modelName}:${id}`));
+            }
+          }
+        }
+      }
+    } catch (error) {
+      for (const callbacks of pendingEntries.values()) {
+        for (const callback of callbacks) {
+          callback.reject(error);
+        }
+      }
+    }
+  }
+
+  // --- liveQuery ---
+
+  liveQuery<T extends Model = Model>(
+    modelName: string,
+    predicate: (record: T) => boolean,
+  ): RecordArray<T> {
+    return new RecordArray<T>({
+      modelName,
+      source: () => {
+        const all = this.identityMap.all(modelName) as T[];
+        const newRecordsForType = this.newRecords.get(modelName);
+        const combined = newRecordsForType && newRecordsForType.size > 0
+          ? [...all, ...(newRecordsForType as unknown as Set<T>)]
+          : all;
+        return combined.filter(predicate);
+      },
+    });
+  }
+
+  // --- optimisticUpdate ---
+
+  async optimisticUpdate<T extends Model>(
+    record: T,
+    optimisticAttributes: Partial<Record<string, unknown>>,
+    persistFn: () => Promise<unknown>,
+  ): Promise<T> {
+    const internal = record as unknown as {
+      _data: Record<string, unknown>;
+      _savedData: Record<string, unknown>;
+    };
+    const backup = { ...internal._data };
+
+    runInAction(() => {
+      Object.assign(internal._data, optimisticAttributes);
+    });
+
+    try {
+      await persistFn();
+      return record;
+    } catch (error) {
+      runInAction(() => {
+        for (const [key, value] of Object.entries(backup)) {
+          internal._data[key] = value;
+        }
+      });
+      throw error;
+    }
+  }
+
+  // --- runInTransaction ---
+
+  runInTransaction(callback: () => void): void {
+    runInAction(callback);
+  }
+
+  // --- SSR: serialize / hydrate ---
+
+  serialize(): { records: Record<string, Array<{ id: string; attributes: Record<string, unknown>; relationships?: Record<string, RelationshipRef> }>> } {
+    const records: Record<string, Array<{ id: string; attributes: Record<string, unknown>; relationships?: Record<string, RelationshipRef> }>> = {};
+    const allTypes = this.identityMap._buckets;
+    for (const [modelName, bucket] of allTypes) {
+      const items: Array<{ id: string; attributes: Record<string, unknown>; relationships?: Record<string, RelationshipRef> }> = [];
+      for (const [id, record] of bucket) {
+        const internal = record as unknown as {
+          _data: Record<string, unknown>;
+          _relationships: Map<string, RelationshipRef>;
+        };
+        const entry: { id: string; attributes: Record<string, unknown>; relationships?: Record<string, RelationshipRef> } = {
+          id,
+          attributes: { ...internal._data },
+        };
+        if (internal._relationships && internal._relationships.size > 0) {
+          const relationships: Record<string, RelationshipRef> = {};
+          for (const [name, ref] of internal._relationships) {
+            relationships[name] = ref;
+          }
+          entry.relationships = relationships;
+        }
+        items.push(entry);
+      }
+      if (items.length > 0) {
+        records[modelName] = items;
+      }
+    }
+    return { records };
+  }
+
+  hydrate(snapshot: { records: Record<string, Array<{ id: string; attributes: Record<string, unknown>; relationships?: Record<string, RelationshipRef> }>> }): void {
+    runInAction(() => {
+      for (const [modelName, items] of Object.entries(snapshot.records)) {
+        for (const item of items) {
+          this.pushResource({
+            type: modelName,
+            id: item.id,
+            attributes: item.attributes,
+            relationships: item.relationships,
+          });
+        }
+      }
+    });
+  }
+
+  static hydrate(
+    schema: SchemaService,
+    snapshot: { records: Record<string, Array<{ id: string; attributes: Record<string, unknown>; relationships?: Record<string, RelationshipRef> }>> },
+  ): Store {
+    const store = new Store(schema);
+    store.hydrate(snapshot);
+    return store;
   }
 }
