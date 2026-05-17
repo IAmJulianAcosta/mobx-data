@@ -21,6 +21,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Determine npm tag
         id: tag
@@ -34,3 +35,5 @@ jobs:
 
       - name: Publish to npm
         run: npm publish --provenance --access public --ignore-scripts --tag ${{ steps.tag.outputs.tag }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
