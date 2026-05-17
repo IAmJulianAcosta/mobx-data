@@ -1,6 +1,6 @@
 {
   "name": "@iamjulianacosta/mobx-data",
-  "version": "1.0.0-beta.6",
+  "version": "1.0.0-beta.7",
   "description": "Ember Data feature-complete clone for MobX",
   "type": "module",
   "main": "./dist/index.cjs",
