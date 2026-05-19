@@ -53,6 +53,11 @@ import {
   type ModelStoreLike,
   type SaveOptions,
 } from '@mobx-data/model';
+import type { CacheLike } from '../cache/types.js';
+import {
+  extractResponseHeaders,
+  parseCacheTTLFromHeaders,
+} from '../cache/cache-utils.js';
 import { IdentityMap } from './IdentityMap.js';
 import {
   RecordArray,
@@ -222,6 +227,9 @@ export class Store implements ModelStoreLike {
   /** Tracks new records that have been appended to a hasMany but not yet saved. */
   private pendingMembers: WeakMap<Model, Map<string, Set<Model>>> = new WeakMap();
 
+  /** Optional persistent cache layer (e.g. IndexedDB). */
+  private _cache: CacheLike | null = null;
+
   constructor(@inject(SchemaService) schema: SchemaService) {
     this.schema = schema;
   }
@@ -236,6 +244,11 @@ export class Store implements ModelStoreLike {
   /** Registers a serializer for a given model name (or `'application'` as a fallback). */
   registerSerializer(modelName: string, serializer: SerializerLike): void {
     this.serializers.set(modelName, serializer);
+  }
+
+  /** Registers a persistent cache layer (e.g. IndexedDB) for offline-first reads. */
+  registerCache(cache: CacheLike): void {
+    this._cache = cache;
   }
 
   /**
@@ -608,6 +621,22 @@ export class Store implements ModelStoreLike {
     if (cached && !options.reload && !options.include) {
       return cached;
     }
+
+    if (!options.reload && !options.include && this._cache) {
+      const cacheEntry = await this._cache.get(modelName, id);
+      if (cacheEntry) {
+        const record = this.push({
+          data: {
+            type: cacheEntry.modelName,
+            id: cacheEntry.id,
+            attributes: cacheEntry.attributes,
+            relationships: cacheEntry.relationships,
+          },
+        });
+        return record as T;
+      }
+    }
+
     const adapter = this.adapterFor(modelName);
 
     if (adapter.coalesceFindRequests && adapter.findMany && !options.include) {
@@ -619,6 +648,7 @@ export class Store implements ModelStoreLike {
       ? { include: options.include, adapterOptions: options.adapterOptions }
       : options.adapterOptions ? { adapterOptions: options.adapterOptions } : undefined;
     const response = await adapter.findRecord(this, modelName, id, snapshot, adapterOptions);
+    const responseHeaders = extractResponseHeaders(response);
     const doc = this.serializerFor(modelName).normalizeResponse(
       this,
       this.schema.modelFor(modelName),
@@ -627,6 +657,16 @@ export class Store implements ModelStoreLike {
       'findRecord',
     ) as NormalizedDocument;
     const record = this.push(doc);
+
+    if (this._cache) {
+      const ttl = responseHeaders
+        ? parseCacheTTLFromHeaders(responseHeaders)
+        : null;
+      if (ttl !== 0) {
+        this.cacheNormalizedDocument(doc, ttl ?? undefined);
+      }
+    }
+
     return record as T;
   }
 
@@ -643,6 +683,7 @@ export class Store implements ModelStoreLike {
       ? { include: options.include, adapterOptions: options.adapterOptions }
       : options.adapterOptions ? { adapterOptions: options.adapterOptions } : undefined;
     const response = await adapter.findAll(this, modelName, null, [], adapterOptions);
+    const responseHeaders = extractResponseHeaders(response);
     const doc = this.serializerFor(modelName).normalizeResponse(
       this,
       this.schema.modelFor(modelName),
@@ -651,6 +692,16 @@ export class Store implements ModelStoreLike {
       'findAll',
     ) as NormalizedDocument;
     this.push(doc);
+
+    if (this._cache) {
+      const ttl = responseHeaders
+        ? parseCacheTTLFromHeaders(responseHeaders)
+        : null;
+      if (ttl !== 0) {
+        this.cacheNormalizedDocument(doc, ttl ?? undefined);
+      }
+    }
+
     return this.peekAll<T>(modelName);
   }
 
@@ -785,6 +836,22 @@ export class Store implements ModelStoreLike {
         this.pushResource(resource);
       }
     }
+
+    if (this._cache && record.id) {
+      const internal = record as unknown as {
+        _data: Record<string, unknown>;
+        _relationships: Map<string, RelationshipRef>;
+      };
+      const relationships: Record<string, RelationshipRef> = {};
+      for (const [name, ref] of internal._relationships) {
+        relationships[name] = ref;
+      }
+      this._cache.set(record.modelName, record.id, { ...internal._data }, {
+        relationships: Object.keys(relationships).length > 0
+          ? relationships : undefined,
+      });
+    }
+
     return record;
   }
 
@@ -795,6 +862,9 @@ export class Store implements ModelStoreLike {
     const adapter = this.adapterFor(record.modelName);
     const snapshot = this.createSnapshot(record);
     await adapter.deleteRecord(this, record.modelName, snapshot);
+    if (this._cache && record.id) {
+      this._cache.invalidate(record.modelName, record.id);
+    }
     this.unloadRecord(record);
     return record;
   }
@@ -1124,6 +1194,36 @@ export class Store implements ModelStoreLike {
     });
     if (meta.options.inverse) {
       this.removeInverse(value.modelName, value.id, meta.options.inverse, record);
+    }
+  }
+
+  // --- persistent cache helpers ---
+
+  private cacheNormalizedDocument(
+    doc: NormalizedDocument,
+    ttl?: number,
+  ): void {
+    if (!this._cache) {
+      return;
+    }
+    const resources: NormalizedResource[] = [];
+    if (doc.data) {
+      if (Array.isArray(doc.data)) {
+        resources.push(...doc.data);
+      } else {
+        resources.push(doc.data);
+      }
+    }
+    if (doc.included) {
+      resources.push(...doc.included);
+    }
+    for (const resource of resources) {
+      if (resource.id) {
+        this._cache.set(resource.type, resource.id, resource.attributes ?? {}, {
+          relationships: resource.relationships,
+          ttl,
+        });
+      }
     }
   }
 

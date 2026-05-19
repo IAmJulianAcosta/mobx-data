@@ -36,6 +36,7 @@
  */
 import { SchemaService, type RelationshipDef, type AttributeDef } from '@mobx-data/schema';
 import { Model, type RelationshipRef, type ModelStoreLike, type SaveOptions } from '@mobx-data/model';
+import type { CacheLike } from '../cache/types.js';
 import { IdentityMap } from './IdentityMap.js';
 import { RecordArray, AdapterPopulatedRecordArray } from './RecordArray.js';
 /** Options forwarded from the Store to adapter fetch methods. */
@@ -127,11 +128,15 @@ export declare class Store implements ModelStoreLike {
     private relationshipCache;
     /** Tracks new records that have been appended to a hasMany but not yet saved. */
     private pendingMembers;
+    /** Optional persistent cache layer (e.g. IndexedDB). */
+    private _cache;
     constructor(schema: SchemaService);
     /** Registers an adapter for a given model name (or `'application'` as a fallback). */
     registerAdapter(modelName: string, adapter: AdapterLike): void;
     /** Registers a serializer for a given model name (or `'application'` as a fallback). */
     registerSerializer(modelName: string, serializer: SerializerLike): void;
+    /** Registers a persistent cache layer (e.g. IndexedDB) for offline-first reads. */
+    registerCache(cache: CacheLike): void;
     /**
      * Returns the adapter for `modelName`, falling back to `'application'`.
      * @throws when no adapter is registered.
@@ -305,6 +310,7 @@ export declare class Store implements ModelStoreLike {
      * the inverse.  Pending members are removed from the pending set.
      */
     _hasManyRemove(record: Model, name: string, meta: RelationshipDef, value: Model): void;
+    private cacheNormalizedDocument;
     private coalescePending;
     private coalesceScheduled;
     private scheduleCoalescedFind;

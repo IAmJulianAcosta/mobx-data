@@ -22,6 +22,7 @@
 
 import { injectable } from 'tsyringe';
 import { Adapter, type AdapterSnapshot } from './Adapter.js';
+import { attachResponseHeaders } from '../cache/cache-utils.js';
 
 @injectable()
 export class RestAdapter extends Adapter {
@@ -104,11 +105,20 @@ export class RestAdapter extends Adapter {
     if (!text) {
       return null;
     }
+    let result: unknown;
     try {
-      return JSON.parse(text);
+      result = JSON.parse(text);
     } catch {
-      return text;
+      result = text;
     }
+    if (result !== null && typeof result === 'object') {
+      const headers: Record<string, string> = {};
+      response.headers.forEach((value, key) => {
+        headers[key.toLowerCase()] = value;
+      });
+      attachResponseHeaders(result, headers);
+    }
+    return result;
   }
 
   override async findRecord(

@@ -15,3 +15,4 @@ export * from './transforms/index.js';
 export * from './request/index.js';
 export * from './json-api/index.js';
 export * from './odata/index.js';
+export * from './cache/index.js';
