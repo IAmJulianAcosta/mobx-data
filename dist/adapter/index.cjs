@@ -1,2 +1,2 @@
-"use strict";Object.defineProperty(exports,Symbol.toStringTag,{value:"Module"});const e=require("../RestAdapter-1V94stW-.cjs"),r=require("../MemoryAdapter-BTK2D64s.cjs");exports.Adapter=e.Adapter;Object.defineProperty(exports,"RestAdapter",{enumerable:!0,get:()=>e.RestAdapter});Object.defineProperty(exports,"MemoryAdapter",{enumerable:!0,get:()=>r.MemoryAdapter});
+"use strict";Object.defineProperty(exports,Symbol.toStringTag,{value:"Module"});const e=require("../RestAdapter-CSoJg7D2.cjs"),r=require("../MemoryAdapter-DH-gzSSl.cjs");exports.Adapter=e.Adapter;Object.defineProperty(exports,"RestAdapter",{enumerable:!0,get:()=>e.RestAdapter});Object.defineProperty(exports,"MemoryAdapter",{enumerable:!0,get:()=>r.MemoryAdapter});
 //# sourceMappingURL=index.cjs.map

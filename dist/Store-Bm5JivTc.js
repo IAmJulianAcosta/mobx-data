@@ -2,7 +2,7 @@ import { singleton as M, injectable as F, inject as z } from "tsyringe";
 import { makeObservable as _, action as b, observable as y, computed as u, runInAction as p } from "mobx";
 import { S as D } from "./SchemaService-DZwkFgZu.js";
 import { b as S, A as C, a as E, M as O } from "./relationships-BEXANmWg.js";
-import { e as m, p as v } from "./cache-utils-38Dqu4Qf.js";
+import { e as m, p as v } from "./cache-utils-B2wFhisx.js";
 class q {
   constructor() {
     this._buckets = /* @__PURE__ */ new Map(), _(this, {
@@ -451,8 +451,8 @@ let f = class {
       "findRecord"
     ), d = this.push(c);
     if (this._cache) {
-      const l = h ? v(h) : void 0;
-      l !== 0 && this.cacheNormalizedDocument(c, l);
+      const l = h ? v(h) : null;
+      l !== 0 && this.cacheNormalizedDocument(c, l ?? void 0);
     }
     return d;
   }
@@ -469,8 +469,8 @@ let f = class {
       "findAll"
     );
     if (this.push(o), this._cache) {
-      const n = r ? v(r) : void 0;
-      n !== 0 && this.cacheNormalizedDocument(o, n);
+      const n = r ? v(r) : null;
+      n !== 0 && this.cacheNormalizedDocument(o, n ?? void 0);
     }
     return this.peekAll(t);
   }
@@ -954,4 +954,4 @@ export {
   k as R,
   f as S
 };
-//# sourceMappingURL=Store-mvrDLQEZ.js.map
+//# sourceMappingURL=Store-Bm5JivTc.js.map

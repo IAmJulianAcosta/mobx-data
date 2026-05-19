@@ -1,8 +1,8 @@
 import { RESPONSE_HEADERS } from './types.js';
 
-const DEFAULT_TTL = 3_600_000;
-
-export function parseCacheTTLFromHeaders(headers: Record<string, string>): number {
+export function parseCacheTTLFromHeaders(
+  headers: Record<string, string>,
+): number | null {
   const cacheControl = headers['cache-control'];
   if (cacheControl) {
     if (/no-store/i.test(cacheControl) || /no-cache/i.test(cacheControl)) {
@@ -26,7 +26,7 @@ export function parseCacheTTLFromHeaders(headers: Record<string, string>): numbe
     }
   }
 
-  return DEFAULT_TTL;
+  return null;
 }
 
 export function extractResponseHeaders(
