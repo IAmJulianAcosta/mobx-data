@@ -1,4 +1,4 @@
-import { O as t } from "../ODataAdapter-RQUjVTcf.js";
+import { O as t } from "../ODataAdapter-DAja_jKM.js";
 export {
   t as ODataAdapter
 };

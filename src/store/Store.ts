@@ -661,9 +661,9 @@ export class Store implements ModelStoreLike {
     if (this._cache) {
       const ttl = responseHeaders
         ? parseCacheTTLFromHeaders(responseHeaders)
-        : null;
+        : undefined;
       if (ttl !== 0) {
-        this.cacheNormalizedDocument(doc, ttl ?? undefined);
+        this.cacheNormalizedDocument(doc, ttl);
       }
     }
 
@@ -696,9 +696,9 @@ export class Store implements ModelStoreLike {
     if (this._cache) {
       const ttl = responseHeaders
         ? parseCacheTTLFromHeaders(responseHeaders)
-        : null;
+        : undefined;
       if (ttl !== 0) {
-        this.cacheNormalizedDocument(doc, ttl ?? undefined);
+        this.cacheNormalizedDocument(doc, ttl);
       }
     }
 
