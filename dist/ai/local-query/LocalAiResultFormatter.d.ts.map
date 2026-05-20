@@ -1,0 +1,1 @@
+{"version":3,"file":"LocalAiResultFormatter.d.ts","sourceRoot":"","sources":["../../../src/ai/local-query/LocalAiResultFormatter.ts"],"names":[],"mappings":"AACA,OAAO,KAAK,EAAE,kBAAkB,EAAsB,MAAM,mBAAmB,CAAC;AAEhF,qBAAa,sBAAsB;IAC1B,MAAM,CAAC,MAAM,EAAE,kBAAkB,GAAG,MAAM;IAQjD,OAAO,CAAC,QAAQ,CAAC,QAAQ,CAgBvB;IAEF,OAAO,CAAC,iBAAiB;IAezB,OAAO,CAAC,kBAAkB;CAc3B"}

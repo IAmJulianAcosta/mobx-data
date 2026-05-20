@@ -1,6 +1,6 @@
 {
   "name": "@iamjulianacosta/mobx-data",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Ember Data feature-complete clone for MobX",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -61,6 +61,11 @@
       "types": "./dist/inspector/index.d.ts",
       "import": "./dist/inspector/index.js",
       "require": "./dist/inspector/index.cjs"
+    },
+    "./ai": {
+      "types": "./dist/ai/index.d.ts",
+      "import": "./dist/ai/index.js",
+      "require": "./dist/ai/index.cjs"
     }
   },
   "files": [
@@ -118,6 +123,8 @@
     "tsyringe": "^4.8.0"
   },
   "devDependencies": {
+    "@huggingface/transformers": "^4.2.0",
+    "@mlc-ai/web-llm": "^0.2.83",
     "@playwright/test": "^1.60.0",
     "@types/node": "^22.10.0",
     "@types/pluralize": "^0.0.33",

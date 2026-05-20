@@ -1,0 +1,1972 @@
+class L {
+  constructor(e) {
+    this.schema = e;
+  }
+  introspect() {
+    const e = this.schema.registeredNames(), r = this.buildTypeDescriptors(e), t = this.buildRelationshipGraph(r), s = this.buildStringAttributesMap(r), n = this.generateSystemPrompt(e, r), i = this.generateJsonSchema(e);
+    return {
+      typeNames: e,
+      types: r,
+      relationshipGraph: t,
+      systemPrompt: n,
+      jsonSchema: i,
+      stringAttributes: s
+    };
+  }
+  buildTypeDescriptors(e) {
+    const r = /* @__PURE__ */ new Map();
+    for (const t of e) {
+      const s = [], n = [];
+      this.schema.eachAttribute(t, (i, o) => {
+        s.push({ name: i, type: o.type });
+      }), this.schema.eachRelationship(t, (i, o) => {
+        n.push({
+          name: i,
+          kind: o.kind,
+          relatedType: o.type
+        });
+      }), r.set(t, { typeName: t, attributes: s, relationships: n });
+    }
+    return r;
+  }
+  buildRelationshipGraph(e) {
+    const r = /* @__PURE__ */ new Map();
+    for (const [t, s] of e) {
+      const n = [];
+      for (const i of s.relationships)
+        n.push({
+          relatedType: i.relatedType,
+          relationshipName: i.name,
+          kind: i.kind
+        });
+      r.set(t, n);
+    }
+    return r;
+  }
+  buildStringAttributesMap(e) {
+    const r = /* @__PURE__ */ new Map();
+    for (const [t, s] of e) {
+      const n = s.attributes.filter((i) => i.type === "string" || i.type === null).map((i) => i.name);
+      r.set(t, n);
+    }
+    return r;
+  }
+  generateSystemPrompt(e, r) {
+    const t = [
+      "You are a query classifier for a data store. Given a user query in English or Spanish, output a JSON object describing the data query.",
+      "",
+      `Available types: ${e.join(", ")}`,
+      "",
+      "Type details:"
+    ];
+    for (const s of e) {
+      const n = r.get(s), i = n.attributes.map((a) => `${a.name}(${a.type ?? "any"})`).join(", "), o = n.relationships.map((a) => `${a.name}(${a.kind})→${a.relatedType}`).join(", ");
+      t.push(`- ${s}: attributes [${i}], relationships [${o}]`);
+    }
+    return t.push(
+      "",
+      "Output format:",
+      '{"target":"<type>","filter_type":"<type or none>","filter_attribute":"<attr or none>","filter_value":"<value or none>","through_type":"<type or none>","search":"<text or none>","limit":"<number or none>","confidence":<0-1>}',
+      "",
+      "Rules:",
+      '- target: the type of records to return, or "unsupported" if the query is NOT about stored data',
+      `- filter_type + filter_attribute + filter_value: filter by an entity's attribute (all three must be set, or all "none")`,
+      '- through_type: intermediate type when the query explicitly mentions traversal (e.g., "comments on POSTS by Alice" → through_type:"post")',
+      '- When target == filter_type, it means direct attribute lookup (e.g., "profile of Alice" → target:"user", filter_type:"user")',
+      '- "show posts by Alice" means filter posts by the author user named Alice, NOT filter posts by title. Use filter_type for the entity that owns the name.',
+      '- filter_attribute can be ANY string attribute of filter_type (name, title, email, slug, etc.), not just "name"',
+      '- "comments on the Weekend post" → target:"comment", filter_type:"post", filter_attribute:"title", filter_value:"Weekend" (filter by post title, NOT search)',
+      "- When a query references a specific entity by name or title, use filter — NOT search. Search is only for free-text keyword matching.",
+      '- search: free-text search across string attributes of the target type (e.g., "search posts about MobX")',
+      '- limit: number of results for "recent"/"latest" queries, or "none" if no limit',
+      '- For queries unrelated to stored data, set target to "unsupported"',
+      '- Use "none" (the string) instead of null for empty fields',
+      "",
+      "Examples:"
+    ), t.push(...this.generateExamples(e, r)), t.push(
+      "",
+      "Output ONLY the JSON object. No explanation."
+    ), t.join(`
+`);
+  }
+  generateExamples(e, r) {
+    const t = [];
+    let s = !1;
+    for (const o of e) {
+      const a = r.get(o);
+      for (const c of a.relationships) {
+        if (c.kind !== "belongsTo") continue;
+        const l = r.get(c.relatedType);
+        if (!l) continue;
+        const p = l.attributes.find(
+          (f) => f.name === "name" || f.name === "title"
+        );
+        if (p) {
+          t.push(
+            `"show ${o}s by Alice" → {"target":"${o}","filter_type":"${c.relatedType}","filter_attribute":"${p.name}","filter_value":"Alice","through_type":"none","search":"none","limit":"none","confidence":0.9}`
+          ), s = !0;
+          break;
+        }
+      }
+    }
+    for (const o of e) {
+      const c = r.get(o).attributes.find(
+        (l) => l.name === "name"
+      );
+      if (c) {
+        t.push(
+          `"profile of Alice" → {"target":"${o}","filter_type":"${o}","filter_attribute":"${c.name}","filter_value":"Alice","through_type":"none","search":"none","limit":"none","confidence":0.95}`
+        );
+        break;
+      }
+    }
+    if (!s)
+      for (const o of e) {
+        const c = r.get(o).attributes.find(
+          (l) => l.name === "name" || l.name === "title"
+        );
+        if (c) {
+          t.push(
+            `"find ${o} named example" → {"target":"${o}","filter_type":"${o}","filter_attribute":"${c.name}","filter_value":"example","through_type":"none","search":"none","limit":"none","confidence":0.95}`
+          );
+          break;
+        }
+      }
+    const n = e.find((o) => r.get(o).attributes.some(
+      (c) => c.type === "string" && c.name !== "name"
+    ));
+    if (n && t.push(
+      `"search ${n}s about TypeScript" → {"target":"${n}","filter_type":"none","filter_attribute":"none","filter_value":"none","through_type":"none","search":"TypeScript","limit":"none","confidence":0.9}`
+    ), e.length > 0) {
+      const o = e.find((a) => r.get(a).attributes.some(
+        (l) => l.name.toLowerCase().includes("date") || l.name.toLowerCase().includes("at")
+      )) ?? e[0];
+      t.push(
+        `"recent ${o}s" → {"target":"${o}","filter_type":"none","filter_attribute":"none","filter_value":"none","through_type":"none","search":"none","limit":"10","confidence":0.9}`
+      );
+    }
+    const i = this.findMultiHopExample(e, r);
+    return i && t.push(i), t.push(...this.generateTitleFilterExamples(e, r)), t.push(
+      '"what is the weather" → {"target":"unsupported","filter_type":"none","filter_attribute":"none","filter_value":"none","through_type":"none","search":"none","limit":"none","confidence":0.8}'
+    ), t;
+  }
+  findMultiHopExample(e, r) {
+    for (const t of e) {
+      const s = r.get(t);
+      for (const n of s.relationships) {
+        if (n.kind !== "hasMany") continue;
+        const i = r.get(n.relatedType);
+        if (i)
+          for (const o of i.relationships) {
+            if (o.kind !== "hasMany" || o.relatedType === t) continue;
+            const a = o.relatedType;
+            if (s.attributes.find(
+              (l) => l.name === "name"
+            ))
+              return `"${a}s on ${n.relatedType}s by ${t} Alice" → {"target":"${a}","filter_type":"${t}","filter_attribute":"name","filter_value":"Alice","through_type":"${n.relatedType}","search":"none","limit":"none","confidence":0.9}`;
+          }
+      }
+    }
+    return null;
+  }
+  generateTitleFilterExamples(e, r) {
+    const t = [];
+    for (const s of e) {
+      const n = r.get(s);
+      for (const i of n.relationships) {
+        if (i.kind !== "belongsTo") continue;
+        const o = r.get(i.relatedType);
+        if (!o || !o.attributes.find(
+          (p) => p.name === "title"
+        )) continue;
+        const c = s.endsWith("s") ? s : `${s}s`, l = i.relatedType;
+        t.push(
+          `"all ${c} on the Example ${l}" → {"target":"${s}","filter_type":"${l}","filter_attribute":"title","filter_value":"Example","through_type":"none","search":"none","limit":"none","confidence":0.9}`
+        ), t.push(
+          `"${c} for ${l} Weekend" → {"target":"${s}","filter_type":"${l}","filter_attribute":"title","filter_value":"Weekend","through_type":"none","search":"none","limit":"none","confidence":0.9}`
+        );
+        for (const p of n.relationships) {
+          if (p.kind !== "belongsTo" || p.relatedType === l) continue;
+          const f = r.get(p.relatedType);
+          if (!(!f || !f.attributes.find(
+            (m) => m.name === "name" || m.name === "title"
+          ))) {
+            t.push(
+              `"who ${i.name === "post" ? "commented on" : `has ${c} on`} Example" → {"target":"${p.relatedType}","filter_type":"${l}","filter_attribute":"title","filter_value":"Example","through_type":"${s}","search":"none","limit":"none","confidence":0.85}`
+            );
+            break;
+          }
+        }
+        return t;
+      }
+    }
+    return t;
+  }
+  generateJsonSchema(e) {
+    return JSON.stringify({
+      type: "object",
+      properties: {
+        target: {
+          type: "string",
+          enum: [...e, "unsupported"]
+        },
+        filter_type: {
+          type: "string",
+          enum: [...e, "none"]
+        },
+        filter_attribute: {
+          type: "string"
+        },
+        filter_value: {
+          type: "string"
+        },
+        through_type: {
+          type: "string",
+          enum: [...e, "none"]
+        },
+        search: {
+          type: "string"
+        },
+        limit: {
+          type: "string"
+        },
+        confidence: {
+          type: "number"
+        }
+      },
+      required: [
+        "target",
+        "filter_type",
+        "filter_attribute",
+        "filter_value",
+        "through_type",
+        "search",
+        "limit",
+        "confidence"
+      ]
+    });
+  }
+}
+class x extends Error {
+  constructor(e) {
+    super(`Not a data query: "${e}"`), this.name = "NotADataQueryError", this.originalQuery = e;
+  }
+}
+class R {
+  constructor(e, r = "local") {
+    this.introspection = e, this.dataSourceMode = r;
+  }
+  async execute(e, r) {
+    if (e.target === "unsupported")
+      throw new x("");
+    return this.introspection.typeNames.includes(e.target) ? e.filterType && !this.introspection.typeNames.includes(e.filterType) ? {
+      status: "validation_error",
+      message: `Unknown filter type "${e.filterType}".`
+    } : e.search ? this.executeSearch(e, r) : e.filterType ? e.target === e.filterType ? this.executeSelfFilter(e, r) : this.executeTraversal(e, r) : this.executeList(e, r) : {
+      status: "validation_error",
+      message: `Unknown type "${e.target}".`
+    };
+  }
+  async executeSearch(e, r) {
+    const t = await this.resolveRecords(e.target, r), s = e.search.toLowerCase(), n = this.introspection.stringAttributes.get(e.target) ?? [], i = t.filter((a) => {
+      const c = a;
+      for (const l of n) {
+        const p = c[l];
+        if (typeof p == "string" && p.toLowerCase().includes(s))
+          return !0;
+      }
+      return !1;
+    }), o = e.limit ? i.slice(0, e.limit) : i;
+    return {
+      status: "success",
+      data: o,
+      message: o.length > 0 ? `Found ${o.length} ${e.target}(s) matching "${e.search}".` : `No ${e.target}s found matching "${e.search}".`
+    };
+  }
+  async executeList(e, r) {
+    const t = await this.resolveRecords(e.target, r), s = e.limit ?? t.length, n = t.slice(-s).reverse();
+    return {
+      status: "success",
+      data: n,
+      message: n.length > 0 ? `Found ${n.length} ${e.target}(s).` : `No ${e.target}s found.`
+    };
+  }
+  async executeSelfFilter(e, r) {
+    const t = await this.resolveRecords(e.target, r), s = this.findByAttribute(
+      t,
+      e.filterAttribute,
+      e.filterValue
+    );
+    return s ? {
+      status: "success",
+      data: s,
+      message: `Found ${e.target} "${e.filterValue}".`
+    } : {
+      status: "success",
+      data: null,
+      message: `No ${e.target} found matching ${e.filterAttribute} "${e.filterValue}".`
+    };
+  }
+  async executeTraversal(e, r) {
+    const t = await this.resolveRecords(e.filterType, r), s = this.findByAttribute(
+      t,
+      e.filterAttribute,
+      e.filterValue
+    );
+    if (!s)
+      return {
+        status: "success",
+        data: [],
+        message: `No ${e.filterType} found matching ${e.filterAttribute} "${e.filterValue}".`
+      };
+    const n = this.findPath(
+      e.filterType,
+      e.target,
+      e.throughType
+    );
+    if (!n)
+      return {
+        status: "error",
+        message: `No relationship path from ${e.filterType} to ${e.target}.`
+      };
+    let i = [s];
+    for (const c of n) {
+      const l = [];
+      for (const p of i) {
+        const f = this.followRelationship(p, c, r);
+        l.push(...f);
+      }
+      i = this.deduplicateRecords(l);
+    }
+    const o = e.limit ? i.slice(0, e.limit) : i, a = e.filterValue ?? e.filterType;
+    return {
+      status: "success",
+      data: o,
+      message: o.length > 0 ? `Found ${o.length} ${e.target}(s) for ${a}.` : `No ${e.target}s found for ${a}.`
+    };
+  }
+  findByAttribute(e, r, t) {
+    const s = t.toLowerCase();
+    return e.find((n) => {
+      const o = n[r];
+      return typeof o == "string" ? o.toLowerCase() === s : String(o) === t;
+    });
+  }
+  followRelationship(e, r, t) {
+    const s = e, n = s[r.relationshipName];
+    if (Array.isArray(n))
+      return n;
+    if (n && typeof n == "object" && "id" in n)
+      return [n];
+    if (n && typeof n.toArray == "function")
+      return n.toArray();
+    const i = s[`${r.relationshipName}Id`];
+    if (typeof i == "string") {
+      const o = t.peekRecord(r.toType, i);
+      return o ? [o] : [];
+    }
+    return [];
+  }
+  findPath(e, r, t) {
+    const s = this.introspection.relationshipGraph, n = [{ type: e, path: [] }], i = /* @__PURE__ */ new Set([e]), o = [];
+    for (; n.length > 0; ) {
+      const a = n.shift(), c = s.get(a.type) ?? [];
+      for (const l of c) {
+        if (i.has(l.relatedType)) continue;
+        const p = [
+          ...a.path,
+          {
+            fromType: a.type,
+            relationshipName: l.relationshipName,
+            toType: l.relatedType
+          }
+        ];
+        if (l.relatedType === r) {
+          if (!t)
+            return p;
+          o.push(p);
+          continue;
+        }
+        i.add(l.relatedType), n.push({ type: l.relatedType, path: p });
+      }
+    }
+    return t && o.length > 0 ? o.find(
+      (c) => c.some((l) => l.toType === t || l.fromType === t)
+    ) ?? o[0] ?? null : null;
+  }
+  deduplicateRecords(e) {
+    const r = /* @__PURE__ */ new Set();
+    return e.filter((t) => {
+      const s = `${t.modelName}:${t.id}`;
+      return r.has(s) ? !1 : (r.add(s), !0);
+    });
+  }
+  async resolveRecords(e, r) {
+    if (this.dataSourceMode === "server" || this.dataSourceMode === "both")
+      try {
+        await r.findAll(e);
+      } catch {
+      }
+    return r.peekAll(e).toArray();
+  }
+}
+function g(u) {
+  return u.endsWith("s") ? u : u.endsWith("y") ? `${u.slice(0, -1)}ies` : `${u}s`;
+}
+function h(u) {
+  return u.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+class M {
+  constructor(e) {
+    this.rules = this.buildRules(e);
+  }
+  async parse(e) {
+    const r = e.trim();
+    if (r.length === 0)
+      return null;
+    for (const t of this.rules)
+      for (const s of t.patterns) {
+        const n = r.match(s);
+        if (n) {
+          const i = t.buildIntent(n);
+          return {
+            intent: i.target === "unsupported" ? "unsupported" : `generic:${i.target}`,
+            arguments: i,
+            originalQuery: r,
+            confidence: i.confidence
+          };
+        }
+      }
+    return null;
+  }
+  buildRules(e) {
+    const r = [];
+    return r.push(...this.buildMultiHopTraversalRules(e)), r.push(...this.buildWhoTraversalRules(e)), r.push(...this.buildWhoCreatedRules(e)), r.push(...this.buildOnAboutTraversalRules(e)), r.push(...this.buildSelfFilterRules(e)), r.push(...this.buildSingleHopTraversalRules(e)), r.push(...this.buildSearchRules(e)), r.push(...this.buildListRules(e)), r;
+  }
+  buildSelfFilterRules(e) {
+    const r = [];
+    for (const [t, s] of e.types) {
+      const n = this.findNameAttribute(s);
+      if (!n) continue;
+      const i = h(t);
+      r.push({
+        patterns: [
+          new RegExp(
+            `(?:show|get|find|dame|muestra)\\s+(?:el\\s+)?(?:perfil|profile)\\s+(?:of|for|de|del)\\s+(?:${i}\\s+)?(.+)`,
+            "i"
+          ),
+          new RegExp(
+            `(?:perfil|profile)\\s+(?:of|for|de|del)\\s+(?:${i}\\s+)?(.+)`,
+            "i"
+          ),
+          new RegExp(
+            `(?:show|get|find|dame|muestra)\\s+(?:${i})\\s+(\\S+)`,
+            "i"
+          )
+        ],
+        buildIntent: (o) => ({
+          target: t,
+          filterType: t,
+          filterAttribute: n,
+          filterValue: o[1].trim(),
+          throughType: null,
+          search: null,
+          limit: null,
+          confidence: 0.85
+        })
+      });
+    }
+    return r;
+  }
+  buildSingleHopTraversalRules(e) {
+    const r = [];
+    for (const [t, s] of e.types) {
+      const n = g(t), i = `${h(t)}|${h(n)}`;
+      for (const o of s.relationships) {
+        if (o.kind !== "belongsTo") continue;
+        const a = e.types.get(o.relatedType);
+        if (!a) continue;
+        const c = this.findNameAttribute(a);
+        if (!c) continue;
+        const l = o.relatedType, p = g(l), f = `${h(l)}|${h(p)}`;
+        r.push({
+          patterns: [
+            new RegExp(
+              `(?:show|get|find|list|dame|muestra)\\s+(?:todos?\\s+)?(?:los?\\s+)?(?:${i})\\s+(?:by|from|for|of|de|del|por)\\s+(?:(?:${f})\\s+)?(.+)`,
+              "i"
+            ),
+            new RegExp(
+              `(?:${i})\\s+(?:by|from|for|of|de|del|por)\\s+(?:(?:${f})\\s+)?(.+)`,
+              "i"
+            )
+          ],
+          buildIntent: (d) => ({
+            target: t,
+            filterType: l,
+            filterAttribute: c,
+            filterValue: d[1].trim(),
+            throughType: null,
+            search: null,
+            limit: null,
+            confidence: 0.9
+          })
+        });
+      }
+    }
+    return r;
+  }
+  buildMultiHopTraversalRules(e) {
+    const r = [];
+    for (const [t, s] of e.types) {
+      const n = g(t), i = `${h(t)}|${h(n)}`;
+      for (const o of s.relationships) {
+        if (o.kind !== "belongsTo") continue;
+        const a = o.relatedType, c = e.types.get(a);
+        if (!c) continue;
+        const l = g(a), p = `${h(a)}|${h(l)}`;
+        for (const f of c.relationships) {
+          if (f.kind !== "belongsTo") continue;
+          const d = f.relatedType;
+          if (d === t) continue;
+          const m = e.types.get(d);
+          if (!m) continue;
+          const b = this.findNameAttribute(m);
+          b && r.push({
+            patterns: [
+              new RegExp(
+                `(?:show|get|find|list|dame|muestra)\\s+(?:todos?\\s+)?(?:los?\\s+)?(?:${i})\\s+(?:on|in|en|de|del)\\s+(?:los?\\s+)?(?:${p})\\s+(?:by|from|of|de|del|por|hechos?\\s+por)\\s+(.+)`,
+                "i"
+              )
+            ],
+            buildIntent: (E) => ({
+              target: t,
+              filterType: d,
+              filterAttribute: b,
+              filterValue: E[1].trim(),
+              throughType: a,
+              search: null,
+              limit: null,
+              confidence: 0.85
+            })
+          });
+        }
+      }
+    }
+    return r;
+  }
+  buildWhoCreatedRules(e) {
+    const r = [];
+    for (const [t, s] of e.types) {
+      if (!s.attributes.find(
+        (a) => a.name === "title"
+      )) continue;
+      const i = g(t), o = `${h(t)}|${h(i)}`;
+      for (const a of s.relationships) {
+        if (a.kind !== "belongsTo") continue;
+        const c = e.types.get(a.relatedType);
+        !c || !c.attributes.find(
+          (p) => p.name === "name"
+        ) || r.push({
+          patterns: [
+            new RegExp(
+              `who\\s+(?:wrote|created|authored|made)\\s+(?:the\\s+)?(.+?)\\s+(?:${o})\\s*\\??\\s*$`,
+              "i"
+            ),
+            new RegExp(
+              "who\\s+(?:wrote|created|authored|made)\\s+(.+?)\\s*\\??\\s*$",
+              "i"
+            ),
+            new RegExp(
+              `(?:author|creator)\\s+(?:of|de|del)\\s+(?:the\\s+)?(.+?)\\s+(?:${o})\\s*\\??\\s*$`,
+              "i"
+            ),
+            new RegExp(
+              "(?:author|creator)\\s+(?:of|de|del)\\s+(?:the\\s+)?(.+?)\\s*\\??\\s*$",
+              "i"
+            )
+          ],
+          buildIntent: (p) => ({
+            target: a.relatedType,
+            filterType: t,
+            filterAttribute: "title",
+            filterValue: p[1].trim(),
+            throughType: null,
+            search: null,
+            limit: null,
+            confidence: 0.85
+          })
+        });
+      }
+    }
+    return r;
+  }
+  buildOnAboutTraversalRules(e) {
+    const r = [];
+    for (const [t, s] of e.types) {
+      const n = g(t), i = `${h(t)}|${h(n)}`;
+      for (const o of s.relationships) {
+        if (o.kind !== "belongsTo") continue;
+        const a = e.types.get(o.relatedType);
+        if (!a) continue;
+        const c = a.attributes.find(
+          (d) => d.name === "title"
+        );
+        if (!c) continue;
+        const l = o.relatedType, p = g(l), f = `${h(l)}|${h(p)}`;
+        r.push({
+          patterns: [
+            new RegExp(
+              `(?:all\\s+)?(?:${i})\\s+(?:on|about)\\s+(?:the\\s+)?(.+?)\\s+(?:${f})\\s*\\??\\s*$`,
+              "i"
+            ),
+            new RegExp(
+              `(?:all\\s+)?(?:${i})\\s+(?:on|about|for|in)\\s+(?:the\\s+)?(?:(?:${f})\\s+)?(.+?)\\s*\\??\\s*$`,
+              "i"
+            )
+          ],
+          buildIntent: (d) => ({
+            target: t,
+            filterType: l,
+            filterAttribute: c.name,
+            filterValue: d[1].trim(),
+            throughType: null,
+            search: null,
+            limit: null,
+            confidence: 0.85
+          })
+        });
+      }
+    }
+    return r;
+  }
+  buildWhoTraversalRules(e) {
+    const r = [];
+    for (const [t, s] of e.types) {
+      const n = s.relationships.filter(
+        (i) => i.kind === "belongsTo"
+      );
+      if (!(n.length < 2))
+        for (const i of n) {
+          const o = e.types.get(i.relatedType);
+          if (!o) continue;
+          const a = o.attributes.find(
+            (f) => f.name === "title"
+          );
+          if (!a) continue;
+          const c = i.relatedType, l = g(c), p = `${h(c)}|${h(l)}`;
+          for (const f of n) {
+            if (f.relatedType === c) continue;
+            const d = f.relatedType, m = t === "comment" ? "commented|left comments" : `(?:wrote|created|has)\\s+${h(g(t))}`;
+            r.push({
+              patterns: [
+                new RegExp(
+                  `who\\s+(?:${m})\\s+(?:on|about)\\s+(?:the\\s+)?(.+?)\\s+(?:${p})\\s*\\??\\s*$`,
+                  "i"
+                ),
+                new RegExp(
+                  `who\\s+(?:${m})\\s+(?:on|about)\\s+(?:the\\s+)?(.+?)\\s*\\??\\s*$`,
+                  "i"
+                )
+              ],
+              buildIntent: (b) => ({
+                target: d,
+                filterType: c,
+                filterAttribute: a.name,
+                filterValue: b[1].trim(),
+                throughType: t,
+                search: null,
+                limit: null,
+                confidence: 0.85
+              })
+            });
+          }
+        }
+    }
+    return r;
+  }
+  buildSearchRules(e) {
+    const r = [];
+    for (const t of e.typeNames) {
+      const s = g(t), n = `${h(t)}|${h(s)}`;
+      (e.stringAttributes.get(t) ?? []).length !== 0 && r.push({
+        patterns: [
+          new RegExp(
+            `(?:search|find|buscar?)\\s+(?:${n})\\s+(?:about|for|with|containing|sobre|con|que contengan?)\\s+(.+)`,
+            "i"
+          ),
+          new RegExp(
+            `(?:buscar?)\\s+(.+)\\s+(?:en|in)\\s+(?:${n})`,
+            "i"
+          )
+        ],
+        buildIntent: (o) => ({
+          target: t,
+          filterType: null,
+          filterAttribute: null,
+          filterValue: null,
+          throughType: null,
+          search: o[1].trim(),
+          limit: null,
+          confidence: 0.8
+        })
+      });
+    }
+    return r;
+  }
+  buildListRules(e) {
+    const r = [];
+    for (const t of e.typeNames) {
+      const s = g(t), n = `${h(t)}|${h(s)}`;
+      r.push({
+        patterns: [
+          new RegExp(
+            `(?:show|get|list|dame|muestra)\\s+(?:los?\\s+)?(?:\\d+\\s+)?(?:${n})\\s+(?:recientes|recent)`,
+            "i"
+          ),
+          new RegExp(
+            `(?:${n})\\s+(?:recientes|recent)`,
+            "i"
+          ),
+          new RegExp(
+            `(?:recent|latest|last|recientes|últimos?)\\s+(?:(\\d+)\\s+)?(?:${n})`,
+            "i"
+          )
+        ],
+        buildIntent: (i) => {
+          const o = i[1], a = o && /^\d+$/.test(o) ? parseInt(o, 10) : 10;
+          return {
+            target: t,
+            filterType: null,
+            filterAttribute: null,
+            filterValue: null,
+            throughType: null,
+            search: null,
+            limit: a,
+            confidence: 0.85
+          };
+        }
+      });
+    }
+    return r;
+  }
+  findNameAttribute(e) {
+    const r = e.attributes.find(
+      (s) => s.name === "name"
+    );
+    if (r) return r.name;
+    const t = e.attributes.find(
+      (s) => s.name === "title"
+    );
+    return t ? t.name : null;
+  }
+}
+const v = "Qwen3.5-2B-q4f16_1-MLC", k = 0.1, O = 128, S = /* @__PURE__ */ new Set([
+  "get_posts_by_user",
+  "get_user_profile",
+  "get_comments_by_post",
+  "search_posts",
+  "get_recent_posts"
+]), j = [
+  "You are an intent classifier. Given a user query in English or Spanish, output a JSON object with the intent, arguments, and confidence.",
+  "",
+  "Intents:",
+  "- get_posts_by_user: {userName?: string, userId?: string}",
+  "- get_user_profile: {userName?: string, userId?: string}",
+  "- get_comments_by_post: {postId?: string, postTitle?: string}",
+  "- search_posts: {text: string}",
+  "- get_recent_posts: {limit?: number}",
+  "- unsupported: {}",
+  "",
+  "Examples:",
+  '"dame los posts de julian" → {"intent":"get_posts_by_user","arguments":{"userName":"julian"},"confidence":0.95}',
+  '"perfil del usuario maria" → {"intent":"get_user_profile","arguments":{"userName":"maria"},"confidence":0.9}',
+  '"comments for post 123" → {"intent":"get_comments_by_post","arguments":{"postId":"123"},"confidence":0.95}',
+  '"buscar posts sobre timeout" → {"intent":"search_posts","arguments":{"text":"timeout"},"confidence":0.9}',
+  '"show posts by alice" → {"intent":"get_posts_by_user","arguments":{"userName":"alice"},"confidence":0.95}',
+  '"recent posts" → {"intent":"get_recent_posts","arguments":{},"confidence":0.95}',
+  '"últimos 10 posts" → {"intent":"get_recent_posts","arguments":{"limit":10},"confidence":0.9}',
+  '"posts recientes" → {"intent":"get_recent_posts","arguments":{},"confidence":0.9}',
+  '"what is the weather" → {"intent":"unsupported","arguments":{},"confidence":0.8}',
+  "",
+  "Output ONLY the JSON object. No explanation."
+].join(`
+`), z = JSON.stringify({
+  type: "object",
+  properties: {
+    intent: {
+      type: "string",
+      enum: [...S, "unsupported"]
+    },
+    arguments: {
+      type: "object"
+    },
+    confidence: {
+      type: "number"
+    }
+  },
+  required: ["intent", "arguments", "confidence"]
+});
+class $ {
+  constructor(e = {}) {
+    this.engine = null, this.initializationPromise = null, this.modelId = e.modelId ?? v, this.onProgress = e.onProgress, this.temperature = e.temperature ?? k, this.maxTokens = e.maxTokens ?? O, this.customSystemPrompt = e.systemPrompt, this.customJsonSchema = e.jsonSchema, this.validTargets = e.validTargets;
+  }
+  async initialize() {
+    if (!this.engine) {
+      if (this.initializationPromise)
+        return this.initializationPromise;
+      this.initializationPromise = this.loadEngine();
+      try {
+        await this.initializationPromise;
+      } catch (e) {
+        throw this.initializationPromise = null, e;
+      }
+    }
+  }
+  async dispose() {
+    this.engine && (await this.engine.unload(), this.engine = null, this.initializationPromise = null);
+  }
+  get isLoaded() {
+    return this.engine !== null;
+  }
+  get isGenericMode() {
+    return this.validTargets !== void 0;
+  }
+  async parse(e) {
+    var a, c;
+    const r = e.trim();
+    if (r.length === 0)
+      return null;
+    await this.initialize();
+    const t = this.customSystemPrompt ?? j, s = this.customJsonSchema ?? z, n = {
+      stream: !1,
+      messages: [
+        { role: "system", content: t },
+        { role: "user", content: r }
+      ],
+      temperature: this.temperature,
+      max_tokens: this.maxTokens,
+      response_format: {
+        type: "json_object",
+        schema: s
+      }
+    };
+    this.modelId.startsWith("Qwen3-") && (n.extra_body = { enable_thinking: !1 });
+    const o = (c = (a = (await this.engine.chat.completions.create(n)).choices[0]) == null ? void 0 : a.message) == null ? void 0 : c.content;
+    return o ? this.isGenericMode ? this.parseGenericResponse(o, r) : this.parseLegacyResponse(o, r) : null;
+  }
+  parseGenericResponse(e, r) {
+    let t;
+    try {
+      t = JSON.parse(e);
+    } catch {
+      return null;
+    }
+    const s = t.target;
+    if (typeof s != "string")
+      return null;
+    if (s === "unsupported")
+      return {
+        intent: "unsupported",
+        arguments: {
+          target: "unsupported",
+          filterType: null,
+          filterAttribute: null,
+          filterValue: null,
+          throughType: null,
+          search: null,
+          limit: null,
+          confidence: 0.8
+        },
+        originalQuery: r,
+        confidence: 0.8
+      };
+    if (!this.validTargets.has(s))
+      return null;
+    const n = typeof t.confidence == "number" ? Math.max(0, Math.min(1, t.confidence)) : 0.7, i = {
+      target: s,
+      filterType: this.parseNullableString(t.filter_type),
+      filterAttribute: this.parseNullableString(t.filter_attribute),
+      filterValue: this.parseNullableString(t.filter_value),
+      throughType: this.parseNullableString(t.through_type),
+      search: this.parseNullableString(t.search),
+      limit: this.parseNullableNumber(t.limit),
+      confidence: n
+    };
+    return {
+      intent: `generic:${s}`,
+      arguments: i,
+      originalQuery: r,
+      confidence: n
+    };
+  }
+  parseLegacyResponse(e, r) {
+    let t;
+    try {
+      t = JSON.parse(e);
+    } catch {
+      return null;
+    }
+    const s = t.intent;
+    if (typeof s != "string" || s === "unsupported" || !S.has(s))
+      return null;
+    const n = typeof t.arguments == "object" && t.arguments !== null ? t.arguments : {}, i = typeof t.confidence == "number" ? Math.max(0, Math.min(1, t.confidence)) : 0.7;
+    return {
+      intent: s,
+      arguments: n,
+      originalQuery: r,
+      confidence: i
+    };
+  }
+  parseNullableString(e) {
+    return typeof e != "string" || e === "none" || e === "null" || e === "" ? null : e;
+  }
+  parseNullableNumber(e) {
+    if (typeof e == "number") return Math.max(1, Math.min(100, e));
+    if (typeof e != "string" || e === "none" || e === "null" || e === "") return null;
+    const r = parseInt(e, 10);
+    return Number.isNaN(r) ? null : Math.max(1, Math.min(100, r));
+  }
+  async loadEngine() {
+    let e;
+    try {
+      e = await import("@mlc-ai/web-llm");
+    } catch {
+      throw new Error(
+        "@mlc-ai/web-llm is required for WebLlmIntentParser. Install it with: pnpm add @mlc-ai/web-llm"
+      );
+    }
+    this.engine = await e.CreateMLCEngine(this.modelId, {
+      initProgressCallback: this.onProgress
+    });
+  }
+}
+const W = "HuggingFaceTB/SmolLM3-3B-ONNX", C = 0.1, F = 128, V = "/no_think", D = /* @__PURE__ */ new Set([
+  "get_posts_by_user",
+  "get_user_profile",
+  "get_comments_by_post",
+  "get_comments_by_user",
+  "search_posts",
+  "get_recent_posts"
+]), U = [
+  "You are an intent classifier. Given a user query in English or Spanish, output a JSON object with the intent, arguments, and confidence.",
+  "",
+  "Intents:",
+  "- get_posts_by_user: {userName?: string, userId?: string}",
+  "- get_user_profile: {userName?: string, userId?: string}",
+  "- get_comments_by_post: {postId?: string, postTitle?: string}",
+  "- search_posts: {text: string}",
+  "- get_recent_posts: {limit?: number}",
+  "- unsupported: {}",
+  "",
+  "Examples:",
+  '"dame los posts de julian" -> {"intent":"get_posts_by_user","arguments":{"userName":"julian"},"confidence":0.95}',
+  '"perfil del usuario maria" -> {"intent":"get_user_profile","arguments":{"userName":"maria"},"confidence":0.9}',
+  '"comments for post 123" -> {"intent":"get_comments_by_post","arguments":{"postId":"123"},"confidence":0.95}',
+  '"buscar posts sobre timeout" -> {"intent":"search_posts","arguments":{"text":"timeout"},"confidence":0.9}',
+  '"show posts by alice" -> {"intent":"get_posts_by_user","arguments":{"userName":"alice"},"confidence":0.95}',
+  '"recent posts" -> {"intent":"get_recent_posts","arguments":{},"confidence":0.95}',
+  '"ultimos 10 posts" -> {"intent":"get_recent_posts","arguments":{"limit":10},"confidence":0.9}',
+  '"posts recientes" -> {"intent":"get_recent_posts","arguments":{},"confidence":0.9}',
+  '"what is the weather" -> {"intent":"unsupported","arguments":{},"confidence":0.8}',
+  "",
+  "Output ONLY the JSON object. No explanation."
+].join(`
+`);
+class P {
+  constructor(e = {}) {
+    this.generator = null, this.initializationPromise = null, this.modelId = e.modelId ?? W, this.onProgress = e.onProgress, this.temperature = e.temperature ?? C, this.maxTokens = e.maxTokens ?? F, this.customSystemPrompt = e.systemPrompt, this.customJsonSchema = e.jsonSchema, this.validTargets = e.validTargets;
+  }
+  async initialize() {
+    if (!this.generator) {
+      if (this.initializationPromise)
+        return this.initializationPromise;
+      this.initializationPromise = this.loadPipeline();
+      try {
+        await this.initializationPromise;
+      } catch (e) {
+        throw this.initializationPromise = null, e;
+      }
+    }
+  }
+  async dispose() {
+    this.generator && (await this.generator.dispose(), this.generator = null, this.initializationPromise = null);
+  }
+  get isLoaded() {
+    return this.generator !== null;
+  }
+  get isGenericMode() {
+    return this.validTargets !== void 0;
+  }
+  async parse(e) {
+    const r = e.trim();
+    if (r.length === 0)
+      return null;
+    await this.initialize();
+    const s = [
+      { role: "system", content: this.buildSystemPrompt() },
+      { role: "user", content: r }
+    ], n = await this.generator(s, {
+      max_new_tokens: this.maxTokens,
+      temperature: this.temperature,
+      do_sample: this.temperature > 0,
+      return_full_text: !1
+    }), i = this.extractContent(n);
+    return i ? this.isGenericMode ? this.parseGenericResponse(i, r) : this.parseLegacyResponse(i, r) : null;
+  }
+  buildSystemPrompt() {
+    return `${this.customSystemPrompt ?? U}${V}`;
+  }
+  extractContent(e) {
+    var s;
+    if (!Array.isArray(e) || e.length === 0)
+      return null;
+    const r = (s = e[0]) == null ? void 0 : s.generated_text;
+    if (!Array.isArray(r) || r.length === 0)
+      return null;
+    const t = r.find(
+      (n) => n.role === "assistant"
+    );
+    return t != null && t.content ? this.cleanJsonResponse(t.content) : null;
+  }
+  cleanJsonResponse(e) {
+    let r = e.trim();
+    const t = r.match(/```(?:json)?\s*([\s\S]*?)```/);
+    t && (r = t[1].trim());
+    const s = r.match(/\{[\s\S]*\}/);
+    return s ? s[0] : null;
+  }
+  parseGenericResponse(e, r) {
+    let t;
+    try {
+      t = JSON.parse(e);
+    } catch {
+      return null;
+    }
+    const s = t.target;
+    if (typeof s != "string")
+      return null;
+    if (s === "unsupported")
+      return {
+        intent: "unsupported",
+        arguments: {
+          target: "unsupported",
+          filterType: null,
+          filterAttribute: null,
+          filterValue: null,
+          throughType: null,
+          search: null,
+          limit: null,
+          confidence: 0.8
+        },
+        originalQuery: r,
+        confidence: 0.8
+      };
+    if (!this.validTargets.has(s))
+      return null;
+    const n = typeof t.confidence == "number" ? Math.max(0, Math.min(1, t.confidence)) : 0.7, i = {
+      target: s,
+      filterType: this.parseNullableString(t.filter_type),
+      filterAttribute: this.parseNullableString(t.filter_attribute),
+      filterValue: this.parseNullableString(t.filter_value),
+      throughType: this.parseNullableString(t.through_type),
+      search: this.parseNullableString(t.search),
+      limit: this.parseNullableNumber(t.limit),
+      confidence: n
+    };
+    return {
+      intent: `generic:${s}`,
+      arguments: i,
+      originalQuery: r,
+      confidence: n
+    };
+  }
+  parseLegacyResponse(e, r) {
+    let t;
+    try {
+      t = JSON.parse(e);
+    } catch {
+      return null;
+    }
+    const s = t.intent;
+    if (typeof s != "string" || s === "unsupported" || !D.has(s))
+      return null;
+    const n = typeof t.arguments == "object" && t.arguments !== null ? t.arguments : {}, i = typeof t.confidence == "number" ? Math.max(0, Math.min(1, t.confidence)) : 0.7;
+    return {
+      intent: s,
+      arguments: n,
+      originalQuery: r,
+      confidence: i
+    };
+  }
+  parseNullableString(e) {
+    return typeof e != "string" || e === "none" || e === "null" || e === "" ? null : e;
+  }
+  parseNullableNumber(e) {
+    if (typeof e == "number") return Math.max(1, Math.min(100, e));
+    if (typeof e != "string" || e === "none" || e === "null" || e === "") return null;
+    const r = parseInt(e, 10);
+    return Number.isNaN(r) ? null : Math.max(1, Math.min(100, r));
+  }
+  async loadPipeline() {
+    let e;
+    try {
+      e = await import("@huggingface/transformers");
+    } catch {
+      throw new Error(
+        "@huggingface/transformers is required for TransformersJsIntentParser. Install it with: pnpm add @huggingface/transformers"
+      );
+    }
+    const r = {
+      dtype: "q4f16",
+      device: "webgpu"
+    };
+    this.onProgress && (r.progress_callback = (t) => {
+      this.onProgress({
+        progress: typeof t.progress == "number" ? t.progress : 0,
+        status: typeof t.status == "string" ? t.status : "unknown",
+        file: typeof t.file == "string" ? t.file : void 0
+      });
+    }), this.generator = await e.pipeline(
+      "text-generation",
+      this.modelId,
+      r
+    );
+  }
+}
+const q = "Xenova/all-MiniLM-L6-v2", G = 0.3, J = [
+  { name: "filter_by_name", description: "find or show records created by a specific person, filtered by author name" },
+  { name: "filter_by_title", description: "find records related to something identified by its title or name" },
+  { name: "who_created", description: "identify who wrote, created, or authored something" },
+  { name: "who_interacted", description: "identify who commented on, reviewed, or interacted with something" },
+  { name: "multi_hop", description: "find records through a chain of relationships, like comments on posts by someone" },
+  { name: "search", description: "search or find records containing specific text, keywords, or a topic" },
+  { name: "list_recent", description: "list, show, or get recent, latest, newest, or last records" },
+  { name: "profile", description: "get profile, details, or information about a specific person" },
+  { name: "unsupported", description: "general conversation, weather, jokes, math, translations, or anything unrelated to stored data" }
+];
+function T(u) {
+  return u.endsWith("s") ? u : u.endsWith("y") ? `${u.slice(0, -1)}ies` : `${u}s`;
+}
+class B {
+  constructor(e, r = {}) {
+    this.pipeline = null, this.initializationPromise = null, this.categories = [], this.introspection = e, this.modelId = r.modelId ?? q, this.onProgress = r.onProgress, this.similarityThreshold = r.similarityThreshold ?? G;
+  }
+  async initialize() {
+    if (!this.pipeline) {
+      if (this.initializationPromise)
+        return this.initializationPromise;
+      this.initializationPromise = this.loadAndEmbed();
+      try {
+        await this.initializationPromise;
+      } catch (e) {
+        throw this.initializationPromise = null, e;
+      }
+    }
+  }
+  async dispose() {
+    this.pipeline && (await this.pipeline.dispose(), this.pipeline = null, this.initializationPromise = null, this.categories = []);
+  }
+  get isLoaded() {
+    return this.pipeline !== null;
+  }
+  async parse(e) {
+    const r = e.trim();
+    if (r.length === 0) return null;
+    await this.initialize();
+    const t = await this.embed(r), s = this.classifyIntent(t);
+    if (!s || s.score < this.similarityThreshold)
+      return null;
+    if (s.name === "unsupported")
+      return {
+        intent: "unsupported",
+        arguments: {
+          target: "unsupported",
+          filterType: null,
+          filterAttribute: null,
+          filterValue: null,
+          throughType: null,
+          search: null,
+          limit: null,
+          confidence: s.score
+        },
+        originalQuery: r,
+        confidence: s.score
+      };
+    const n = this.resolveIntent(r, s.name);
+    return n ? (n.confidence = s.score, {
+      intent: n.target === "unsupported" ? "unsupported" : `generic:${n.target}`,
+      arguments: n,
+      originalQuery: r,
+      confidence: s.score
+    }) : null;
+  }
+  // ─── Initialization ──────────────────────────────────────────
+  async loadAndEmbed() {
+    let e;
+    try {
+      e = await import("@huggingface/transformers");
+    } catch {
+      throw new Error(
+        "@huggingface/transformers is required for EmbeddingIntentParser. Install it with: pnpm add @huggingface/transformers"
+      );
+    }
+    const r = {};
+    this.onProgress && (r.progress_callback = (t) => {
+      this.onProgress({
+        progress: typeof t.progress == "number" ? t.progress : 0,
+        status: typeof t.status == "string" ? t.status : "unknown",
+        file: typeof t.file == "string" ? t.file : void 0
+      });
+    }), this.pipeline = await e.pipeline(
+      "feature-extraction",
+      this.modelId,
+      r
+    ), this.categories = [];
+    for (const t of J) {
+      const s = await this.embed(t.description);
+      this.categories.push({ ...t, embedding: s });
+    }
+  }
+  async embed(e) {
+    const s = (await this.pipeline(e, {
+      pooling: "mean",
+      normalize: !0
+    })).tolist()[0];
+    if (!s)
+      throw new Error("Embedding produced no output vectors");
+    return s;
+  }
+  // ─── Phase 1: Intent Classification ─────────────────────────
+  classifyIntent(e) {
+    let r = "", t = -1;
+    for (const s of this.categories) {
+      if (!s.embedding) continue;
+      const n = this.dotProduct(e, s.embedding);
+      n > t && (t = n, r = s.name);
+    }
+    return r ? { name: r, score: t } : null;
+  }
+  dotProduct(e, r) {
+    let t = 0;
+    for (let s = 0; s < e.length; s++)
+      t += (e[s] ?? 0) * (r[s] ?? 0);
+    return t;
+  }
+  // ─── Phase 2: Type Resolution + Intent Building ─────────────
+  resolveIntent(e, r) {
+    const t = this.findTypeMentions(e);
+    switch (r) {
+      case "filter_by_name":
+        return this.resolveFilterByName(e, t);
+      case "filter_by_title":
+        return this.resolveFilterByTitle(e, t);
+      case "who_created":
+        return this.resolveWhoCreated(e, t);
+      case "who_interacted":
+        return this.resolveWhoInteracted(e, t);
+      case "multi_hop":
+        return this.resolveMultiHop(e, t);
+      case "search":
+        return this.resolveSearch(e, t);
+      case "list_recent":
+        return this.resolveListRecent(e, t);
+      case "profile":
+        return this.resolveProfile(e, t);
+      default:
+        return null;
+    }
+  }
+  findTypeMentions(e) {
+    const r = e.toLowerCase(), t = [];
+    for (const s of this.introspection.typeNames) {
+      const n = T(s), i = r.indexOf(n.toLowerCase());
+      if (i !== -1) {
+        t.push({ typeName: s, position: i });
+        continue;
+      }
+      const o = r.indexOf(s.toLowerCase());
+      o !== -1 && t.push({ typeName: s, position: o });
+    }
+    return t.sort((s, n) => s.position - n.position), t;
+  }
+  findTypeWithAttribute(e) {
+    for (const [r, t] of this.introspection.types)
+      if (t.attributes.some((s) => s.name === e))
+        return r;
+    return null;
+  }
+  findTypesWithTitleAttribute() {
+    const e = [];
+    for (const [r, t] of this.introspection.types)
+      t.attributes.some((s) => s.name === "title") && e.push(r);
+    return e;
+  }
+  findTypesWithNameAttribute() {
+    const e = [];
+    for (const [r, t] of this.introspection.types)
+      t.attributes.some((s) => s.name === "name") && e.push(r);
+    return e;
+  }
+  findBelongsToType(e, r) {
+    const t = this.introspection.types.get(e);
+    return t ? t.relationships.some(
+      (s) => s.kind === "belongsTo" && s.relatedType === r
+    ) : !1;
+  }
+  findTypeWithBelongsTo(e) {
+    for (const [r, t] of this.introspection.types)
+      if (r !== e) {
+        for (const s of t.relationships)
+          if (s.kind === "belongsTo" && s.relatedType === e)
+            return r;
+      }
+    return null;
+  }
+  // ─── Intent Resolvers ───────────────────────────────────────
+  resolveFilterByName(e, r) {
+    const t = this.findTypesWithNameAttribute();
+    if (t.length === 0) return null;
+    const s = t[0];
+    let n = null;
+    for (const o of r)
+      if (o.typeName !== s) {
+        n = o.typeName;
+        break;
+      }
+    if (n || (n = this.findTypeWithBelongsTo(s) ?? this.introspection.typeNames[0] ?? null), !n) return null;
+    const i = this.extractValueAfterPreposition(e);
+    return {
+      target: n,
+      filterType: s,
+      filterAttribute: "name",
+      filterValue: i,
+      throughType: null,
+      search: null,
+      limit: null,
+      confidence: 0
+    };
+  }
+  resolveFilterByTitle(e, r) {
+    const t = this.findTypesWithTitleAttribute();
+    if (t.length === 0) return null;
+    const s = t[0];
+    let n = null;
+    for (const o of r)
+      if (o.typeName !== s) {
+        n = o.typeName;
+        break;
+      }
+    if (n || (n = this.findTypeWithBelongsTo(s) ?? this.introspection.typeNames[0] ?? null), !n) return null;
+    const i = this.extractTitleValue(e, s);
+    return {
+      target: n,
+      filterType: s,
+      filterAttribute: "title",
+      filterValue: i,
+      throughType: null,
+      search: null,
+      limit: null,
+      confidence: 0
+    };
+  }
+  resolveWhoCreated(e, r) {
+    const t = this.findTypesWithTitleAttribute(), s = this.findTypesWithNameAttribute();
+    if (t.length === 0 || s.length === 0) return null;
+    const n = t[0], i = s[0], o = this.extractCreatedValue(e, n);
+    return {
+      target: i,
+      filterType: n,
+      filterAttribute: "title",
+      filterValue: o,
+      throughType: null,
+      search: null,
+      limit: null,
+      confidence: 0
+    };
+  }
+  resolveWhoInteracted(e, r) {
+    const t = this.findTypesWithTitleAttribute(), s = this.findTypesWithNameAttribute();
+    if (t.length === 0 || s.length === 0) return null;
+    const n = t[0], i = s[0];
+    let o = null;
+    for (const [c, l] of this.introspection.types) {
+      if (c === i || c === n) continue;
+      const p = l.relationships.some(
+        (d) => d.kind === "belongsTo" && d.relatedType === i
+      ), f = l.relationships.some(
+        (d) => d.kind === "belongsTo" && d.relatedType === n
+      );
+      if (p && f) {
+        o = c;
+        break;
+      }
+    }
+    const a = this.extractTitleValue(e, n);
+    return {
+      target: i,
+      filterType: n,
+      filterAttribute: "title",
+      filterValue: a,
+      throughType: o,
+      search: null,
+      limit: null,
+      confidence: 0
+    };
+  }
+  resolveMultiHop(e, r) {
+    const t = this.findTypesWithNameAttribute();
+    if (t.length === 0) return null;
+    const s = t[0];
+    let n = null, i = null;
+    const o = r[0], a = r[1];
+    if (r.length >= 2 && o && a ? (n = o.typeName, i = a.typeName !== n ? a.typeName : null) : o && (n = o.typeName), n || (n = this.introspection.typeNames.find((l) => l !== s) ?? this.introspection.typeNames[0] ?? null), !n) return null;
+    const c = this.extractValueAfterPreposition(e);
+    return {
+      target: n,
+      filterType: s,
+      filterAttribute: "name",
+      filterValue: c,
+      throughType: i,
+      search: null,
+      limit: null,
+      confidence: 0
+    };
+  }
+  resolveSearch(e, r) {
+    const t = r[0], s = t ? t.typeName : this.introspection.typeNames[0];
+    if (!s) return null;
+    const n = this.extractSearchText(e);
+    return {
+      target: s,
+      filterType: null,
+      filterAttribute: null,
+      filterValue: null,
+      throughType: null,
+      search: n,
+      limit: null,
+      confidence: 0
+    };
+  }
+  resolveListRecent(e, r) {
+    const t = r[0], s = t ? t.typeName : this.introspection.typeNames[0];
+    if (!s) return null;
+    const n = this.extractLimit(e);
+    return {
+      target: s,
+      filterType: null,
+      filterAttribute: null,
+      filterValue: null,
+      throughType: null,
+      search: null,
+      limit: n,
+      confidence: 0
+    };
+  }
+  resolveProfile(e, r) {
+    const t = this.findTypesWithNameAttribute();
+    if (t.length === 0) return null;
+    const s = r[0], n = s && t.includes(s.typeName) ? s.typeName : t[0], i = this.extractValueAfterPreposition(e);
+    return {
+      target: n,
+      filterType: n,
+      filterAttribute: "name",
+      filterValue: i,
+      throughType: null,
+      search: null,
+      limit: null,
+      confidence: 0
+    };
+  }
+  // ─── Phase 3: Value Extraction ──────────────────────────────
+  extractValueAfterPreposition(e) {
+    const r = e.replace(/[?!.]+$/, "").trim(), t = /^(.+?)'s\s+/i, s = r.match(t);
+    if (s) return s[1].trim();
+    const n = /(?:by|from|for|of|on|about|de|del|por)\s+(?:the\s+)?(?:(?:user|post|comment|usuario)\s+)?(.+?)\s*$/i, i = r.match(n);
+    return i ? i[1].trim() : null;
+  }
+  extractTitleValue(e, r) {
+    const t = e.replace(/[?!.]+$/, "").trim(), s = T(r), n = new RegExp(
+      `(?:on|about|of)\\s+(?:the\\s+)?(.+?)\\s+(?:${r}|${s})\\s*$`,
+      "i"
+    ), i = t.match(n);
+    if (i) return i[1].trim();
+    const o = /(?:on|about|of|for)\s+(?:the\s+)?(.+?)\s*$/i, a = t.match(o);
+    return a ? a[1].trim() : null;
+  }
+  extractCreatedValue(e, r) {
+    const t = e.replace(/[?!.]+$/, "").trim(), s = T(r), n = new RegExp(
+      `(?:wrote|created|authored|made)\\s+(?:the\\s+)?(.+?)\\s+(?:${r}|${s})\\s*$`,
+      "i"
+    ), i = t.match(n);
+    if (i) return i[1].trim();
+    const o = /(?:wrote|created|authored|made|escribió)\s+(.+?)\s*$/i, a = t.match(o);
+    return a ? a[1].trim() : null;
+  }
+  extractSearchText(e) {
+    const r = /(?:about|for|with|containing|sobre|con)\s+(.+?)\s*$/i, t = e.match(r);
+    if (t) return t[1].trim();
+    const s = /(?:search|find|buscar?)\s+\S+\s+(.+?)\s*$/i, n = e.match(s);
+    return n ? n[1].trim() : null;
+  }
+  extractLimit(e) {
+    const r = /(\d+)/, t = e.match(r);
+    return t ? Math.max(1, Math.min(100, parseInt(t[1], 10))) : 10;
+  }
+}
+class A {
+  constructor(e) {
+    this.parsers = e;
+  }
+  async parse(e) {
+    for (const r of this.parsers)
+      try {
+        const t = await r.parse(e);
+        if (t)
+          return t;
+      } catch {
+        continue;
+      }
+    return null;
+  }
+}
+class _ {
+  constructor(e, r, t, s) {
+    this.parser = e, this.toolRegistry = r, this.executor = null, this.formatter = t, this.store = s;
+  }
+  static createGeneric(e, r, t, s) {
+    const n = Object.create(_.prototype);
+    return Object.assign(n, {
+      parser: e,
+      toolRegistry: null,
+      executor: r,
+      formatter: t,
+      store: s
+    }), n;
+  }
+  async query(e) {
+    if (!e || e.trim().length === 0)
+      return {
+        status: "validation_error",
+        message: "Query cannot be empty."
+      };
+    const r = await this.parser.parse(e);
+    if (!r)
+      return {
+        status: "unsupported",
+        message: "I could not understand your query."
+      };
+    if (this.executor) {
+      const s = r.arguments;
+      if (s.target === "unsupported")
+        throw new x(e);
+      return { ...await this.executor.execute(s, this.store), intent: r.intent, parsedIntent: s };
+    }
+    return { ...await this.toolRegistry.execute(r, this.store), intent: r.intent };
+  }
+  async queryFormatted(e) {
+    const r = await this.query(e), t = this.formatter.format(r);
+    return { result: r, formatted: t };
+  }
+}
+class H {
+  constructor() {
+    this.handlers = {
+      success: (e) => Array.isArray(e.data) ? this.formatArrayResult(e) : e.data && typeof e.data == "object" ? this.formatSingleResult(e) : e.message,
+      not_found: (e) => e.message,
+      unsupported: () => `I don't understand that query. Try something like "show posts by julian" or "recent posts".`,
+      validation_error: (e) => `Invalid query: ${e.message}`,
+      error: (e) => e.error ? `Something went wrong: ${e.error}` : "Something went wrong while processing the query."
+    };
+  }
+  format(e) {
+    const r = this.handlers[e.status];
+    return r ? r(e) : e.message;
+  }
+  formatArrayResult(e) {
+    const r = e.data;
+    if (r.length === 0)
+      return e.message;
+    const t = [e.message, ""];
+    for (const s of r) {
+      const n = s, i = n.title ?? n.name ?? n.body ?? `#${s.id}`;
+      t.push(`  - ${i}`);
+    }
+    return t.join(`
+`);
+  }
+  formatSingleResult(e) {
+    const r = e.data, t = [e.message, ""];
+    for (const [s, n] of Object.entries(r))
+      s.startsWith("_") || typeof n == "function" || n === void 0 || n !== null && typeof n == "object" && !Array.isArray(n) || t.push(`  ${s}: ${String(n)}`);
+    return t.join(`
+`);
+  }
+}
+class te {
+  constructor(e, r = {}) {
+    const s = new L(e.schema).introspect(), n = new R(
+      s,
+      r.dataSourceMode ?? "local"
+    ), i = new H(), o = new M(s), a = new Set(s.typeNames);
+    let c, l = null, p = null, f = null;
+    const d = {
+      ...r.webLlmOptions,
+      systemPrompt: s.systemPrompt,
+      jsonSchema: s.jsonSchema,
+      validTargets: a
+    }, m = {
+      ...r.transformersOptions,
+      systemPrompt: s.systemPrompt,
+      jsonSchema: s.jsonSchema,
+      validTargets: a
+    };
+    r.parserMode === "webllm" ? (l = new $(d), c = l) : r.parserMode === "transformers" ? (p = new P(m), c = p) : r.parserMode === "embedding" ? (f = new B(s, r.embeddingOptions), c = f) : r.parserMode === "cascade" ? (l = new $(d), c = new A([o, l])) : r.parserMode === "cascade-transformers" ? (p = new P(m), c = new A([o, p])) : c = o, this.webLlmParser = l, this.transformersParser = p, this.embeddingParser = f, this.service = _.createGeneric(c, n, i, e);
+  }
+  async query(e) {
+    return this.service.query(e);
+  }
+  async queryFormatted(e) {
+    return this.service.queryFormatted(e);
+  }
+  async initializeWebLlm() {
+    this.webLlmParser && await this.webLlmParser.initialize();
+  }
+  async initializeTransformers() {
+    this.transformersParser && await this.transformersParser.initialize();
+  }
+  async initializeEmbedding() {
+    this.embeddingParser && await this.embeddingParser.initialize();
+  }
+  async initializeModel() {
+    this.embeddingParser ? await this.embeddingParser.initialize() : this.transformersParser ? await this.transformersParser.initialize() : this.webLlmParser && await this.webLlmParser.initialize();
+  }
+  get isWebLlmLoaded() {
+    var e;
+    return ((e = this.webLlmParser) == null ? void 0 : e.isLoaded) ?? !1;
+  }
+  get isTransformersLoaded() {
+    var e;
+    return ((e = this.transformersParser) == null ? void 0 : e.isLoaded) ?? !1;
+  }
+  get isEmbeddingLoaded() {
+    var e;
+    return ((e = this.embeddingParser) == null ? void 0 : e.isLoaded) ?? !1;
+  }
+  get isModelLoaded() {
+    return this.isEmbeddingLoaded || this.isTransformersLoaded || this.isWebLlmLoaded;
+  }
+  async dispose() {
+    this.webLlmParser && await this.webLlmParser.dispose(), this.transformersParser && await this.transformersParser.dispose(), this.embeddingParser && await this.embeddingParser.dispose();
+  }
+}
+const Y = [
+  {
+    intent: "get_posts_by_user",
+    patterns: [
+      /(?:dame|muestra|show|get|find|list)\s+(?:todos?\s+)?(?:los?\s+)?posts?\s+(?:del?\s+|de\s+|from\s+|by\s+|for\s+)(?:usuario?\s+|user\s+)?(\S+)/i,
+      /posts?\s+(?:del?\s+|de\s+|from\s+|by\s+|for\s+)(?:usuario?\s+|user\s+)?(\S+)/i
+    ],
+    extractArguments: (u) => ({ userName: u[1] }),
+    confidence: 0.9
+  },
+  {
+    intent: "get_user_profile",
+    patterns: [
+      /(?:dame|muestra|show|get|find)\s+(?:el\s+)?(?:perfil|profile)\s+(?:del?\s+|de\s+|for\s+|of\s+)(?:usuario?\s+|user\s+)?(\S+)/i,
+      /(?:perfil|profile)\s+(?:del?\s+|de\s+|for\s+|of\s+)(?:usuario?\s+|user\s+)?(\S+)/i,
+      /(?:dame|muestra|show|get|find)\s+(?:usuario?\s+|user\s+)(\S+)/i
+    ],
+    extractArguments: (u) => ({ userName: u[1] }),
+    confidence: 0.85
+  },
+  {
+    intent: "get_comments_by_post",
+    patterns: [
+      /(?:dame|muestra|show|get|find|list)\s+(?:todos?\s+)?(?:los?\s+)?(?:comentarios|comments)\s+(?:del?\s+|de\s+|for\s+|of\s+|from\s+)(?:post\s+)?(\S+)/i,
+      /(?:comentarios|comments)\s+(?:del?\s+|de\s+|for\s+|of\s+|from\s+)(?:post\s+)?(\S+)/i
+    ],
+    extractArguments: (u) => {
+      const e = u[1];
+      return /^\d+$/.test(e) ? { postId: e } : { postTitle: e };
+    },
+    confidence: 0.9
+  },
+  {
+    intent: "search_posts",
+    patterns: [
+      /(?:buscar?|search|find)\s+posts?\s+(?:sobre|about|with|containing)\s+(.+)/i,
+      /(?:buscar?|search)\s+(.+)\s+(?:en|in)\s+posts?/i
+    ],
+    extractArguments: (u) => ({ text: u[1].trim() }),
+    confidence: 0.8
+  },
+  {
+    intent: "get_recent_posts",
+    patterns: [
+      /(?:dame|muestra|show|get|list)\s+(?:los?\s+)?(?:\d+\s+)?(?:posts?\s+)?(?:recientes|recent)/i,
+      /(?:posts?\s+recientes|recent\s+posts?)/i,
+      /(?:últimos?|latest|last)\s+(?:(\d+)\s+)?posts?/i
+    ],
+    extractArguments: (u) => {
+      const e = u[1];
+      return e && /^\d+$/.test(e) ? { limit: parseInt(e, 10) } : {};
+    },
+    confidence: 0.85
+  }
+];
+class re {
+  async parse(e) {
+    const r = e.trim();
+    if (r.length === 0)
+      return null;
+    for (const t of Y)
+      for (const s of t.patterns) {
+        const n = r.match(s);
+        if (n)
+          return {
+            intent: t.intent,
+            arguments: t.extractArguments(n),
+            originalQuery: r,
+            confidence: t.confidence
+          };
+      }
+    return null;
+  }
+}
+class se {
+  async parse(e) {
+    throw new Error(
+      "ModelBackedLocalAiIntentParser is not implemented. Use WebLlmIntentParser for local model-backed parsing, or DeterministicLocalAiIntentParser for regex-based parsing."
+    );
+  }
+}
+class ne {
+  constructor() {
+    this.tools = /* @__PURE__ */ new Map();
+  }
+  register(e) {
+    this.tools.set(e.name, e);
+  }
+  get(e) {
+    return this.tools.get(e);
+  }
+  async execute(e, r) {
+    const t = this.tools.get(e.intent);
+    if (!t)
+      return {
+        status: "error",
+        intent: e.intent,
+        message: `No tool registered for intent "${e.intent}".`
+      };
+    try {
+      return await t.execute(e.arguments, r);
+    } catch (s) {
+      const n = s instanceof Error ? s.message : String(s);
+      return {
+        status: "error",
+        intent: e.intent,
+        message: "An unexpected error occurred while executing the query.",
+        error: n
+      };
+    }
+  }
+}
+const Q = 100, N = 20;
+function w(u) {
+  return {
+    status: "validation_error",
+    message: u
+  };
+}
+function y(u) {
+  return typeof u == "string" && u.trim().length > 0;
+}
+function I(u) {
+  return !y(u.userId) && !y(u.userName) ? w("Either userId or userName must be provided.") : null;
+}
+function X(u) {
+  return !y(u.postId) && !y(u.postTitle) ? w("Either postId or postTitle must be provided.") : null;
+}
+function K(u) {
+  return y(u.text) ? null : w("Search text must be a non-empty string.");
+}
+function Z(u) {
+  const e = u.limit;
+  if (e == null)
+    return N;
+  const r = typeof e == "number" ? e : parseInt(String(e), 10);
+  return Number.isNaN(r) || r < 1 ? N : Math.min(r, Q);
+}
+class ie {
+  constructor() {
+    this.name = "get_posts_by_user";
+  }
+  async execute(e, r) {
+    const t = I(e);
+    if (t)
+      return { ...t, intent: this.name };
+    const s = r.peekAll("user");
+    let n;
+    if (e.userId)
+      n = r.peekRecord("user", e.userId) ?? void 0;
+    else if (e.userName) {
+      const l = e.userName.toLowerCase();
+      n = s.toArray().find((p) => {
+        const f = p.name;
+        return typeof f == "string" && f.toLowerCase() === l;
+      });
+    }
+    if (!n)
+      return {
+        status: "success",
+        intent: this.name,
+        data: [],
+        message: `No user found matching "${e.userId ?? e.userName}".`
+      };
+    const i = n.id, a = r.peekAll("post").toArray().filter((l) => {
+      const p = l.author;
+      return p && p.id === i ? !0 : l.authorId === i;
+    }), c = e.userName ?? e.userId;
+    return {
+      status: "success",
+      intent: this.name,
+      data: a,
+      message: a.length > 0 ? `Found ${a.length} post(s) for ${c}.` : `No posts found for ${c}.`
+    };
+  }
+}
+class oe {
+  constructor() {
+    this.name = "get_user_profile";
+  }
+  async execute(e, r) {
+    const t = I(e);
+    if (t)
+      return { ...t, intent: this.name };
+    let s = null;
+    if (e.userId)
+      s = r.peekRecord("user", e.userId);
+    else if (e.userName) {
+      const n = e.userName.toLowerCase();
+      s = r.peekAll("user").toArray().find((o) => {
+        const a = o.name;
+        return typeof a == "string" && a.toLowerCase() === n;
+      }) ?? null;
+    }
+    return s ? {
+      status: "success",
+      intent: this.name,
+      data: s,
+      message: `Found profile for ${s.name ?? s.id}.`
+    } : {
+      status: "not_found",
+      intent: this.name,
+      message: `No user found matching "${e.userId ?? e.userName}".`
+    };
+  }
+}
+class ae {
+  constructor() {
+    this.name = "get_comments_by_post";
+  }
+  async execute(e, r) {
+    const t = X(e);
+    if (t)
+      return { ...t, intent: this.name };
+    let s = null;
+    if (e.postId)
+      s = r.peekRecord("post", e.postId);
+    else if (e.postTitle) {
+      const c = e.postTitle.toLowerCase();
+      s = r.peekAll("post").toArray().find((p) => {
+        const f = p.title;
+        return typeof f == "string" && f.toLowerCase().includes(c);
+      }) ?? null;
+    }
+    if (!s)
+      return {
+        status: "success",
+        intent: this.name,
+        data: [],
+        message: `No post found matching "${e.postId ?? e.postTitle}".`
+      };
+    const n = s.id, o = r.peekAll("comment").toArray().filter((c) => {
+      const l = c.post;
+      return l && l.id === n ? !0 : c.postId === n;
+    }), a = e.postTitle ?? e.postId;
+    return {
+      status: "success",
+      intent: this.name,
+      data: o,
+      message: o.length > 0 ? `Found ${o.length} comment(s) for post "${a}".` : `No comments found for post "${a}".`
+    };
+  }
+}
+const ee = ["title", "body", "content", "description", "tags"];
+class le {
+  constructor() {
+    this.name = "search_posts";
+  }
+  async execute(e, r) {
+    const t = K(e);
+    if (t)
+      return { ...t, intent: this.name };
+    const s = e.text.toLowerCase(), i = r.peekAll("post").toArray().filter((o) => {
+      const a = o;
+      for (const c of ee) {
+        const l = a[c];
+        if (typeof l == "string" && l.toLowerCase().includes(s) || Array.isArray(l) && l.some(
+          (f) => typeof f == "string" && f.toLowerCase().includes(s)
+        ))
+          return !0;
+      }
+      return !1;
+    });
+    return {
+      status: "success",
+      intent: this.name,
+      data: i,
+      message: i.length > 0 ? `Found ${i.length} post(s) matching "${e.text}".` : `No posts found matching "${e.text}".`
+    };
+  }
+}
+class ce {
+  constructor() {
+    this.name = "get_recent_posts";
+  }
+  async execute(e, r) {
+    const t = Z(e), n = r.peekAll("post").toArray().slice(-t).reverse();
+    return {
+      status: "success",
+      intent: this.name,
+      data: n,
+      message: n.length > 0 ? `Found ${n.length} recent post(s).` : "No posts found."
+    };
+  }
+}
+export {
+  A as CascadeLocalAiIntentParser,
+  re as DeterministicLocalAiIntentParser,
+  M as DeterministicSchemaIntentParser,
+  B as EmbeddingIntentParser,
+  R as GenericQueryExecutor,
+  ae as GetCommentsByPostTool,
+  ie as GetPostsByUserTool,
+  ce as GetRecentPostsTool,
+  oe as GetUserProfileTool,
+  _ as LocalAiQueryService,
+  H as LocalAiResultFormatter,
+  te as LocalAiSchemaQueryService,
+  ne as LocalAiToolRegistry,
+  se as ModelBackedLocalAiIntentParser,
+  x as NotADataQueryError,
+  L as SchemaIntrospector,
+  le as SearchPostsTool,
+  P as TransformersJsIntentParser,
+  $ as WebLlmIntentParser,
+  Z as normalizeLimit,
+  X as validatePostArguments,
+  K as validateSearchArguments,
+  I as validateUserArguments
+};
+//# sourceMappingURL=index.js.map
