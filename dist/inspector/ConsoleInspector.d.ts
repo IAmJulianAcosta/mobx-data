@@ -33,7 +33,7 @@ export declare class ConsoleInspector {
     snapshot(): unknown;
     observe(): () => void;
     raw(): StoreInspector;
-    command(input: string): unknown;
+    command(input?: string): unknown;
     help(): void;
     private isQueryCommand;
     private resolveModelCommand;

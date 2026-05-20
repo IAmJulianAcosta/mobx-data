@@ -8,7 +8,7 @@ let storeCounter = 0;
 declare global {
   interface Window {
     $mobxData?: ConsoleInspector;
-    $m?: (input: string) => unknown;
+    $m?: (input?: string) => unknown;
   }
 }
 
@@ -19,7 +19,7 @@ export function enableConsoleInspector(
   const inspector = new ConsoleInspector(store, name);
   if (typeof window !== 'undefined') {
     window.$mobxData = inspector;
-    window.$m = (input: string) => inspector.command(input);
+    window.$m = (input?: string) => inspector.command(input ?? 'summary');
   }
   return inspector;
 }

@@ -192,8 +192,8 @@ export class ConsoleInspector {
     return this.inspector;
   }
 
-  command(input: string): unknown {
-    const trimmed = input.trim();
+  command(input?: string): unknown {
+    const trimmed = (input ?? 'summary').trim();
 
     if (this.isQueryCommand(trimmed)) {
       const result = this.query(trimmed);

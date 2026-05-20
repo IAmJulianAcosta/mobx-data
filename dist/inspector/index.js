@@ -496,7 +496,7 @@ class P {
   }
   command(e) {
     var o;
-    const s = e.trim();
+    const s = (e ?? "summary").trim();
     if (this.isQueryCommand(s)) {
       const i = this.query(s);
       return i.show(), i;
@@ -868,7 +868,7 @@ class W {
 let g = null, M = 0;
 function K(a, e = "default") {
   const s = new P(a, e);
-  return typeof window < "u" && (window.$mobxData = s, window.$m = (t) => s.command(t)), s;
+  return typeof window < "u" && (window.$mobxData = s, window.$m = (t) => s.command(t ?? "summary")), s;
 }
 function F(a, e) {
   if (typeof window > "u")
