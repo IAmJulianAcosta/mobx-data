@@ -52,10 +52,39 @@ export interface RelationshipOptions {
 export type AttributeDefinitionsMap = Map<string, AttributeDef>;
 /** Relationship definitions keyed by property name. */
 export type RelationshipDefinitionsMap = Map<string, RelationshipDef>;
+/** Constructor type accepted by the discriminator map. */
+export interface ModelConstructor {
+    new (...args: never[]): unknown;
+    modelName?: string;
+    prototype: unknown;
+}
+/** Discriminator configuration for polymorphic model hierarchies. */
+export interface DiscriminatorDef {
+    /** Payload field that identifies the concrete type (defaults to `"type"`). */
+    key: string;
+    /** Maps discriminator values to lazy model constructor references. */
+    map: Record<string, () => ModelConstructor>;
+}
+/** Options accepted by the `@model` class decorator. */
+export interface ModelOptions {
+    /** Registered model name. */
+    name?: string;
+    /** When `true`, the model cannot be instantiated directly. */
+    abstract?: boolean;
+    /** Discriminator configuration for selecting concrete subclass at deserialization. */
+    discriminator?: {
+        /** Payload field that identifies the concrete type (defaults to `"type"`). */
+        key?: string;
+        /** Maps discriminator values to lazy model constructor references. */
+        map: Record<string, () => ModelConstructor>;
+    };
+}
 /** Reflect-metadata key used to store attribute definitions on a prototype. */
 export declare const ATTRIBUTES_META_KEY: unique symbol;
 /** Reflect-metadata key used to store relationship definitions on a prototype. */
 export declare const RELATIONSHIPS_META_KEY: unique symbol;
 /** Reflect-metadata key used to store the registered model name on a class. */
 export declare const MODEL_NAME_META_KEY: unique symbol;
+/** Reflect-metadata key used to store `@model` options on a class constructor. */
+export declare const MODEL_OPTIONS_META_KEY: unique symbol;
 //# sourceMappingURL=types.d.ts.map

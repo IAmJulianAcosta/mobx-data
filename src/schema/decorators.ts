@@ -14,8 +14,10 @@ import 'reflect-metadata';
 import {
   ATTRIBUTES_META_KEY,
   RELATIONSHIPS_META_KEY,
+  MODEL_OPTIONS_META_KEY,
   type AttributeDef,
   type AttributeOptions,
+  type ModelOptions,
   type RelationshipDef,
   type RelationshipOptions,
 } from './types.js';
@@ -159,4 +161,31 @@ export function hasMany(
   options: RelationshipOptions = {},
 ): PropertyDecorator {
   return makeRelationship('hasMany', type, options);
+}
+
+/**
+ * Class decorator that attaches model options (name, abstract, discriminator)
+ * as reflect-metadata on the constructor.  `SchemaService.registerModel` reads
+ * this metadata at registration time.
+ *
+ * @example
+ * ```ts
+ * @model({
+ *   name: 'vehicle',
+ *   abstract: true,
+ *   discriminator: {
+ *     key: 'type',
+ *     map: { car: () => Car, motorcycle: () => Motorcycle },
+ *   },
+ * })
+ * abstract class Vehicle extends Model { … }
+ * ```
+ */
+export function model(options: ModelOptions = {}): ClassDecorator {
+  return (target) => {
+    if (options.name) {
+      (target as unknown as { modelName: string }).modelName = options.name;
+    }
+    Reflect.defineMetadata(MODEL_OPTIONS_META_KEY, options, target);
+  };
 }

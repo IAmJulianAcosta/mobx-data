@@ -19,6 +19,7 @@
  * hook (`normalizeFindRecordResponse`, etc.) when a subclass overrides them.
  * If no override exists it falls through to `_buildDocument`.
  */
+import 'reflect-metadata';
 import { Serializer, type ModelClassMeta, type NormalizeRequestType, type NormalizedDocument, type NormalizedResource, type SerializerSnapshot } from './Serializer.js';
 export declare class JsonSerializer extends Serializer {
     static dispatchMethodName(requestType: NormalizeRequestType): keyof Serializer | null;

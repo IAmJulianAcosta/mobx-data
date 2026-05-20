@@ -302,6 +302,27 @@ export abstract class Serializer {
   }
 
   /**
+   * Extracts all non-id, non-relationship fields from a raw payload.
+   * Used for polymorphic models where the concrete child may have attributes
+   * not declared on the abstract parent.
+   */
+  extractAllAttributes(
+    modelClass: ModelClassMeta,
+    resourceHash: Record<string, unknown>,
+  ): Record<string, unknown> {
+    const relationshipKeys = new Set<string>();
+    for (const [name] of modelClass.relationships) {
+      relationshipKeys.add(this.keyForRelationship(name));
+    }
+    const attributes: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(resourceHash)) {
+      if (key === this.primaryKey || relationshipKeys.has(key)) continue;
+      attributes[key] = value;
+    }
+    return attributes;
+  }
+
+  /**
    * Extracts relationship references from a raw resource hash.
    *
    * - `belongsTo`: raw id (string or number) → `{ data: { type, id } }`

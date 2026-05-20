@@ -10,7 +10,7 @@
  * merge inherited definitions.
  */
 import 'reflect-metadata';
-import { type AttributeOptions, type RelationshipOptions } from './types.js';
+import { type AttributeOptions, type ModelOptions, type RelationshipOptions } from './types.js';
 /**
  * Marks a class property as a serializable attribute.
  *
@@ -47,4 +47,23 @@ export declare function belongsTo(type: string, options?: RelationshipOptions): 
  * ```
  */
 export declare function hasMany(type: string, options?: RelationshipOptions): PropertyDecorator;
+/**
+ * Class decorator that attaches model options (name, abstract, discriminator)
+ * as reflect-metadata on the constructor.  `SchemaService.registerModel` reads
+ * this metadata at registration time.
+ *
+ * @example
+ * ```ts
+ * @model({
+ *   name: 'vehicle',
+ *   abstract: true,
+ *   discriminator: {
+ *     key: 'type',
+ *     map: { car: () => Car, motorcycle: () => Motorcycle },
+ *   },
+ * })
+ * abstract class Vehicle extends Model { … }
+ * ```
+ */
+export declare function model(options?: ModelOptions): ClassDecorator;
 //# sourceMappingURL=decorators.d.ts.map

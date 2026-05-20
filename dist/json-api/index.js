@@ -1,4 +1,4 @@
-import { J as e, a as i } from "../JsonApiSerializer-BLoE046A.js";
+import { J as e, a as i } from "../JsonApiSerializer-BuaiBqGM.js";
 export {
   e as JsonApiAdapter,
   i as JsonApiSerializer

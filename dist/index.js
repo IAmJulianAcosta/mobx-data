@@ -1,32 +1,32 @@
-import { A as S, M as _, R as b } from "./types-C9NB2gRj.js";
-import { a as E, b as R, h as M } from "./decorators-Zr35qr6A.js";
-import { S as w } from "./SchemaService-DZwkFgZu.js";
-import { A as q, a as L, E as N, M as g, b as D, S as H, c as K } from "./relationships-BEXANmWg.js";
-import { a as B, A as I, I as F, M as J, b as z, c as Y, d as k, O as V, R as v, S as C } from "./Store-BAN_4IWi.js";
-import { A as $, R as Q } from "./RestAdapter-D6bGIHZT.js";
-import { M as W } from "./MemoryAdapter-Bp-BGHH3.js";
-import { S as Z } from "./Serializer-FxJbsZ50.js";
-import { E as te, J as se, R as ae } from "./EmbeddedRecordsMixin-VoHluHCT.js";
-import { B as oe, a as ne, D as ce, N as ie, S as de } from "./date-Bj4O2W1F.js";
-import { C as ue, F as pe, R as he } from "./CacheHandler-BhfbVHed.js";
-import { J as Ae, a as fe } from "./JsonApiSerializer-BLoE046A.js";
+import { A as _, M as y, a as E, R as b } from "./types-CC2fG3FP.js";
+import { a as R, b as M, h as P, m as w } from "./decorators-CKneHgoF.js";
+import { S as q } from "./SchemaService-BOy3SIWh.js";
+import { A as N, a as g, E as D, M as K, b as H, S as I, c as j } from "./relationships-DcHr9Q3b.js";
+import { a as F, A as J, I as Y, M as z, b as k, c as V, d as v, O as C, R as U, S as $ } from "./Store-BC3Tsy-Z.js";
+import { A as G, R as W } from "./RestAdapter-D6bGIHZT.js";
+import { M as Z } from "./MemoryAdapter-Bp-BGHH3.js";
+import { S as te } from "./Serializer-Ca6w_QNQ.js";
+import { E as se, J as re, R as oe } from "./EmbeddedRecordsMixin-DlfjZ0nK.js";
+import { B as ce, a as ie, D as de, N as le, S as ue } from "./date-Bj4O2W1F.js";
+import { C as me, F as he, R as Ae } from "./CacheHandler-BhfbVHed.js";
+import { J as fe, a as Se } from "./JsonApiSerializer-BuaiBqGM.js";
 import { O as ye } from "./ODataAdapter-RQUjVTcf.js";
-import { R as _e, a as be, e as xe, p as Ee } from "./cache-utils-B2wFhisx.js";
-const o = "cache-entries", h = 1, m = 36e5;
+import { R as be, a as xe, e as Re, p as Me } from "./cache-utils-B2wFhisx.js";
+const o = "cache-entries", m = 1, h = 36e5;
 class l {
   constructor(e = {}) {
-    this._database = null, this._openPromise = null, this._databaseName = e.databaseName ?? "mobx-data-cache", this._defaultTTL = e.defaultTTL ?? m;
+    this._database = null, this._openPromise = null, this._databaseName = e.databaseName ?? "mobx-data-cache", this._defaultTTL = e.defaultTTL ?? h;
   }
   get defaultTTL() {
     return this._defaultTTL;
   }
   async open() {
-    return this._database ? this._database : this._openPromise ? this._openPromise : (this._openPromise = new Promise((e, s) => {
-      const t = indexedDB.open(this._databaseName, h);
+    return this._database ? this._database : this._openPromise ? this._openPromise : (this._openPromise = new Promise((e, a) => {
+      const t = indexedDB.open(this._databaseName, m);
       t.onupgradeneeded = () => {
-        const a = t.result;
-        if (!a.objectStoreNames.contains(o)) {
-          const n = a.createObjectStore(o, {
+        const s = t.result;
+        if (!s.objectStoreNames.contains(o)) {
+          const n = s.createObjectStore(o, {
             keyPath: "key"
           });
           n.createIndex("modelName", "modelName", { unique: !1 }), n.createIndex("expiresAt", "expiresAt", { unique: !1 });
@@ -34,38 +34,38 @@ class l {
       }, t.onsuccess = () => {
         this._database = t.result, e(this._database);
       }, t.onerror = () => {
-        this._openPromise = null, s(t.error);
+        this._openPromise = null, a(t.error);
       };
     }), this._openPromise);
   }
-  static cacheKey(e, s) {
-    return `${e}:${s}`;
+  static cacheKey(e, a) {
+    return `${e}:${a}`;
   }
-  async get(e, s) {
+  async get(e, a) {
     const t = await this.open();
-    return new Promise((a, n) => {
-      const r = t.transaction(o, "readonly").objectStore(o).get(l.cacheKey(e, s));
+    return new Promise((s, n) => {
+      const r = t.transaction(o, "readonly").objectStore(o).get(l.cacheKey(e, a));
       r.onsuccess = () => {
         const c = r.result;
         if (!c) {
-          a(null);
+          s(null);
           return;
         }
         if (Date.now() > c.expiresAt) {
-          this.invalidate(e, s), a(null);
+          this.invalidate(e, a), s(null);
           return;
         }
-        a(c);
+        s(c);
       }, r.onerror = () => n(r.error);
     });
   }
-  async set(e, s, t, a = {}) {
-    const n = await this.open(), d = Date.now(), i = a.ttl ?? this._defaultTTL, r = {
-      key: l.cacheKey(e, s),
+  async set(e, a, t, s = {}) {
+    const n = await this.open(), d = Date.now(), i = s.ttl ?? this._defaultTTL, r = {
+      key: l.cacheKey(e, a),
       modelName: e,
-      id: s,
+      id: a,
       attributes: t,
-      relationships: a.relationships,
+      relationships: s.relationships,
       cachedAt: d,
       expiresAt: d + i
     };
@@ -74,27 +74,27 @@ class l {
       u.onsuccess = () => c(), u.onerror = () => p(u.error);
     });
   }
-  async has(e, s) {
-    return await this.get(e, s) !== null;
+  async has(e, a) {
+    return await this.get(e, a) !== null;
   }
-  async invalidate(e, s) {
+  async invalidate(e, a) {
     const t = await this.open();
-    return new Promise((a, n) => {
-      const r = t.transaction(o, "readwrite").objectStore(o).delete(l.cacheKey(e, s));
-      r.onsuccess = () => a(), r.onerror = () => n(r.error);
+    return new Promise((s, n) => {
+      const r = t.transaction(o, "readwrite").objectStore(o).delete(l.cacheKey(e, a));
+      r.onsuccess = () => s(), r.onerror = () => n(r.error);
     });
   }
   async invalidateAll(e) {
-    const s = await this.open();
-    return e ? new Promise((t, a) => {
-      const r = s.transaction(o, "readwrite").objectStore(o).index("modelName").openCursor(IDBKeyRange.only(e));
+    const a = await this.open();
+    return e ? new Promise((t, s) => {
+      const r = a.transaction(o, "readwrite").objectStore(o).index("modelName").openCursor(IDBKeyRange.only(e));
       r.onsuccess = () => {
         const c = r.result;
         c ? (c.delete(), c.continue()) : t();
-      }, r.onerror = () => a(r.error);
-    }) : new Promise((t, a) => {
-      const i = s.transaction(o, "readwrite").objectStore(o).clear();
-      i.onsuccess = () => t(), i.onerror = () => a(i.error);
+      }, r.onerror = () => s(r.error);
+    }) : new Promise((t, s) => {
+      const i = a.transaction(o, "readwrite").objectStore(o).clear();
+      i.onsuccess = () => t(), i.onerror = () => s(i.error);
     });
   }
   async close() {
@@ -102,52 +102,54 @@ class l {
   }
 }
 export {
-  B as ALL_OPERATORS,
-  S as ATTRIBUTES_META_KEY,
-  $ as Adapter,
-  I as AdapterPopulatedRecordArray,
-  q as AsyncBelongsTo,
-  L as AsyncHasMany,
-  oe as BaseTransform,
-  ne as BooleanTransform,
-  ue as CacheHandler,
-  ce as DateTransform,
-  te as EmbeddedRecordsMixin,
-  N as Errors,
-  pe as FetchHandler,
-  F as IdentityMap,
+  F as ALL_OPERATORS,
+  _ as ATTRIBUTES_META_KEY,
+  G as Adapter,
+  J as AdapterPopulatedRecordArray,
+  N as AsyncBelongsTo,
+  g as AsyncHasMany,
+  ce as BaseTransform,
+  ie as BooleanTransform,
+  me as CacheHandler,
+  de as DateTransform,
+  se as EmbeddedRecordsMixin,
+  D as Errors,
+  he as FetchHandler,
+  Y as IdentityMap,
   l as IndexedDBCache,
-  Ae as JsonApiAdapter,
-  fe as JsonApiSerializer,
-  se as JsonSerializer,
-  _ as MODEL_NAME_META_KEY,
-  g as ManyArray,
-  J as MdqlMemoryExecutor,
-  z as MdqlQueryBuilder,
-  Y as MdqlValidationException,
-  k as MdqlValidator,
-  W as MemoryAdapter,
-  D as Model,
-  ie as NumberTransform,
+  fe as JsonApiAdapter,
+  Se as JsonApiSerializer,
+  re as JsonSerializer,
+  y as MODEL_NAME_META_KEY,
+  E as MODEL_OPTIONS_META_KEY,
+  K as ManyArray,
+  z as MdqlMemoryExecutor,
+  k as MdqlQueryBuilder,
+  V as MdqlValidationException,
+  v as MdqlValidator,
+  Z as MemoryAdapter,
+  H as Model,
+  le as NumberTransform,
   ye as ODataAdapter,
-  V as OPERATORS_FOR_TYPE,
+  C as OPERATORS_FOR_TYPE,
   b as RELATIONSHIPS_META_KEY,
-  _e as RESPONSE_HEADERS,
-  v as RecordArray,
-  he as RequestManager,
-  Q as RestAdapter,
-  ae as RestSerializer,
-  w as SchemaService,
-  Z as Serializer,
-  H as Snapshot,
-  K as StateMachine,
-  C as Store,
-  de as StringTransform,
-  be as attachResponseHeaders,
-  E as attr,
-  R as belongsTo,
-  xe as extractResponseHeaders,
-  M as hasMany,
-  Ee as parseCacheTTLFromHeaders
+  be as RESPONSE_HEADERS,
+  U as RecordArray,
+  Ae as RequestManager,
+  W as RestAdapter,
+  oe as RestSerializer,
+  q as SchemaService,
+  te as Serializer,
+  I as Snapshot,
+  j as StateMachine,
+  $ as Store,
+  ue as StringTransform,
+  xe as attachResponseHeaders,
+  R as attr,
+  M as belongsTo,
+  Re as extractResponseHeaders,
+  P as hasMany,
+  w as model,
+  Me as parseCacheTTLFromHeaders
 };
 //# sourceMappingURL=index.js.map

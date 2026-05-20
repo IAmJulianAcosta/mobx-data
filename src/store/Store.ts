@@ -329,7 +329,17 @@ export class Store implements ModelStoreLike {
     if (key === null) {
       return null;
     }
-    return (this.identityMap.get(modelName, key) as T | null) ?? null;
+    const direct = this.identityMap.get(modelName, key) as T | null;
+    if (direct) return direct;
+
+    const root = this.schema.polymorphicRootFor(modelName);
+    if (root) {
+      const record = this.identityMap.get(root, key);
+      if (record && record instanceof (this.schema.modelFor(modelName) as unknown as abstract new (...args: never[]) => Model)) {
+        return record as T;
+      }
+    }
+    return null;
   }
 
   /**
@@ -432,7 +442,25 @@ export class Store implements ModelStoreLike {
     if (id === null) {
       throw new Error(`Cannot push a resource of type "${type}" without an id`);
     }
-    const existing = this.identityMap.get(type, id);
+
+    let bucketType = type;
+    let modelClass = this.schema.modelFor(type);
+
+    const resolved = this.schema.resolveConcreteModel(
+      type,
+      resource.attributes ?? {},
+    );
+    if (resolved) {
+      modelClass = resolved.modelClass;
+      bucketType = type;
+    }
+
+    const polymorphicRoot = this.schema.polymorphicRootFor(type);
+    if (polymorphicRoot) {
+      bucketType = polymorphicRoot;
+    }
+
+    const existing = this.identityMap.get(bucketType, id);
     if (existing) {
       runInAction(() => {
         (existing as unknown as {
@@ -446,7 +474,7 @@ export class Store implements ModelStoreLike {
       this.trackInverseForResource(existing, resource);
       return existing;
     }
-    const Klass = this.schema.modelFor(type) as unknown as new (
+    const Klass = modelClass as unknown as new (
       opts: {
         id: string;
         data: Record<string, unknown>;
@@ -460,7 +488,7 @@ export class Store implements ModelStoreLike {
       relationships: resource.relationships,
       store: this,
     }) as Model;
-    this.identityMap.set(type, id, record);
+    this.identityMap.set(bucketType, id, record);
     this.trackInverseForResource(record, resource);
     return record;
   }

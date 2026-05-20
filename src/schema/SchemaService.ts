@@ -16,8 +16,11 @@ import { singleton } from 'tsyringe';
 import {
   ATTRIBUTES_META_KEY,
   RELATIONSHIPS_META_KEY,
+  MODEL_OPTIONS_META_KEY,
   type AttributeDef,
   type AttributeDefinitionsMap,
+  type DiscriminatorDef,
+  type ModelOptions,
   type RelationshipDef,
   type RelationshipDefinitionsMap,
 } from './types.js';
@@ -36,6 +39,12 @@ interface Entry {
   attributes: AttributeDefinitionsMap;
   /** Merged relationship definitions (ancestors → leaf, leaf wins). */
   relationships: RelationshipDefinitionsMap;
+  /** When `true`, the model is abstract and cannot be instantiated directly. */
+  abstract?: boolean;
+  /** Discriminator configuration for polymorphic hierarchies. */
+  discriminator?: DiscriminatorDef;
+  /** Model name of the polymorphic root when this is a concrete child. */
+  polymorphicRoot?: string;
 }
 
 /**
@@ -87,7 +96,43 @@ export class SchemaService {
       modelClass.prototype as object,
       RELATIONSHIPS_META_KEY,
     );
-    this.entries.set(modelName, { modelClass, attributes, relationships });
+    const entry: Entry = { modelClass, attributes, relationships };
+
+    const options = Reflect.getOwnMetadata(MODEL_OPTIONS_META_KEY, modelClass) as
+      | ModelOptions
+      | undefined;
+    if (options?.abstract) {
+      entry.abstract = true;
+    }
+    if (options?.discriminator) {
+      entry.discriminator = {
+        key: options.discriminator.key ?? 'type',
+        map: options.discriminator.map,
+      };
+    }
+
+    this.entries.set(modelName, entry);
+    this.linkPolymorphicChild(modelName, modelClass);
+  }
+
+  /**
+   * After registering a model, checks whether any already-registered
+   * polymorphic parent lists this model in its discriminator map and, if so,
+   * stores the `polymorphicRoot` back-link.
+   */
+  private linkPolymorphicChild(childName: string, childClass: ModelClass): void {
+    for (const [parentName, parentEntry] of this.entries) {
+      if (!parentEntry.discriminator || parentName === childName) continue;
+      for (const factory of Object.values(parentEntry.discriminator.map)) {
+        if (factory() === childClass) {
+          const childEntry = this.entries.get(childName);
+          if (childEntry) {
+            childEntry.polymorphicRoot = parentName;
+          }
+          return;
+        }
+      }
+    }
   }
 
   /**
@@ -100,6 +145,11 @@ export class SchemaService {
       throw new Error(`No model registered for type "${modelName}"`);
     }
     return entry.modelClass;
+  }
+
+  /** Returns all registered model names. */
+  registeredNames(): string[] {
+    return Array.from(this.entries.keys());
   }
 
   /** Returns `true` when a model class has been registered for `modelName`. */
@@ -157,5 +207,67 @@ export class SchemaService {
     for (const [name, meta] of relationships) {
       callback(name, meta);
     }
+  }
+
+  /**
+   * Returns the discriminator definition for `modelName`, or `undefined`
+   * when the model is not polymorphic.
+   */
+  discriminatorFor(modelName: string): DiscriminatorDef | undefined {
+    return this.entries.get(modelName)?.discriminator;
+  }
+
+  /**
+   * Returns the polymorphic root model name for a concrete child, or `null`
+   * when `modelName` is not part of a polymorphic hierarchy.
+   */
+  polymorphicRootFor(modelName: string): string | null {
+    return this.entries.get(modelName)?.polymorphicRoot ?? null;
+  }
+
+  /**
+   * Returns `true` when `modelName` is declared abstract.
+   */
+  isAbstract(modelName: string): boolean {
+    return this.entries.get(modelName)?.abstract === true;
+  }
+
+  /**
+   * Resolves the concrete model class for a polymorphic parent given a raw
+   * payload.  Reads the discriminator key from the payload and returns the
+   * resolved model name and class.
+   *
+   * @throws when the discriminator key is missing from the payload.
+   * @throws when the discriminator value is not in the map.
+   * @returns `null` when `modelName` has no discriminator (not polymorphic).
+   */
+  resolveConcreteModel(
+    modelName: string,
+    payload: Record<string, unknown>,
+  ): { modelName: string; modelClass: ModelClass } | null {
+    const entry = this.entries.get(modelName);
+    if (!entry?.discriminator) return null;
+
+    const { key, map } = entry.discriminator;
+    const discriminatorValue = payload[key];
+    if (discriminatorValue === undefined || discriminatorValue === null) {
+      throw new Error(
+        `Missing discriminator key "${key}" in payload for polymorphic model "${modelName}".`,
+      );
+    }
+
+    const valueString = String(discriminatorValue);
+    const factory = map[valueString];
+    if (!factory) {
+      const knownValues = Object.keys(map).join(', ');
+      throw new Error(
+        `Unknown discriminator value "${valueString}" for model "${modelName}" `
+        + `(key: "${key}"). Known values: ${knownValues}.`,
+      );
+    }
+
+    const concreteClass = factory() as ModelClass;
+    const concreteName = concreteClass.modelName ?? valueString;
+    return { modelName: concreteName, modelClass: concreteClass };
   }
 }

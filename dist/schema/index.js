@@ -1,13 +1,15 @@
-import { A as s, M as o, R as r } from "../types-C9NB2gRj.js";
-import { a as e, b as A, h as M } from "../decorators-Zr35qr6A.js";
-import { S } from "../SchemaService-DZwkFgZu.js";
+import { A as s, M as T, a as _, R as o } from "../types-CC2fG3FP.js";
+import { a as e, b as r, h as A, m as S } from "../decorators-CKneHgoF.js";
+import { S as t } from "../SchemaService-BOy3SIWh.js";
 export {
   s as ATTRIBUTES_META_KEY,
-  o as MODEL_NAME_META_KEY,
-  r as RELATIONSHIPS_META_KEY,
-  S as SchemaService,
+  T as MODEL_NAME_META_KEY,
+  _ as MODEL_OPTIONS_META_KEY,
+  o as RELATIONSHIPS_META_KEY,
+  t as SchemaService,
   e as attr,
-  A as belongsTo,
-  M as hasMany
+  r as belongsTo,
+  A as hasMany,
+  S as model
 };
 //# sourceMappingURL=index.js.map

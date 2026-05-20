@@ -20,7 +20,9 @@
  * If no override exists it falls through to `_buildDocument`.
  */
 
+import 'reflect-metadata';
 import { injectable } from 'tsyringe';
+import { MODEL_OPTIONS_META_KEY, type ModelOptions } from '../schema/types.js';
 import {
   Serializer,
   type ModelClassMeta,
@@ -73,7 +75,15 @@ export class JsonSerializer extends Serializer {
     }
     const hash = payload as Record<string, unknown>;
     const id = this.extractId(modelClass, hash);
-    const attributes = this.extractAttributes(modelClass, hash);
+
+    const modelOptions = Reflect.getOwnMetadata(
+      MODEL_OPTIONS_META_KEY,
+      modelClass,
+    ) as ModelOptions | undefined;
+    const attributes = modelOptions?.discriminator
+      ? this.extractAllAttributes(modelClass, hash)
+      : this.extractAttributes(modelClass, hash);
+
     const relationships = this.extractRelationships(modelClass, hash);
 
     const resource: NormalizedResource = {

@@ -169,6 +169,12 @@ export declare abstract class Serializer {
      */
     extractAttributes(modelClass: ModelClassMeta, resourceHash: Record<string, unknown>): Record<string, unknown>;
     /**
+     * Extracts all non-id, non-relationship fields from a raw payload.
+     * Used for polymorphic models where the concrete child may have attributes
+     * not declared on the abstract parent.
+     */
+    extractAllAttributes(modelClass: ModelClassMeta, resourceHash: Record<string, unknown>): Record<string, unknown>;
+    /**
      * Extracts relationship references from a raw resource hash.
      *
      * - `belongsTo`: raw id (string or number) → `{ data: { type, id } }`
