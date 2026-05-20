@@ -35,12 +35,12 @@ const L = /* @__PURE__ */ new Set([
   startswith: "startsWith",
   endswith: "endsWith"
 }, $ = /* @__PURE__ */ new Set(["=", "!", "<", ">", "~", "^", "$"]);
-class b {
+class k {
   static parse(e) {
-    return new b(e).parseQuery();
+    return new k(e).parseQuery();
   }
   constructor(e) {
-    this.tokens = b.tokenize(e), this.position = 0;
+    this.tokens = k.tokenize(e), this.position = 0;
   }
   static tokenize(e) {
     const s = [];
@@ -138,7 +138,7 @@ class b {
     return s.length === 1 && e.kind !== "condition" ? e : { kind: t, children: s };
   }
   parseCondition() {
-    var o, i, l, h, p, u;
+    var o, i, l, h, p, d;
     if (this.matchKeyword("not"))
       return { kind: "not", children: [this.parseCondition()] };
     const e = this.advance();
@@ -151,7 +151,7 @@ class b {
       const f = this.parseArray();
       return { kind: "condition", field: s, operator: "in", value: f };
     }
-    if (((p = this.peek()) == null ? void 0 : p.type) === "keyword" && ((u = this.peek()) == null ? void 0 : u.value) === "between") {
+    if (((p = this.peek()) == null ? void 0 : p.type) === "keyword" && ((d = this.peek()) == null ? void 0 : d.value) === "between") {
       this.advance();
       const f = this.parseValue(), _ = this.parseValue();
       return { kind: "condition", field: s, operator: "between", value: [f, _] };
@@ -198,7 +198,7 @@ class b {
     throw new Error(`Unexpected value token: ${e.type}:${e.value}`);
   }
   parseArray() {
-    var s, t, r, n, o, i, l, h, p, u, f;
+    var s, t, r, n, o, i, l, h, p, d, f;
     const e = [];
     if (((s = this.peek()) == null ? void 0 : s.type) === "bracket" && ((t = this.peek()) == null ? void 0 : t.value) === "[") {
       for (this.advance(); this.peek() && !(((r = this.peek()) == null ? void 0 : r.type) === "bracket" && ((n = this.peek()) == null ? void 0 : n.value) === "]"); ) {
@@ -211,7 +211,7 @@ class b {
       ((l = this.peek()) == null ? void 0 : l.type) === "bracket" && ((h = this.peek()) == null ? void 0 : h.value) === "]" && this.advance();
     } else
       for (; this.peek() && ((p = this.peek()) == null ? void 0 : p.type) !== "keyword"; ) {
-        if (((u = this.peek()) == null ? void 0 : u.type) === "bracket" && ((f = this.peek()) == null ? void 0 : f.value) === ",") {
+        if (((d = this.peek()) == null ? void 0 : d.type) === "bracket" && ((f = this.peek()) == null ? void 0 : f.value) === ",") {
           this.advance();
           continue;
         }
@@ -284,7 +284,7 @@ function I(a, e) {
     relationships: o
   };
 }
-class q {
+class x {
   constructor(e) {
     this.store = e;
   }
@@ -323,11 +323,11 @@ class q {
     return this.store.schema.registeredNames().sort();
   }
   query(e) {
-    const s = b.parse(e), t = this.store.peekAll(s.modelName).toArray();
+    const s = k.parse(e), t = this.store.peekAll(s.modelName).toArray();
     return D.executeMany(t, s);
   }
   queryWithMeta(e) {
-    const s = b.parse(e), t = this.store.peekAll(s.modelName).toArray();
+    const s = k.parse(e), t = this.store.peekAll(s.modelName).toArray();
     return {
       modelName: s.modelName,
       results: D.executeMany(t, s)
@@ -382,12 +382,12 @@ class q {
     }
   }
 }
-const m = "color: #2196f3; font-weight: bold", d = "color: #ff9800; font-weight: bold", w = "color: #f44336; font-weight: bold", v = "color: #4caf50", c = "color: inherit";
-function k(a) {
+const m = "color: #2196f3; font-weight: bold", u = "color: #ff9800; font-weight: bold", w = "color: #f44336; font-weight: bold", v = "color: #4caf50", c = "color: inherit";
+function b(a) {
   return a.isError ? "ERROR" : a.isSaving ? "SAVING" : a.isNew ? "NEW" : a.isDirty ? "DIRTY" : a.isDeleted ? "DELETED" : a.isLoading ? "LOADING" : "SAVED";
 }
 function j(a) {
-  return a.isError || a.hasErrors ? w : a.isDirty || a.isNew ? d : v;
+  return a.isError || a.hasErrors ? w : a.isDirty || a.isNew ? u : v;
 }
 const A = /* @__PURE__ */ new Set(["show", "toJSON", "inspect", "summary"]);
 function V(a, e) {
@@ -417,7 +417,7 @@ function V(a, e) {
 }
 class P {
   constructor(e, s = "default") {
-    this.inspector = new q(e), this.storeName = s;
+    this.inspector = new x(e), this.storeName = s;
   }
   summary() {
     const e = this.inspector.summary(), s = this;
@@ -477,7 +477,7 @@ class P {
     const e = this.inspector.types(), s = this, t = [...e];
     return t.show = () => {
       const r = s.inspector.summary(), n = new Map(r.types.map((o) => [o.modelName, o.count]));
-      console.log(`%c[mobx-data] Registered types (${e.length})`, m);
+      console.log(`%cRegistered types (${e.length})`, m);
       for (const o of e)
         console.log(`  ${o} (${n.get(o) ?? 0})`);
     }, t;
@@ -486,9 +486,9 @@ class P {
     return this.inspector.snapshot();
   }
   observe() {
-    return console.log("%c[mobx-data] Live observation started. Call the returned function to stop.", m), this.inspector.observe((e) => {
-      const s = e.type === "removed" ? w : e.type === "added" ? v : d, t = e.type.toUpperCase(), r = e.id ?? "(new)", n = e.record ? ` [${k(e.record)}]` : "";
-      console.log(`%c[mobx-data] %c${t}%c ${e.modelName}:${r}${n}`, m, s, c);
+    return console.log("%cLive observation started. Call the returned function to stop.", m), this.inspector.observe((e) => {
+      const s = e.type === "removed" ? w : e.type === "added" ? v : u, t = e.type.toUpperCase(), r = e.id ?? "(new)", n = e.record ? ` [${b(e.record)}]` : "";
+      console.log(`%c${t}%c ${e.modelName}:${r}${n}`, s, c);
     });
   }
   raw() {
@@ -538,7 +538,7 @@ class P {
           const i = this.schema(n);
           return i.show(), i;
         }
-        console.log("%c[mobx-data] Usage: schema <type>", w);
+        console.log("%cUsage: schema <type>", w);
         return;
       case "snap":
       case "snapshot":
@@ -551,7 +551,7 @@ class P {
     }
   }
   help() {
-    console.log("%c[mobx-data] CLI commands:", m), console.log(
+    console.log("%cCLI commands:", m), console.log(
       `
   %c$m('help')%c                          Show this help
   %c$m('summary')%c                       Overview of all types and counts
@@ -568,33 +568,33 @@ class P {
   %c$m('snapshot')%c                      Full store snapshot
   %c$m('watch')%c                         Live change logging (returns stop fn)
 `,
-      d,
+      u,
       c,
-      d,
+      u,
       c,
-      d,
+      u,
       c,
-      d,
+      u,
       c,
-      d,
+      u,
       c,
-      d,
+      u,
       c,
-      d,
+      u,
       c,
-      d,
+      u,
       c,
-      d,
+      u,
       c,
-      d,
+      u,
       c,
-      d,
+      u,
       c,
-      d,
+      u,
       c,
-      d,
+      u,
       c,
-      d,
+      u,
       c
     ), console.log("%c  Operators: = != > >= < <= ~ (contains) ^= (startsWith) $= (endsWith) in between is null", v), console.log("%c  All methods return live objects. Use .show() to render, [0] for refs.", v), console.log("%c  Shortcuts: s=summary, t=types, d=dirty, e=errored, h=help", v);
   }
@@ -607,7 +607,7 @@ class P {
     if (r) {
       if (s) {
         const o = this.record(r, s);
-        return o ? o.show() : console.log(`%c[mobx-data] ${r}:${s} not found`, w), o;
+        return o ? o.show() : console.log(`%c${r}:${s} not found`, w), o;
       }
       const n = this.records(r);
       return n.show(), n;
@@ -616,7 +616,7 @@ class P {
       const n = this.summary();
       return n.show(), n;
     }
-    console.log(`%c[mobx-data] Unknown command: "${e}". Try $m('help')`, w);
+    console.log(`%cUnknown command: "${e}". Try $m('help')`, w);
   }
   wrapModel(e) {
     return V(e, (s) => {
@@ -629,7 +629,7 @@ class P {
     return r.show = s, r.toJSON = () => t.map((n) => n.toJSON()), r;
   }
   renderSummary(e) {
-    if (console.log(`%c[mobx-data] Store "${this.storeName}" — ${e.totalRecords} records`, m), e.types.length === 0) {
+    if (console.log(`%cStore "${this.storeName}" — ${e.totalRecords} records`, m), e.types.length === 0) {
       console.log("  (empty)");
       return;
     }
@@ -638,14 +638,14 @@ class P {
     );
   }
   renderRecords(e, s) {
-    if (console.log(`%c[mobx-data] ${e} — ${s.length} records`, m), s.length === 0) {
+    if (console.log(`%c${e} — ${s.length} records`, m), s.length === 0) {
       console.log("  (none)");
       return;
     }
     console.table(
       s.map((t) => ({
         id: t.id ?? t.clientId,
-        state: k(t),
+        state: b(t),
         isDirty: t.isDirty,
         isNew: t.isNew,
         isSaving: t.isSaving,
@@ -654,8 +654,8 @@ class P {
     );
   }
   renderRecordDetail(e, s, t) {
-    const r = k(t), n = j(t);
-    console.groupCollapsed(`%c[mobx-data] %c${e}:${s}%c — %c${r}%c (${t.currentState})`, m, c, c, n, c), console.groupCollapsed("Attributes");
+    const r = b(t), n = j(t);
+    console.groupCollapsed(`%c${e}:${s}%c — %c${r}%c (${t.currentState})`, m, c, n, c), console.groupCollapsed("Attributes");
     const o = new Set(Object.keys(t.changedAttributes)), i = {};
     for (const [l, h] of Object.entries(t.attributes))
       i[l] = {
@@ -668,11 +668,11 @@ class P {
       for (const [l, h] of Object.entries(t.relationships)) {
         const p = h == null ? void 0 : h.data;
         if (Array.isArray(p)) {
-          const u = p.map((f) => `${f.type}:${f.id}`);
-          console.log(`  ${l} → [${u.join(", ")}]`);
+          const d = p.map((f) => `${f.type}:${f.id}`);
+          console.log(`  ${l} → [${d.join(", ")}]`);
         } else if (p && typeof p == "object") {
-          const u = p;
-          console.log(`  ${l} → ${u.type}:${u.id}`);
+          const d = p;
+          console.log(`  ${l} → ${d.type}:${d.id}`);
         } else
           console.log(`  ${l} → null`);
       }
@@ -687,7 +687,7 @@ class P {
     console.groupEnd();
   }
   renderSchema(e, s) {
-    console.log(`%c[mobx-data] Schema: ${e}${s.isAbstract ? " (abstract)" : ""}`, m), s.discriminator && console.log(`  Discriminator key: ${s.discriminator.key}`), s.attributes.length > 0 && (console.log("%cAttributes:", m), console.table(
+    console.log(`%cSchema: ${e}${s.isAbstract ? " (abstract)" : ""}`, m), s.discriminator && console.log(`  Discriminator key: ${s.discriminator.key}`), s.attributes.length > 0 && (console.log("%cAttributes:", m), console.table(
       s.attributes.map((t) => ({ name: t.name, type: t.type ?? "(untyped)" }))
     )), s.relationships.length > 0 && (console.log("%cRelationships:", m), console.table(
       s.relationships.map((t) => ({
@@ -700,7 +700,7 @@ class P {
     ));
   }
   renderFilteredRecords(e, s) {
-    if (console.log(`%c[mobx-data] ${e} — ${s.length} total`, m), s.length === 0) {
+    if (console.log(`%c${e} — ${s.length} total`, m), s.length === 0) {
       console.log("  (none)");
       return;
     }
@@ -708,7 +708,7 @@ class P {
       s.map((t) => ({
         type: t.modelName,
         id: t.id ?? t.clientId,
-        state: k(t),
+        state: b(t),
         isDirty: t.isDirty,
         isNew: t.isNew,
         hasErrors: t.hasErrors
@@ -716,7 +716,7 @@ class P {
     );
   }
 }
-const T = "__MOBX_DATA_DEVTOOLS_HOOK__", x = "mobx-data-devtools", O = "1.4.0";
+const T = "__MOBX_DATA_DEVTOOLS_HOOK__", O = "mobx-data-devtools", M = "1.4.0";
 function N() {
   return typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : {};
 }
@@ -731,7 +731,7 @@ class W {
   install() {
     const e = N(), s = {
       stores: this.stores,
-      version: O,
+      version: M,
       registerStore: (r, n) => this.registerStore(r, n),
       unregisterStore: (r) => this.unregisterStore(r)
     };
@@ -745,11 +745,11 @@ class W {
     t != null && t.addEventListener && (this.messageHandler = (r) => {
       var o, i, l;
       const n = r;
-      n.origin && typeof location < "u" && n.origin !== location.origin || ((o = n.data) == null ? void 0 : o.source) !== x || ((i = n.data) == null ? void 0 : i.direction) !== "panel-to-page" || this.isValidPayload((l = n.data) == null ? void 0 : l.payload) && this.handleMessage(n);
+      n.origin && typeof location < "u" && n.origin !== location.origin || ((o = n.data) == null ? void 0 : o.source) !== O || ((i = n.data) == null ? void 0 : i.direction) !== "panel-to-page" || this.isValidPayload((l = n.data) == null ? void 0 : l.payload) && this.handleMessage(n);
     }, t.addEventListener("message", this.messageHandler));
   }
   registerStore(e, s) {
-    const t = new q(s);
+    const t = new x(s);
     this.stores.set(e, t);
     const r = t.observe((n) => {
       this.sendToPanel({
@@ -762,7 +762,7 @@ class W {
       type: "init",
       storeId: e,
       storeCount: this.stores.size,
-      version: O
+      version: M
     });
   }
   unregisterStore(e) {
@@ -828,7 +828,7 @@ class W {
         if (!r || !("queryText" in s)) return;
         const n = s.queryText;
         try {
-          const { modelName: o, results: i } = r.queryWithMeta(n), l = r.records(o), h = new Map(l.map((u) => [u.id, u])), p = i.map((u) => h.get(u.id)).filter(Boolean);
+          const { modelName: o, results: i } = r.queryWithMeta(n), l = r.records(o), h = new Map(l.map((d) => [d.id, d])), p = i.map((d) => h.get(d.id)).filter(Boolean);
           this.sendToPanel({
             type: "queryResult",
             storeId: t,
@@ -858,24 +858,24 @@ class W {
     const s = R();
     if (!(s != null && s.postMessage)) return;
     const t = {
-      source: x,
+      source: O,
       direction: "page-to-panel",
       payload: e
     }, r = typeof location < "u" ? location.origin : "*";
     s.postMessage(t, r);
   }
 }
-let g = null, M = 0;
+let g = null, q = 0;
 function K(a, e = "default") {
   const s = new P(a, e);
-  return typeof window < "u" && (window.$mobxData = s, window.$m = (t) => s.command(t ?? "summary")), s;
+  return typeof window < "u" && (window.$mobxData = s, window.$m = (t) => (s.command(t ?? "summary"), s)), s;
 }
 function F(a, e) {
   if (typeof window > "u")
     return () => {
     };
-  g || (g = new W(), g.install()), M += 1;
-  const s = e ?? `store-${M}`;
+  g || (g = new W(), g.install()), q += 1;
+  const s = e ?? `store-${q}`;
   return g.registerStore(s, a), () => {
     g == null || g.unregisterStore(s);
   };
@@ -887,8 +887,8 @@ function B(a, e = "default") {
 export {
   P as ConsoleInspector,
   W as DevToolsBridge,
-  b as QueryParser,
-  q as StoreInspector,
+  k as QueryParser,
+  x as StoreInspector,
   K as enableConsoleInspector,
   F as enableDevTools,
   B as enableInspector

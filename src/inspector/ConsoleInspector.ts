@@ -163,7 +163,7 @@ export class ConsoleInspector {
     result.show = () => {
       const summaryData = self.inspector.summary();
       const countMap = new Map(summaryData.types.map((t) => [t.modelName, t.count]));
-      console.log(`%c[mobx-data] Registered types (${names.length})`, STYLE_HEADER);
+      console.log(`%cRegistered types (${names.length})`, STYLE_HEADER);
       for (const name of names) {
         console.log(`  ${name} (${countMap.get(name) ?? 0})`);
       }
@@ -176,7 +176,7 @@ export class ConsoleInspector {
   }
 
   observe(): () => void {
-    console.log('%c[mobx-data] Live observation started. Call the returned function to stop.', STYLE_HEADER);
+    console.log('%cLive observation started. Call the returned function to stop.', STYLE_HEADER);
     return this.inspector.observe((event) => {
       const style = event.type === 'removed' ? STYLE_ERROR
         : event.type === 'added' ? STYLE_SAVED
@@ -184,7 +184,7 @@ export class ConsoleInspector {
       const label = event.type.toUpperCase();
       const identifier = event.id ?? '(new)';
       const stateInfo = event.record ? ` [${stateLabel(event.record)}]` : '';
-      console.log(`%c[mobx-data] %c${label}%c ${event.modelName}:${identifier}${stateInfo}`, STYLE_HEADER, style, STYLE_RESET);
+      console.log(`%c${label}%c ${event.modelName}:${identifier}${stateInfo}`, style, STYLE_RESET);
     });
   }
 
@@ -240,7 +240,7 @@ export class ConsoleInspector {
           result.show();
           return result;
         }
-        console.log('%c[mobx-data] Usage: schema <type>', STYLE_ERROR);
+        console.log('%cUsage: schema <type>', STYLE_ERROR);
         return undefined;
       case 'snap': case 'snapshot':
         return this.snapshot();
@@ -252,7 +252,7 @@ export class ConsoleInspector {
   }
 
   help(): void {
-    console.log(`%c[mobx-data] CLI commands:`, STYLE_HEADER);
+    console.log(`%cCLI commands:`, STYLE_HEADER);
     console.log(`
   %c$m('help')%c                          Show this help
   %c$m('summary')%c                       Overview of all types and counts
@@ -310,7 +310,7 @@ export class ConsoleInspector {
         if (result) {
           result.show();
         } else {
-          console.log(`%c[mobx-data] ${resolvedType}:${argument1} not found`, STYLE_ERROR);
+          console.log(`%c${resolvedType}:${argument1} not found`, STYLE_ERROR);
         }
         return result;
       }
@@ -325,7 +325,7 @@ export class ConsoleInspector {
       return result;
     }
 
-    console.log(`%c[mobx-data] Unknown command: "${cmd}". Try $m('help')`, STYLE_ERROR);
+    console.log(`%cUnknown command: "${cmd}". Try $m('help')`, STYLE_ERROR);
     return undefined;
   }
 
@@ -345,7 +345,7 @@ export class ConsoleInspector {
   }
 
   private renderSummary(data: StoreSummary): void {
-    console.log(`%c[mobx-data] Store "${this.storeName}" — ${data.totalRecords} records`, STYLE_HEADER);
+    console.log(`%cStore "${this.storeName}" — ${data.totalRecords} records`, STYLE_HEADER);
     if (data.types.length === 0) {
       console.log('  (empty)');
       return;
@@ -359,7 +359,7 @@ export class ConsoleInspector {
   }
 
   private renderRecords(label: string, data: RecordSummary[]): void {
-    console.log(`%c[mobx-data] ${label} — ${data.length} records`, STYLE_HEADER);
+    console.log(`%c${label} — ${data.length} records`, STYLE_HEADER);
     if (data.length === 0) {
       console.log('  (none)');
       return;
@@ -379,7 +379,7 @@ export class ConsoleInspector {
   private renderRecordDetail(modelName: string, id: string, data: RecordDetail): void {
     const label = stateLabel(data);
     const style = stateStyle(data);
-    console.groupCollapsed(`%c[mobx-data] %c${modelName}:${id}%c — %c${label}%c (${data.currentState})`, STYLE_HEADER, STYLE_RESET, STYLE_RESET, style, STYLE_RESET);
+    console.groupCollapsed(`%c${modelName}:${id}%c — %c${label}%c (${data.currentState})`, STYLE_HEADER, STYLE_RESET, style, STYLE_RESET);
 
     console.groupCollapsed('Attributes');
     const changedKeys = new Set(Object.keys(data.changedAttributes));
@@ -423,7 +423,7 @@ export class ConsoleInspector {
   }
 
   private renderSchema(modelName: string, data: SchemaInfo): void {
-    console.log(`%c[mobx-data] Schema: ${modelName}${data.isAbstract ? ' (abstract)' : ''}`, STYLE_HEADER);
+    console.log(`%cSchema: ${modelName}${data.isAbstract ? ' (abstract)' : ''}`, STYLE_HEADER);
 
     if (data.discriminator) {
       console.log(`  Discriminator key: ${data.discriminator.key}`);
@@ -451,7 +451,7 @@ export class ConsoleInspector {
   }
 
   private renderFilteredRecords(label: string, data: RecordSummary[]): void {
-    console.log(`%c[mobx-data] ${label} — ${data.length} total`, STYLE_HEADER);
+    console.log(`%c${label} — ${data.length} total`, STYLE_HEADER);
     if (data.length === 0) {
       console.log('  (none)');
       return;

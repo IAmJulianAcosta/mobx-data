@@ -3,7 +3,7 @@ import { ConsoleInspector } from './ConsoleInspector.js';
 declare global {
     interface Window {
         $mobxData?: ConsoleInspector;
-        $m?: (input?: string) => unknown;
+        $m?: (input?: string) => ConsoleInspector;
     }
 }
 export declare function enableConsoleInspector(store: Store, name?: string): ConsoleInspector;
