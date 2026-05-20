@@ -1,10 +1,10 @@
 import { injectable as u } from "tsyringe";
 import h from "pluralize";
 import { R as l, c as p } from "./RestAdapter-DYUoyV5h.js";
-var y = Object.getOwnPropertyDescriptor, m = (t, r, e, s) => {
-  for (var o = s > 1 ? void 0 : s ? y(r, e) : r, n = t.length - 1, a; n >= 0; n--)
-    (a = t[n]) && (o = a(o) || o);
-  return o;
+var y = Object.getOwnPropertyDescriptor, _ = (t, r, e, o) => {
+  for (var s = o > 1 ? void 0 : o ? y(r, e) : r, n = t.length - 1, a; n >= 0; n--)
+    (a = t[n]) && (s = a(s) || s);
+  return s;
 };
 const d = /* @__PURE__ */ new Set([
   "$filter",
@@ -73,15 +73,15 @@ let i = class extends l {
    * Builds a `$filter=id eq X or id eq Y` expression so only one HTTP round-trip
    * is needed regardless of how many ids are requested.
    */
-  async findMany(t, r, e, s) {
-    const o = this.buildURL(r, e, s, "findMany"), n = e.map((c) => `id eq ${this.encodeKey(c)}`).join(" or "), a = `${o}?${this._toQueryString({ $filter: n })}`;
+  async findMany(t, r, e, o) {
+    const s = this.buildURL(r, e, o, "findMany"), n = e.map((c) => `id eq ${this.encodeKey(c)}`).join(" or "), a = `${s}?${this._toQueryString({ $filter: n })}`;
     return this._fetchJSON(a, {
       method: "GET",
       headers: this.defaultHeaders()
     });
   }
   async query(t, r, e) {
-    const s = this.buildURL(r, null, null, "query", e), o = this._normalizeQuery(e), n = `${s}${this._appendQuery(o)}`;
+    const o = this.buildURL(r, null, null, "query", e), s = this._normalizeQuery(e), n = `${o}${this._appendQuery(s)}`;
     return this._fetchJSON(n, {
       method: "GET",
       headers: this.defaultHeaders()
@@ -92,7 +92,7 @@ let i = class extends l {
    * The caller is responsible for picking the first element from the returned `value` array.
    */
   async queryRecord(t, r, e) {
-    const s = this.buildURL(r, null, null, "queryRecord", e), o = { ...this._normalizeQuery(e), $top: 1 }, n = `${s}${this._appendQuery(o)}`;
+    const o = this.buildURL(r, null, null, "queryRecord", e), s = { ...this._normalizeQuery(e), $top: 1 }, n = `${o}${this._appendQuery(s)}`;
     return this._fetchJSON(n, {
       method: "GET",
       headers: this.defaultHeaders()
@@ -100,8 +100,8 @@ let i = class extends l {
   }
   /** Sends a PATCH request (partial update) as required by the OData v4 spec. */
   async updateRecord(t, r, e) {
-    const s = this.buildURL(r, e.id, e, "updateRecord");
-    return this._fetchJSON(s, {
+    const o = this.buildURL(r, e.id, e, "updateRecord");
+    return this._fetchJSON(o, {
       method: "PATCH",
       headers: this.mutationHeaders(),
       body: JSON.stringify(this._serializeSnapshot(e))
@@ -109,10 +109,10 @@ let i = class extends l {
   }
   /** Sends a PATCH request with only the changed attributes (partial update). */
   async patchRecord(t, r, e) {
-    const s = this.buildURL(r, e.id, e, "updateRecord"), o = e.changedAttributes(), n = {};
-    for (const [a, [, c]] of Object.entries(o))
+    const o = this.buildURL(r, e.id, e, "updateRecord"), s = e.changedAttributes(), n = {};
+    for (const [a, [, c]] of Object.entries(s))
       n[a] = c;
-    return this._fetchJSON(s, {
+    return this._fetchJSON(o, {
       method: "PATCH",
       headers: this.mutationHeaders(),
       body: JSON.stringify(n)
@@ -120,8 +120,11 @@ let i = class extends l {
   }
   /** Extracts the raw attribute map from the snapshot's internal record. */
   _serializeSnapshot(t) {
-    const e = t.record._data, s = {};
-    return e && Object.assign(s, e), s;
+    const e = t.record._data, o = {};
+    if (e)
+      for (const s of Object.keys(e))
+        s === "__proto__" || s === "constructor" || s === "prototype" || (o[s] = e[s]);
+    return o;
   }
   /**
    * Normalises a query hash so every OData system option has its `$` prefix.
@@ -131,15 +134,15 @@ let i = class extends l {
    */
   _normalizeQuery(t) {
     const r = {};
-    for (const [e, s] of Object.entries(t))
-      s != null && (d.has(e) ? r[e] = s : d.has(`$${e}`) ? r[`$${e}`] = s : r[e] = s);
+    for (const [e, o] of Object.entries(t))
+      o != null && (d.has(e) ? r[e] = o : d.has(`$${e}`) ? r[`$${e}`] = o : r[e] = o);
     return r;
   }
   /** Serialises a key→value map to a `key=value&…` query string (percent-encoded). */
   _toQueryString(t) {
     const r = [];
-    for (const [e, s] of Object.entries(t))
-      s != null && r.push(`${encodeURIComponent(e)}=${encodeURIComponent(String(s))}`);
+    for (const [e, o] of Object.entries(t))
+      o != null && r.push(`${encodeURIComponent(e)}=${encodeURIComponent(String(o))}`);
     return r.join("&");
   }
   /** Returns `?key=value&…` when the query is non-empty, or an empty string. */
@@ -148,10 +151,10 @@ let i = class extends l {
     return r ? `?${r}` : "";
   }
 };
-i = m([
+i = _([
   u()
 ], i);
 export {
   i as O
 };
-//# sourceMappingURL=ODataAdapter-BaI5cZn0.js.map
+//# sourceMappingURL=ODataAdapter-CeBJblLQ.js.map

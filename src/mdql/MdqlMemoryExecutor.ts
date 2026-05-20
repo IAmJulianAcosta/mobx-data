@@ -40,9 +40,13 @@ export class MdqlMemoryExecutor {
     items: T[],
     query: MdqlQueryObject,
   ): number {
-    return items.filter((record) =>
-      MdqlMemoryExecutor.matchesNode(record, query.filters),
-    ).length;
+    let count = 0;
+    for (const record of items) {
+      if (MdqlMemoryExecutor.matchesNode(record, query.filters)) {
+        count++;
+      }
+    }
+    return count;
   }
 
   static exists<T extends Model = Model>(

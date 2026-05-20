@@ -1404,7 +1404,10 @@ export class Store implements ModelStoreLike {
     const backup = { ...internal._data };
 
     runInAction(() => {
-      Object.assign(internal._data, optimisticAttributes);
+      for (const key of Object.keys(optimisticAttributes)) {
+        if (key === '__proto__' || key === 'constructor' || key === 'prototype') continue;
+        internal._data[key] = optimisticAttributes[key];
+      }
     });
 
     try {
