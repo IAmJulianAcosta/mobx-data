@@ -45,6 +45,13 @@ import { Errors } from './Errors.js';
 import { StateMachine, type RecordState, type RecordEvent } from './StateMachine.js';
 import { Snapshot } from './Snapshot.js';
 
+let clientIdCounter = 0;
+
+function generateClientId(): string {
+  clientIdCounter += 1;
+  return `client-${clientIdCounter}`;
+}
+
 /**
  * Raw relationship reference stored on the record.
  * Contains either a single `{ type, id }` object (belongsTo),
@@ -238,6 +245,8 @@ export abstract class Model {
   protected _relationships: Map<string, RelationshipRef> = new Map();
   /** Server-assigned id, or `null` for new records. */
   protected _id: string | null = null;
+  /** Client-generated identifier for new records that don't yet have a server id. */
+  readonly _clientId: string = generateClientId();
   /** Internal lifecycle state machine. */
   protected _stateMachine: StateMachine;
 
@@ -287,6 +296,7 @@ export abstract class Model {
       _relationships: observable.shallow,
       _id: observable,
       id: computed,
+      uniqueId: computed,
       currentState: computed,
       isLoading: computed,
       isLoaded: computed,
@@ -316,6 +326,11 @@ export abstract class Model {
     runInAction(() => {
       this._id = v;
     });
+  }
+
+  /** Returns a stable identifier: the server-assigned `id` if available, otherwise the client-generated `_clientId`. */
+  get uniqueId(): string {
+    return this._id ?? this._clientId;
   }
 
   /** Returns the static `modelName` from the concrete subclass constructor. */

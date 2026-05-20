@@ -1,9 +1,10 @@
 import { S as i } from "../Serializer-Ca6w_QNQ.js";
-import { E as s, J as o, R as d } from "../EmbeddedRecordsMixin-DlfjZ0nK.js";
+import { E as a, R as s } from "../EmbeddedRecordsMixin-6mSCXsJ3.js";
+import { J as m } from "../JsonSerializer-CFqo6GjC.js";
 export {
-  s as EmbeddedRecordsMixin,
-  o as JsonSerializer,
-  d as RestSerializer,
+  a as EmbeddedRecordsMixin,
+  m as JsonSerializer,
+  s as RestSerializer,
   i as Serializer
 };
 //# sourceMappingURL=index.js.map

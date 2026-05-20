@@ -9,3 +9,4 @@ export type {
 } from './Store.js';
 export { IdentityMap } from './IdentityMap.js';
 export { RecordArray, AdapterPopulatedRecordArray } from './RecordArray.js';
+export { createStore, type CreateStoreOptions } from './createStore.js';

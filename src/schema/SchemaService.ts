@@ -45,6 +45,8 @@ interface Entry {
   discriminator?: DiscriminatorDef;
   /** Model name of the polymorphic root when this is a concrete child. */
   polymorphicRoot?: string;
+  /** When `true`, the client-generated id is sent to the server on create. */
+  clientGeneratedIds?: boolean;
 }
 
 /**
@@ -109,6 +111,9 @@ export class SchemaService {
         key: options.discriminator.key ?? 'type',
         map: options.discriminator.map,
       };
+    }
+    if (options?.clientGeneratedIds) {
+      entry.clientGeneratedIds = true;
     }
 
     this.entries.set(modelName, entry);
@@ -230,6 +235,11 @@ export class SchemaService {
    */
   isAbstract(modelName: string): boolean {
     return this.entries.get(modelName)?.abstract === true;
+  }
+
+  /** Returns `true` when the model uses client-generated ids. */
+  hasClientGeneratedIds(modelName: string): boolean {
+    return this.entries.get(modelName)?.clientGeneratedIds === true;
   }
 
   /**

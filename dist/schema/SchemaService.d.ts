@@ -76,6 +76,8 @@ export declare class SchemaService {
      * Returns `true` when `modelName` is declared abstract.
      */
     isAbstract(modelName: string): boolean;
+    /** Returns `true` when the model uses client-generated ids. */
+    hasClientGeneratedIds(modelName: string): boolean;
     /**
      * Resolves the concrete model class for a polymorphic parent given a raw
      * payload.  Reads the discriminator key from the payload and returns the

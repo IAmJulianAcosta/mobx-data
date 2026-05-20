@@ -162,11 +162,13 @@ export class JsonSerializer extends Serializer {
    */
   override serialize(
     snapshot: SerializerSnapshot,
-    options?: { includeId?: boolean },
+    options?: { includeId?: boolean; clientGeneratedIds?: boolean },
   ): Record<string, unknown> {
     const json: Record<string, unknown> = {};
     if (options?.includeId && snapshot.id !== null) {
       json[this.primaryKey] = snapshot.id;
+    } else if (options?.clientGeneratedIds && snapshot.id === null) {
+      json[this.primaryKey] = snapshot.clientId;
     }
     snapshot.eachAttribute((key, meta) => {
       this.serializeAttribute(snapshot, json, key, meta);

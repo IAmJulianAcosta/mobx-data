@@ -1,2 +1,2 @@
-"use strict";Object.defineProperty(exports,Symbol.toStringTag,{value:"Module"});const e=require("../JsonApiSerializer-Bqd9FrY8.cjs");Object.defineProperty(exports,"JsonApiAdapter",{enumerable:!0,get:()=>e.JsonApiAdapter});Object.defineProperty(exports,"JsonApiSerializer",{enumerable:!0,get:()=>e.JsonApiSerializer});
+"use strict";Object.defineProperty(exports,Symbol.toStringTag,{value:"Module"});const e=require("../JsonApiSerializer-Dt_Y_FIo.cjs");Object.defineProperty(exports,"JsonApiAdapter",{enumerable:!0,get:()=>e.JsonApiAdapter});Object.defineProperty(exports,"JsonApiSerializer",{enumerable:!0,get:()=>e.JsonApiSerializer});
 //# sourceMappingURL=index.cjs.map

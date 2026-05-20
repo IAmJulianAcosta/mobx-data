@@ -101,6 +101,8 @@ export declare abstract class Model {
     protected _relationships: Map<string, RelationshipRef>;
     /** Server-assigned id, or `null` for new records. */
     protected _id: string | null;
+    /** Client-generated identifier for new records that don't yet have a server id. */
+    readonly _clientId: string;
     /** Internal lifecycle state machine. */
     protected _stateMachine: StateMachine;
     /** Observable validation error collection. */
@@ -111,6 +113,8 @@ export declare abstract class Model {
     /** Server-assigned id, or `null` for new records. */
     get id(): string | null;
     set id(v: string | null);
+    /** Returns a stable identifier: the server-assigned `id` if available, otherwise the client-generated `_clientId`. */
+    get uniqueId(): string;
     /** Returns the static `modelName` from the concrete subclass constructor. */
     get modelName(): string;
     /** Current state-machine state string. */

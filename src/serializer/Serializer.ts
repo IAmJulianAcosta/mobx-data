@@ -97,6 +97,8 @@ export interface NormalizedDocument {
 export interface SerializerSnapshot {
   /** Server-assigned id, or `null` for new records. */
   id: string | null;
+  /** Client-generated identifier, always present. */
+  clientId: string;
   /** Model name. */
   modelName: string;
   /** Returns the snapshot-time value for an attribute key. */
@@ -159,7 +161,7 @@ export abstract class Serializer {
    */
   abstract serialize(
     snapshot: SerializerSnapshot,
-    options?: { includeId?: boolean },
+    options?: { includeId?: boolean; clientGeneratedIds?: boolean },
   ): Record<string, unknown>;
 
   // Per-operation normalization hooks — default to calling `normalizeResponse`.

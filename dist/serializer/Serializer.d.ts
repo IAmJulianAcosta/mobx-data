@@ -82,6 +82,8 @@ export interface NormalizedDocument {
 export interface SerializerSnapshot {
     /** Server-assigned id, or `null` for new records. */
     id: string | null;
+    /** Client-generated identifier, always present. */
+    clientId: string;
     /** Model name. */
     modelName: string;
     /** Returns the snapshot-time value for an attribute key. */
@@ -132,6 +134,7 @@ export declare abstract class Serializer {
      */
     abstract serialize(snapshot: SerializerSnapshot, options?: {
         includeId?: boolean;
+        clientGeneratedIds?: boolean;
     }): Record<string, unknown>;
     /** Called when normalizing a `findRecord` response. */
     normalizeFindRecordResponse(store: unknown, modelClass: ModelClassMeta, payload: unknown, id: string | null, requestType: NormalizeRequestType): NormalizedDocument;

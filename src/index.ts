@@ -2,6 +2,8 @@ export * from './schema/index.js';
 export * from './model/index.js';
 export {
   Store,
+  createStore,
+  type CreateStoreOptions,
   type AdapterLike,
   type SerializerLike,
   type FindOptions,

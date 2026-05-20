@@ -1,8 +1,9 @@
-import { A as e, I as o, R as t, S as d } from "../Store-BC3Tsy-Z.js";
+import { A as e, I as t, R as o, S as d, c as s } from "../createStore-C94UzI7i.js";
 export {
   e as AdapterPopulatedRecordArray,
-  o as IdentityMap,
-  t as RecordArray,
-  d as Store
+  t as IdentityMap,
+  o as RecordArray,
+  d as Store,
+  s as createStore
 };
 //# sourceMappingURL=index.js.map

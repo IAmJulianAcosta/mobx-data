@@ -62,6 +62,8 @@ function walk<V>(proto: object | null, key: symbol): Map<string, V> {
 export class Snapshot<T extends Model = Model> {
   /** Server-assigned id at snapshot time, or `null` for new records. */
   readonly id: string | null;
+  /** Client-generated identifier, always present. */
+  readonly clientId: string;
   /** `modelName` of the snapshotted record. */
   readonly modelName: string;
   /** Reference to the live record (read-only from adapter/serializer code). */
@@ -76,6 +78,7 @@ export class Snapshot<T extends Model = Model> {
   constructor(record: T) {
     this.record = record;
     this.id = record.id;
+    this.clientId = record._clientId;
     this.modelName = record.modelName;
 
     const internal = record as unknown as {

@@ -86,6 +86,8 @@ export interface ModelOptions {
     /** Maps discriminator values to lazy model constructor references. */
     map: Record<string, () => ModelConstructor>;
   };
+  /** When `true`, the client-generated `_clientId` is sent to the server as the record id on create. */
+  clientGeneratedIds?: boolean;
 }
 
 /** Reflect-metadata key used to store attribute definitions on a prototype. */

@@ -48,6 +48,7 @@ export declare class JsonSerializer extends Serializer {
      */
     serialize(snapshot: SerializerSnapshot, options?: {
         includeId?: boolean;
+        clientGeneratedIds?: boolean;
     }): Record<string, unknown>;
 }
 //# sourceMappingURL=JsonSerializer.d.ts.map

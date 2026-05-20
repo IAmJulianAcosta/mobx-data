@@ -1,6 +1,6 @@
 {
   "name": "@iamjulianacosta/mobx-data",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "Ember Data feature-complete clone for MobX",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -67,6 +67,7 @@
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "test:e2e:coverage": "playwright test && nyc report --temp-dir=coverage/playwright --report-dir=coverage/playwright-report --reporter=text",
     "test:all": "vitest run --coverage && playwright test",

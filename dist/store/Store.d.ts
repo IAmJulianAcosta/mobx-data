@@ -94,6 +94,7 @@ export interface NormalizedDocument {
 /** Internal snapshot interface created and consumed by the store. */
 interface Snapshot {
     id: string | null;
+    clientId: string;
     modelName: string;
     record: Model;
     attr(key: string): unknown;

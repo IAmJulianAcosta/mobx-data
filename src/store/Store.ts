@@ -183,6 +183,7 @@ export interface NormalizedDocument {
 /** Internal snapshot interface created and consumed by the store. */
 interface Snapshot {
   id: string | null;
+  clientId: string;
   modelName: string;
   record: Model;
   attr(key: string): unknown;
@@ -826,8 +827,13 @@ export class Store implements ModelStoreLike {
    */
   async saveRecord<T extends Model>(record: T, options: SaveOptions = {}): Promise<T> {
     const adapter = this.adapterFor(record.modelName);
-    const snapshot = this.createSnapshot(record);
     const { isNew } = record;
+
+    if (isNew && this.schema.hasClientGeneratedIds(record.modelName) && record.id === null) {
+      record.id = record._clientId;
+    }
+
+    const snapshot = this.createSnapshot(record);
     let response: unknown;
     if (isNew) {
       response = await adapter.createRecord(this, record.modelName, snapshot);
@@ -938,6 +944,7 @@ export class Store implements ModelStoreLike {
     };
     return {
       id: record.id,
+      clientId: record._clientId,
       modelName,
       record,
       attr: (key) => internal._data[key],
@@ -985,6 +992,7 @@ export class Store implements ModelStoreLike {
     const relationships = this.schema.relationshipsDefinitionFor(modelName);
     return {
       id,
+      clientId: '',
       modelName,
       record: null as unknown as Model,
       attr: () => undefined,

@@ -30,6 +30,8 @@ export interface HasManyReference {
 export declare class Snapshot<T extends Model = Model> {
     /** Server-assigned id at snapshot time, or `null` for new records. */
     readonly id: string | null;
+    /** Client-generated identifier, always present. */
+    readonly clientId: string;
     /** `modelName` of the snapshotted record. */
     readonly modelName: string;
     /** Reference to the live record (read-only from adapter/serializer code). */
