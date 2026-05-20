@@ -1,4 +1,4 @@
-class I {
+class R {
   constructor(e) {
     this.schema = e;
   }
@@ -94,52 +94,52 @@ class I {
     let r = !1;
     for (const o of e) {
       const a = t.get(o);
-      for (const u of a.relationships) {
-        if (u.kind !== "belongsTo") continue;
-        const l = t.get(u.relatedType);
-        if (!l) continue;
-        const p = l.attributes.find(
-          (f) => f.name === "name" || f.name === "title"
+      for (const l of a.relationships) {
+        if (l.kind !== "belongsTo") continue;
+        const c = t.get(l.relatedType);
+        if (!c) continue;
+        const p = c.attributes.find(
+          (h) => h.name === "name" || h.name === "title"
         );
         if (p) {
           s.push(
-            `"show ${o}s by Alice" → {"target":"${o}","filter_type":"${u.relatedType}","filter_attribute":"${p.name}","filter_value":"Alice","through_type":"none","search":"none","limit":"none","confidence":0.9}`
+            `"show ${o}s by Alice" → {"target":"${o}","filter_type":"${l.relatedType}","filter_attribute":"${p.name}","filter_value":"Alice","through_type":"none","search":"none","limit":"none","confidence":0.9}`
           ), r = !0;
           break;
         }
       }
     }
     for (const o of e) {
-      const u = t.get(o).attributes.find(
-        (l) => l.name === "name"
+      const l = t.get(o).attributes.find(
+        (c) => c.name === "name"
       );
-      if (u) {
+      if (l) {
         s.push(
-          `"profile of Alice" → {"target":"${o}","filter_type":"${o}","filter_attribute":"${u.name}","filter_value":"Alice","through_type":"none","search":"none","limit":"none","confidence":0.95}`
+          `"profile of Alice" → {"target":"${o}","filter_type":"${o}","filter_attribute":"${l.name}","filter_value":"Alice","through_type":"none","search":"none","limit":"none","confidence":0.95}`
         );
         break;
       }
     }
     if (!r)
       for (const o of e) {
-        const u = t.get(o).attributes.find(
-          (l) => l.name === "name" || l.name === "title"
+        const l = t.get(o).attributes.find(
+          (c) => c.name === "name" || c.name === "title"
         );
-        if (u) {
+        if (l) {
           s.push(
-            `"find ${o} named example" → {"target":"${o}","filter_type":"${o}","filter_attribute":"${u.name}","filter_value":"example","through_type":"none","search":"none","limit":"none","confidence":0.95}`
+            `"find ${o} named example" → {"target":"${o}","filter_type":"${o}","filter_attribute":"${l.name}","filter_value":"example","through_type":"none","search":"none","limit":"none","confidence":0.95}`
           );
           break;
         }
       }
     const n = e.find((o) => t.get(o).attributes.some(
-      (u) => u.type === "string" && u.name !== "name"
+      (l) => l.type === "string" && l.name !== "name"
     ));
     if (n && s.push(
       `"search ${n}s about TypeScript" → {"target":"${n}","filter_type":"none","filter_attribute":"none","filter_value":"none","through_type":"none","search":"TypeScript","limit":"none","confidence":0.9}`
     ), e.length > 0) {
       const o = e.find((a) => t.get(a).attributes.some(
-        (l) => l.name.toLowerCase().includes("date") || l.name.toLowerCase().includes("at")
+        (c) => c.name.toLowerCase().includes("date") || c.name.toLowerCase().includes("at")
       )) ?? e[0];
       s.push(
         `"recent ${o}s" → {"target":"${o}","filter_type":"none","filter_attribute":"none","filter_value":"none","through_type":"none","search":"none","limit":"10","confidence":0.9}`
@@ -161,7 +161,7 @@ class I {
             if (o.kind !== "hasMany" || o.relatedType === s) continue;
             const a = o.relatedType;
             if (r.attributes.find(
-              (l) => l.name === "name"
+              (c) => c.name === "name"
             ))
               return `"${a}s on ${n.relatedType}s by ${s} Alice" → {"target":"${a}","filter_type":"${s}","filter_attribute":"name","filter_value":"Alice","through_type":"${n.relatedType}","search":"none","limit":"none","confidence":0.9}`;
           }
@@ -179,20 +179,20 @@ class I {
         if (!o || !o.attributes.find(
           (p) => p.name === "title"
         )) continue;
-        const u = r.endsWith("s") ? r : `${r}s`, l = i.relatedType;
+        const l = r.endsWith("s") ? r : `${r}s`, c = i.relatedType;
         s.push(
-          `"all ${u} on the Example ${l}" → {"target":"${r}","filter_type":"${l}","filter_attribute":"title","filter_value":"Example","through_type":"none","search":"none","limit":"none","confidence":0.9}`
+          `"all ${l} on the Example ${c}" → {"target":"${r}","filter_type":"${c}","filter_attribute":"title","filter_value":"Example","through_type":"none","search":"none","limit":"none","confidence":0.9}`
         ), s.push(
-          `"${u} for ${l} Weekend" → {"target":"${r}","filter_type":"${l}","filter_attribute":"title","filter_value":"Weekend","through_type":"none","search":"none","limit":"none","confidence":0.9}`
+          `"${l} for ${c} Weekend" → {"target":"${r}","filter_type":"${c}","filter_attribute":"title","filter_value":"Weekend","through_type":"none","search":"none","limit":"none","confidence":0.9}`
         );
         for (const p of n.relationships) {
-          if (p.kind !== "belongsTo" || p.relatedType === l) continue;
-          const f = t.get(p.relatedType);
-          if (!(!f || !f.attributes.find(
-            (m) => m.name === "name" || m.name === "title"
+          if (p.kind !== "belongsTo" || p.relatedType === c) continue;
+          const h = t.get(p.relatedType);
+          if (!(!h || !h.attributes.find(
+            (d) => d.name === "name" || d.name === "title"
           ))) {
             s.push(
-              `"who ${i.name === "post" ? "commented on" : `has ${u} on`} Example" → {"target":"${p.relatedType}","filter_type":"${l}","filter_attribute":"title","filter_value":"Example","through_type":"${r}","search":"none","limit":"none","confidence":0.85}`
+              `"who ${i.name === "post" ? "commented on" : `has ${l} on`} Example" → {"target":"${p.relatedType}","filter_type":"${c}","filter_attribute":"title","filter_value":"Example","through_type":"${r}","search":"none","limit":"none","confidence":0.85}`
             );
             break;
           }
@@ -247,18 +247,18 @@ class I {
     });
   }
 }
-class P extends Error {
+class S extends Error {
   constructor(e) {
     super(`Not a data query: "${e}"`), this.name = "NotADataQueryError", this.originalQuery = e;
   }
 }
-class L {
+class I {
   constructor(e, t = "local") {
     this.introspection = e, this.dataSourceMode = t;
   }
   async execute(e, t) {
     if (e.target === "unsupported")
-      throw new P("");
+      throw new S("");
     return this.introspection.typeNames.includes(e.target) ? e.filterType && !this.introspection.typeNames.includes(e.filterType) ? {
       status: "validation_error",
       message: `Unknown filter type "${e.filterType}".`
@@ -269,9 +269,9 @@ class L {
   }
   async executeSearch(e, t) {
     const s = await this.resolveRecords(e.target, t), r = e.search.toLowerCase(), n = this.introspection.stringAttributes.get(e.target) ?? [], i = s.filter((a) => {
-      const u = a;
-      for (const l of n) {
-        const p = u[l];
+      const l = a;
+      for (const c of n) {
+        const p = l[c];
         if (typeof p == "string" && p.toLowerCase().includes(r))
           return !0;
       }
@@ -330,13 +330,13 @@ class L {
         message: `No relationship path from ${e.filterType} to ${e.target}.`
       };
     let i = [r];
-    for (const u of n) {
-      const l = [];
+    for (const l of n) {
+      const c = [];
       for (const p of i) {
-        const f = this.followRelationship(p, u, t);
-        l.push(...f);
+        const h = this.followRelationship(p, l, t);
+        c.push(...h);
       }
-      i = this.deduplicateRecords(l);
+      i = this.deduplicateRecords(c);
     }
     const o = e.limit ? i.slice(0, e.limit) : i, a = e.filterValue ?? e.filterType;
     return {
@@ -370,28 +370,28 @@ class L {
   findPath(e, t, s) {
     const r = this.introspection.relationshipGraph, n = [{ type: e, path: [] }], i = /* @__PURE__ */ new Set([e]), o = [];
     for (; n.length > 0; ) {
-      const a = n.shift(), u = r.get(a.type) ?? [];
-      for (const l of u) {
-        if (i.has(l.relatedType)) continue;
+      const a = n.shift(), l = r.get(a.type) ?? [];
+      for (const c of l) {
+        if (i.has(c.relatedType)) continue;
         const p = [
           ...a.path,
           {
             fromType: a.type,
-            relationshipName: l.relationshipName,
-            toType: l.relatedType
+            relationshipName: c.relationshipName,
+            toType: c.relatedType
           }
         ];
-        if (l.relatedType === t) {
+        if (c.relatedType === t) {
           if (!s)
             return p;
           o.push(p);
           continue;
         }
-        i.add(l.relatedType), n.push({ type: l.relatedType, path: p });
+        i.add(c.relatedType), n.push({ type: c.relatedType, path: p });
       }
     }
     return s && o.length > 0 ? o.find(
-      (u) => u.some((l) => l.toType === s || l.fromType === s)
+      (l) => l.some((c) => c.toType === s || c.fromType === s)
     ) ?? o[0] ?? null : null;
   }
   deduplicateRecords(e) {
@@ -410,22 +410,22 @@ class L {
     return t.peekAll(e).toArray();
   }
 }
-function E(c) {
-  return c.endsWith("s") ? c : c.endsWith("y") ? `${c.slice(0, -1)}ies` : `${c}s`;
+function E(u) {
+  return u.endsWith("s") ? u : u.endsWith("y") ? `${u.slice(0, -1)}ies` : `${u}s`;
 }
-function w(c) {
-  return c.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+function w(u) {
+  return u.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
-const v = {
+const M = {
   comment: ["comentario", "comentarios"],
   post: ["publicación", "publicacion", "publicaciones"],
   user: ["usuario", "usuarios"]
 };
-function d(c) {
-  const e = E(c), t = v[c.toLowerCase()] ?? [];
-  return [c, e, ...t].map(w).join("|");
+function f(u) {
+  const e = E(u), t = M[u.toLowerCase()] ?? [];
+  return [u, e, ...t].map(w).join("|");
 }
-class M {
+class v {
   constructor(e) {
     this.defaultContentType = this.findDefaultContentType(e), this.personType = this.findPersonType(e), this.commentLikeType = this.findCommentLikeType(e), this.rules = this.buildRules(e);
   }
@@ -502,22 +502,22 @@ class M {
   buildSingleHopTraversalRules(e) {
     const t = [];
     for (const [s, r] of e.types) {
-      const n = d(s);
+      const n = f(s);
       for (const i of r.relationships) {
         if (i.kind !== "belongsTo") continue;
         const o = e.types.get(i.relatedType);
         if (!o) continue;
         const a = this.findNameAttribute(o);
         if (!a) continue;
-        const u = i.relatedType, l = d(u);
+        const l = i.relatedType, c = f(l);
         t.push({
           patterns: [
             new RegExp(
-              `(?:show|get|find|list|dame|muestra)\\s+(?:todos?\\s+)?(?:los?\\s+)?(?:${n})\\s+(?:by|from|for|of|de|del|por)\\s+(?:(?:${l})\\s+)?(.+)`,
+              `(?:show|get|find|list|dame|muestra)\\s+(?:todos?\\s+)?(?:los?\\s+)?(?:${n})\\s+(?:by|from|for|of|de|del|por)\\s+(?:(?:${c})\\s+)?(.+)`,
               "i"
             ),
             new RegExp(
-              `(?:${n})\\s+(?:by|from|for|of|de|del|por)\\s+(?:(?:${l})\\s+)?(.+)`,
+              `(?:${n})\\s+(?:by|from|for|of|de|del|por)\\s+(?:(?:${c})\\s+)?(.+)`,
               "i"
             ),
             new RegExp(
@@ -543,7 +543,7 @@ class M {
           ],
           buildIntent: (p) => ({
             target: s,
-            filterType: u,
+            filterType: l,
             filterAttribute: a,
             filterValue: p[1].trim(),
             throughType: null,
@@ -559,27 +559,27 @@ class M {
   buildMultiHopTraversalRules(e) {
     const t = [];
     for (const [s, r] of e.types) {
-      const n = d(s);
+      const n = f(s);
       for (const i of r.relationships) {
         if (i.kind !== "belongsTo") continue;
         const o = i.relatedType, a = e.types.get(o);
         if (!a) continue;
-        const u = d(o);
-        for (const l of a.relationships) {
-          if (l.kind !== "belongsTo") continue;
-          const p = l.relatedType;
+        const l = f(o);
+        for (const c of a.relationships) {
+          if (c.kind !== "belongsTo") continue;
+          const p = c.relatedType;
           if (p === s) continue;
-          const f = e.types.get(p);
-          if (!f) continue;
-          const h = this.findNameAttribute(f);
-          h && t.push({
+          const h = e.types.get(p);
+          if (!h) continue;
+          const m = this.findNameAttribute(h);
+          m && t.push({
             patterns: [
               new RegExp(
-                `(?:show|get|find|list|dame|muestra)\\s+(?:todos?\\s+)?(?:los?\\s+)?(?:${n})\\s+(?:on|in|en|de|del)\\s+(?:los?\\s+)?(?:${u})\\s+(?:by|from|of|de|del|por|hechos?\\s+por)\\s+(.+)`,
+                `(?:show|get|find|list|dame|muestra)\\s+(?:todos?\\s+)?(?:los?\\s+)?(?:${n})\\s+(?:on|in|en|de|del)\\s+(?:los?\\s+)?(?:${l})\\s+(?:by|from|of|de|del|por|hechos?\\s+por)\\s+(.+)`,
                 "i"
               ),
               new RegExp(
-                `(?:all\\s+)?(?:${n})\\s+(?:on|in|en|de|del)\\s+(?:los?\\s+)?(?:${u})\\s+(?:by|from|of|de|del|por|hechos?\\s+por)\\s+(.+)`,
+                `(?:all\\s+)?(?:${n})\\s+(?:on|in|en|de|del)\\s+(?:los?\\s+)?(?:${l})\\s+(?:by|from|of|de|del|por|hechos?\\s+por)\\s+(.+)`,
                 "i"
               ),
               new RegExp(
@@ -591,11 +591,11 @@ class M {
                 "i"
               )
             ],
-            buildIntent: (m) => ({
+            buildIntent: (d) => ({
               target: s,
               filterType: p,
-              filterAttribute: h,
-              filterValue: m[1].trim(),
+              filterAttribute: m,
+              filterValue: d[1].trim(),
               throughType: o,
               search: null,
               limit: null,
@@ -613,12 +613,12 @@ class M {
       if (!r.attributes.find(
         (o) => o.name === "title"
       )) continue;
-      const i = d(s);
+      const i = f(s);
       for (const o of r.relationships) {
         if (o.kind !== "belongsTo") continue;
         const a = e.types.get(o.relatedType);
         !a || !a.attributes.find(
-          (l) => l.name === "name"
+          (c) => c.name === "name"
         ) || t.push({
           patterns: [
             new RegExp(
@@ -642,11 +642,11 @@ class M {
               "i"
             )
           ],
-          buildIntent: (l) => ({
+          buildIntent: (c) => ({
             target: o.relatedType,
             filterType: s,
             filterAttribute: "title",
-            filterValue: l[1].trim(),
+            filterValue: c[1].trim(),
             throughType: null,
             search: null,
             limit: null,
@@ -660,15 +660,15 @@ class M {
   buildCompoundFilterSearchRules(e) {
     const t = [];
     for (const [s, r] of e.types) {
-      const n = d(s);
+      const n = f(s);
       if ((e.stringAttributes.get(s) ?? []).length !== 0)
         for (const o of r.relationships) {
           if (o.kind !== "belongsTo") continue;
           const a = e.types.get(o.relatedType);
           if (!a) continue;
-          const u = this.findNameAttribute(a);
-          if (!u) continue;
-          const l = o.relatedType;
+          const l = this.findNameAttribute(a);
+          if (!l) continue;
+          const c = o.relatedType;
           t.push({
             patterns: [
               new RegExp(
@@ -678,8 +678,8 @@ class M {
             ],
             buildIntent: (p) => ({
               target: s,
-              filterType: l,
-              filterAttribute: u,
+              filterType: c,
+              filterAttribute: l,
               filterValue: p[1].trim(),
               throughType: null,
               search: p[2].trim(),
@@ -695,8 +695,8 @@ class M {
             ],
             buildIntent: (p) => ({
               target: s,
-              filterType: l,
-              filterAttribute: u,
+              filterType: c,
+              filterAttribute: l,
               filterValue: p[2].trim(),
               throughType: null,
               search: p[1].trim(),
@@ -711,7 +711,7 @@ class M {
   buildOnAboutTraversalRules(e) {
     const t = [];
     for (const [s, r] of e.types) {
-      const n = d(s);
+      const n = f(s);
       for (const i of r.relationships) {
         if (i.kind !== "belongsTo") continue;
         const o = e.types.get(i.relatedType);
@@ -720,19 +720,19 @@ class M {
           (p) => p.name === "title"
         );
         if (!a) continue;
-        const u = i.relatedType, l = d(u);
+        const l = i.relatedType, c = f(l);
         t.push({
           patterns: [
             new RegExp(
-              `(?:all\\s+)?(?:${n})\\s+(?:on|about)\\s+(?:the\\s+)?(.+?)\\s+(?:${l})\\s*\\??\\s*$`,
+              `(?:all\\s+)?(?:${n})\\s+(?:on|about)\\s+(?:the\\s+)?(.+?)\\s+(?:${c})\\s*\\??\\s*$`,
               "i"
             ),
             new RegExp(
-              `(?:all\\s+)?(?:${n})\\s+(?:on|about|for|in)\\s+(?:the\\s+)?(?:(?:${l})\\s+)?(.+?)\\s*\\??\\s*$`,
+              `(?:all\\s+)?(?:${n})\\s+(?:on|about|for|in)\\s+(?:the\\s+)?(?:(?:${c})\\s+)?(.+?)\\s*\\??\\s*$`,
               "i"
             ),
             new RegExp(
-              `(?:muéstrame|dame|show me)\\s+(?:los?\\s+)?(?:${n}|comentarios|publicaciones)\\s+(?:del?|on|about)\\s+(?:(?:${l}|post|posts)\\s+)?(.+?)\\s*\\??\\s*$`,
+              `(?:muéstrame|dame|show me)\\s+(?:los?\\s+)?(?:${n}|comentarios|publicaciones)\\s+(?:del?|on|about)\\s+(?:(?:${c}|post|posts)\\s+)?(.+?)\\s*\\??\\s*$`,
               "i"
             ),
             new RegExp(
@@ -746,7 +746,7 @@ class M {
           ],
           buildIntent: (p) => ({
             target: s,
-            filterType: u,
+            filterType: l,
             filterAttribute: a.name,
             filterValue: p[1].trim(),
             throughType: null,
@@ -773,26 +773,26 @@ class M {
             (p) => p.name === "title"
           );
           if (!a) continue;
-          const u = i.relatedType, l = d(u);
+          const l = i.relatedType, c = f(l);
           for (const p of n) {
-            if (p.relatedType === u) continue;
-            const f = p.relatedType, h = s === "comment" ? "commented|left comments" : `(?:wrote|created|has)\\s+${w(E(s))}`;
+            if (p.relatedType === l) continue;
+            const h = p.relatedType, m = s === "comment" ? "commented|left comments" : `(?:wrote|created|has)\\s+${w(E(s))}`;
             t.push({
               patterns: [
                 new RegExp(
-                  `(?:who|anyone|anybody)\\s+(?:has\\s+)?(?:${h})\\s+(?:on|about)\\s+(?:the\\s+)?(.+?)\\s+(?:${l})\\s*\\??\\s*$`,
+                  `(?:who|anyone|anybody)\\s+(?:has\\s+)?(?:${m})\\s+(?:on|about)\\s+(?:the\\s+)?(.+?)\\s+(?:${c})\\s*\\??\\s*$`,
                   "i"
                 ),
                 new RegExp(
-                  `(?:who|anyone|anybody)\\s+(?:has\\s+)?(?:${h})\\s+(?:on|about)\\s+(?:the\\s+)?(.+?)\\s*\\??\\s*$`,
+                  `(?:who|anyone|anybody)\\s+(?:has\\s+)?(?:${m})\\s+(?:on|about)\\s+(?:the\\s+)?(.+?)\\s*\\??\\s*$`,
                   "i"
                 )
               ],
-              buildIntent: (m) => ({
-                target: f,
-                filterType: u,
+              buildIntent: (d) => ({
+                target: h,
+                filterType: l,
                 filterAttribute: a.name,
-                filterValue: m[1].trim(),
+                filterValue: d[1].trim(),
                 throughType: s,
                 search: null,
                 limit: null,
@@ -807,7 +807,7 @@ class M {
   buildSearchRules(e) {
     const t = [];
     for (const s of e.typeNames) {
-      const r = d(s);
+      const r = f(s);
       (e.stringAttributes.get(s) ?? []).length !== 0 && t.push({
         patterns: [
           new RegExp(
@@ -848,7 +848,7 @@ class M {
   buildListRules(e) {
     const t = [];
     for (const s of e.typeNames) {
-      const r = d(s);
+      const r = f(s);
       t.push({
         patterns: [
           new RegExp(
@@ -1015,7 +1015,7 @@ class M {
       })
     })), r) {
       const i = e.typeNames.map(
-        (u) => d(u)
+        (l) => f(l)
       ).join("|");
       t.push({
         patterns: [
@@ -1040,11 +1040,11 @@ class M {
         patterns: [
           new RegExp("^([A-Z][a-z]+)$")
         ],
-        buildIntent: (u) => ({
+        buildIntent: (l) => ({
           target: r,
           filterType: r,
           filterAttribute: a,
-          filterValue: u[1].trim(),
+          filterValue: l[1].trim(),
           throughType: null,
           search: null,
           limit: null,
@@ -1075,13 +1075,13 @@ class M {
     return null;
   }
 }
-const k = "Qwen3.5-2B-q4f16_1-MLC", C = 0.1, O = 128, R = /* @__PURE__ */ new Set([
+const O = "Qwen3.5-2B-q4f16_1-MLC", C = 0.1, F = 128, L = /* @__PURE__ */ new Set([
   "get_posts_by_user",
   "get_user_profile",
   "get_comments_by_post",
   "search_posts",
   "get_recent_posts"
-]), j = [
+]), W = [
   "You are an intent classifier. Given a user query in English or Spanish, output a JSON object with the intent, arguments, and confidence.",
   "",
   "Intents:",
@@ -1110,7 +1110,7 @@ const k = "Qwen3.5-2B-q4f16_1-MLC", C = 0.1, O = 128, R = /* @__PURE__ */ new Se
   properties: {
     intent: {
       type: "string",
-      enum: [...R, "unsupported"]
+      enum: [...L, "unsupported"]
     },
     arguments: {
       type: "object"
@@ -1121,9 +1121,9 @@ const k = "Qwen3.5-2B-q4f16_1-MLC", C = 0.1, O = 128, R = /* @__PURE__ */ new Se
   },
   required: ["intent", "arguments", "confidence"]
 });
-class $ {
+class N {
   constructor(e = {}) {
-    this.engine = null, this.initializationPromise = null, this.modelId = e.modelId ?? k, this.onProgress = e.onProgress, this.temperature = e.temperature ?? C, this.maxTokens = e.maxTokens ?? O, this.customSystemPrompt = e.systemPrompt, this.customJsonSchema = e.jsonSchema, this.validTargets = e.validTargets;
+    this.engine = null, this.initializationPromise = null, this.modelId = e.modelId ?? O, this.onProgress = e.onProgress, this.temperature = e.temperature ?? C, this.maxTokens = e.maxTokens ?? F, this.customSystemPrompt = e.systemPrompt, this.customJsonSchema = e.jsonSchema, this.validTargets = e.validTargets;
   }
   async initialize() {
     if (!this.engine) {
@@ -1147,12 +1147,12 @@ class $ {
     return this.validTargets !== void 0;
   }
   async parse(e) {
-    var a, u;
+    var a, l;
     const t = e.trim();
     if (t.length === 0)
       return null;
     await this.initialize();
-    const s = this.customSystemPrompt ?? j, r = this.customJsonSchema ?? z, n = {
+    const s = this.customSystemPrompt ?? W, r = this.customJsonSchema ?? z, n = {
       stream: !1,
       messages: [
         { role: "system", content: s },
@@ -1166,7 +1166,7 @@ class $ {
       }
     };
     this.modelId.startsWith("Qwen3-") && (n.extra_body = { enable_thinking: !1 });
-    const o = (u = (a = (await this.engine.chat.completions.create(n)).choices[0]) == null ? void 0 : a.message) == null ? void 0 : u.content;
+    const o = (l = (a = (await this.engine.chat.completions.create(n)).choices[0]) == null ? void 0 : a.message) == null ? void 0 : l.content;
     return o ? this.isGenericMode ? this.parseGenericResponse(o, t) : this.parseLegacyResponse(o, t) : null;
   }
   parseGenericResponse(e, t) {
@@ -1222,7 +1222,7 @@ class $ {
       return null;
     }
     const r = s.intent;
-    if (typeof r != "string" || r === "unsupported" || !R.has(r))
+    if (typeof r != "string" || r === "unsupported" || !L.has(r))
       return null;
     const n = typeof s.arguments == "object" && s.arguments !== null ? s.arguments : {}, i = typeof s.confidence == "number" ? Math.max(0, Math.min(1, s.confidence)) : 0.7;
     return {
@@ -1255,14 +1255,14 @@ class $ {
     });
   }
 }
-const V = "HuggingFaceTB/SmolLM3-3B-ONNX", W = 0.1, D = 128, F = "/no_think", q = /* @__PURE__ */ new Set([
+const j = "HuggingFaceTB/SmolLM3-3B-ONNX", D = 0.1, V = 128, B = "/no_think", U = /* @__PURE__ */ new Set([
   "get_posts_by_user",
   "get_user_profile",
   "get_comments_by_post",
   "get_comments_by_user",
   "search_posts",
   "get_recent_posts"
-]), U = [
+]), H = [
   "You are an intent classifier. Given a user query in English or Spanish, output a JSON object with the intent, arguments, and confidence.",
   "",
   "Intents:",
@@ -1287,9 +1287,9 @@ const V = "HuggingFaceTB/SmolLM3-3B-ONNX", W = 0.1, D = 128, F = "/no_think", q 
   "Output ONLY the JSON object. No explanation."
 ].join(`
 `);
-class A {
+class _ {
   constructor(e = {}) {
-    this.generator = null, this.initializationPromise = null, this.modelId = e.modelId ?? V, this.onProgress = e.onProgress, this.temperature = e.temperature ?? W, this.maxTokens = e.maxTokens ?? D, this.customSystemPrompt = e.systemPrompt, this.customJsonSchema = e.jsonSchema, this.validTargets = e.validTargets;
+    this.generator = null, this.initializationPromise = null, this.modelId = e.modelId ?? j, this.onProgress = e.onProgress, this.temperature = e.temperature ?? D, this.maxTokens = e.maxTokens ?? V, this.customSystemPrompt = e.systemPrompt, this.customJsonSchema = e.jsonSchema, this.validTargets = e.validTargets;
   }
   async initialize() {
     if (!this.generator) {
@@ -1329,7 +1329,7 @@ class A {
     return i ? this.isGenericMode ? this.parseGenericResponse(i, t) : this.parseLegacyResponse(i, t) : null;
   }
   buildSystemPrompt() {
-    return `${this.customSystemPrompt ?? U}${F}`;
+    return `${this.customSystemPrompt ?? H}${B}`;
   }
   extractContent(e) {
     var r;
@@ -1403,7 +1403,7 @@ class A {
       return null;
     }
     const r = s.intent;
-    if (typeof r != "string" || r === "unsupported" || !q.has(r))
+    if (typeof r != "string" || r === "unsupported" || !U.has(r))
       return null;
     const n = typeof s.arguments == "object" && s.arguments !== null ? s.arguments : {}, i = typeof s.confidence == "number" ? Math.max(0, Math.min(1, s.confidence)) : 0.7;
     return {
@@ -1448,7 +1448,7 @@ class A {
     );
   }
 }
-const G = "Xenova/all-MiniLM-L6-v2", J = 0.3, B = [
+const J = "Xenova/all-MiniLM-L6-v2", q = 0.3, G = [
   { name: "filter_by_name", description: "find or show records created by a specific person, filtered by author name" },
   { name: "filter_by_title", description: "find records related to something identified by its title or name" },
   { name: "who_created", description: "identify who wrote, created, or authored something" },
@@ -1459,12 +1459,12 @@ const G = "Xenova/all-MiniLM-L6-v2", J = 0.3, B = [
   { name: "profile", description: "get profile, details, or information about a specific person" },
   { name: "unsupported", description: "general conversation, weather, jokes, math, translations, or anything unrelated to stored data" }
 ];
-function y(c) {
-  return c.endsWith("s") ? c : c.endsWith("y") ? `${c.slice(0, -1)}ies` : `${c}s`;
+function b(u) {
+  return u.endsWith("s") ? u : u.endsWith("y") ? `${u.slice(0, -1)}ies` : `${u}s`;
 }
-class x {
+class A {
   constructor(e, t = {}) {
-    this.pipeline = null, this.initializationPromise = null, this.categories = [], this.introspection = e, this.modelId = t.modelId ?? G, this.onProgress = t.onProgress, this.similarityThreshold = t.similarityThreshold ?? J;
+    this.pipeline = null, this.initializationPromise = null, this.categories = [], this.introspection = e, this.modelId = t.modelId ?? J, this.onProgress = t.onProgress, this.similarityThreshold = t.similarityThreshold ?? q;
   }
   async initialize() {
     if (!this.pipeline) {
@@ -1537,7 +1537,7 @@ class x {
       this.modelId,
       t
     ), this.categories = [];
-    for (const s of B) {
+    for (const s of G) {
       const r = await this.embed(s.description);
       this.categories.push({ ...s, embedding: r });
     }
@@ -1594,7 +1594,7 @@ class x {
   findTypeMentions(e) {
     const t = e.toLowerCase(), s = [];
     for (const r of this.introspection.typeNames) {
-      const n = y(r), i = t.indexOf(n.toLowerCase());
+      const n = b(r), i = t.indexOf(n.toLowerCase());
       if (i !== -1) {
         s.push({ typeName: r, position: i });
         continue;
@@ -1704,15 +1704,15 @@ class x {
     if (s.length === 0 || r.length === 0) return null;
     const n = s[0], i = r[0];
     let o = null;
-    for (const [u, l] of this.introspection.types) {
-      if (u === i || u === n) continue;
-      const p = l.relationships.some(
-        (h) => h.kind === "belongsTo" && h.relatedType === i
-      ), f = l.relationships.some(
-        (h) => h.kind === "belongsTo" && h.relatedType === n
+    for (const [l, c] of this.introspection.types) {
+      if (l === i || l === n) continue;
+      const p = c.relationships.some(
+        (m) => m.kind === "belongsTo" && m.relatedType === i
+      ), h = c.relationships.some(
+        (m) => m.kind === "belongsTo" && m.relatedType === n
       );
-      if (p && f) {
-        o = u;
+      if (p && h) {
+        o = l;
         break;
       }
     }
@@ -1734,13 +1734,13 @@ class x {
     const r = s[0];
     let n = null, i = null;
     const o = t[0], a = t[1];
-    if (t.length >= 2 && o && a ? (n = o.typeName, i = a.typeName !== n ? a.typeName : null) : o && (n = o.typeName), n || (n = this.introspection.typeNames.find((l) => l !== r) ?? this.introspection.typeNames[0] ?? null), !n) return null;
-    const u = this.extractValueAfterPreposition(e);
+    if (t.length >= 2 && o && a ? (n = o.typeName, i = a.typeName !== n ? a.typeName : null) : o && (n = o.typeName), n || (n = this.introspection.typeNames.find((c) => c !== r) ?? this.introspection.typeNames[0] ?? null), !n) return null;
+    const l = this.extractValueAfterPreposition(e);
     return {
       target: n,
       filterType: r,
       filterAttribute: "name",
-      filterValue: u,
+      filterValue: l,
       throughType: i,
       search: null,
       limit: null,
@@ -1802,7 +1802,7 @@ class x {
   extractProperNoun(e) {
     const t = /* @__PURE__ */ new Set();
     for (const n of this.introspection.typeNames)
-      t.add(n.toLowerCase()), t.add(y(n).toLowerCase());
+      t.add(n.toLowerCase()), t.add(b(n).toLowerCase());
     const s = /* @__PURE__ */ new Set([
       "i",
       "me",
@@ -1856,7 +1856,7 @@ class x {
     return null;
   }
   extractTitleValue(e, t) {
-    const s = e.replace(/[?!.]+$/, "").trim(), r = y(t), n = new RegExp(
+    const s = e.replace(/[?!.]+$/, "").trim(), r = b(t), n = new RegExp(
       `(?:on|about|of)\\s+(?:the\\s+)?(.+?)\\s+(?:${t}|${r})\\s*$`,
       "i"
     ), i = s.match(n);
@@ -1865,7 +1865,7 @@ class x {
     return a ? a[1].trim() : null;
   }
   extractCreatedValue(e, t) {
-    const s = e.replace(/[?!.]+$/, "").trim(), r = y(t), n = new RegExp(
+    const s = e.replace(/[?!.]+$/, "").trim(), r = b(t), n = new RegExp(
       `(?:wrote|created|authored|made)\\s+(?:the\\s+)?(.+?)\\s+(?:${t}|${r})\\s*$`,
       "i"
     ), i = s.match(n);
@@ -1884,7 +1884,7 @@ class x {
     return s ? Math.max(1, Math.min(100, parseInt(s[1], 10))) : 10;
   }
 }
-class b {
+class T {
   constructor(e) {
     this.parsers = e;
   }
@@ -1900,12 +1900,12 @@ class b {
     return null;
   }
 }
-class T {
+class x {
   constructor(e, t, s, r) {
     this.parser = e, this.toolRegistry = t, this.executor = null, this.formatter = s, this.store = r;
   }
   static createGeneric(e, t, s, r) {
-    const n = Object.create(T.prototype);
+    const n = Object.create(x.prototype);
     return Object.assign(n, {
       parser: e,
       toolRegistry: null,
@@ -1929,7 +1929,7 @@ class T {
     if (this.executor) {
       const r = t.arguments;
       if (r.target === "unsupported")
-        throw new P(e);
+        throw new S(e);
       return { ...await this.executor.execute(r, this.store), intent: t.intent, parsedIntent: r };
     }
     return { ...await this.toolRegistry.execute(t, this.store), intent: t.intent };
@@ -1939,7 +1939,7 @@ class T {
     return { result: t, formatted: s };
   }
 }
-class H {
+class Y {
   constructor() {
     this.handlers = {
       success: (e) => Array.isArray(e.data) ? this.formatArrayResult(e) : e.data && typeof e.data == "object" ? this.formatSingleResult(e) : e.message,
@@ -1973,25 +1973,25 @@ class H {
 `);
   }
 }
-class te {
+class de {
   constructor(e, t = {}) {
-    const r = new I(e.schema).introspect(), n = new L(
+    const r = new R(e.schema).introspect(), n = new I(
       r,
       t.dataSourceMode ?? "local"
-    ), i = new H(), o = new M(r), a = new Set(r.typeNames);
-    let u, l = null, p = null, f = null;
-    const h = {
+    ), i = new Y(), o = new v(r), a = new Set(r.typeNames);
+    let l, c = null, p = null, h = null;
+    const m = {
       ...t.webLlmOptions,
       systemPrompt: r.systemPrompt,
       jsonSchema: r.jsonSchema,
       validTargets: a
-    }, m = {
+    }, d = {
       ...t.transformersOptions,
       systemPrompt: r.systemPrompt,
       jsonSchema: r.jsonSchema,
       validTargets: a
     };
-    t.parserMode === "webllm" ? (l = new $(h), u = l) : t.parserMode === "transformers" ? (p = new A(m), u = p) : t.parserMode === "embedding" ? (f = new x(r, t.embeddingOptions), u = f) : t.parserMode === "cascade" ? (l = new $(h), u = new b([o, l])) : t.parserMode === "cascade-transformers" ? (p = new A(m), u = new b([o, p])) : t.parserMode === "cascade-embedding" ? (f = new x(r, t.embeddingOptions), u = new b([o, f])) : u = o, this.webLlmParser = l, this.transformersParser = p, this.embeddingParser = f, this.service = T.createGeneric(u, n, i, e);
+    t.parserMode === "webllm" ? (c = new N(m), l = c) : t.parserMode === "transformers" ? (p = new _(d), l = p) : t.parserMode === "embedding" ? (h = new A(r, t.embeddingOptions), l = h) : t.parserMode === "cascade" ? (c = new N(m), l = new T([o, c])) : t.parserMode === "cascade-transformers" ? (p = new _(d), l = new T([o, p])) : t.parserMode === "cascade-embedding" ? (h = new A(r, t.embeddingOptions), l = new T([o, h])) : l = o, this.webLlmParser = c, this.transformersParser = p, this.embeddingParser = h, this.service = x.createGeneric(l, n, i, e);
   }
   async query(e) {
     return this.service.query(e);
@@ -2030,14 +2030,1436 @@ class te {
     this.webLlmParser && await this.webLlmParser.dispose(), this.transformersParser && await this.transformersParser.dispose(), this.embeddingParser && await this.embeddingParser.dispose();
   }
 }
-const Y = [
+const X = "onnx-community/Qwen2.5-0.5B-Instruct", Q = 0.1, K = 200;
+class ge {
+  constructor(e, t = {}) {
+    this.generator = null, this.initializationPromise = null, this.introspection = e, this.modelId = t.modelId ?? X, this.device = t.device ?? null, this.dtype = t.dtype ?? "q4f16", this.onProgress = t.onProgress, this.temperature = t.temperature ?? Q, this.maxTokens = t.maxTokens ?? K;
+  }
+  async initialize() {
+    if (!this.generator) {
+      if (this.initializationPromise)
+        return this.initializationPromise;
+      this.initializationPromise = this.loadPipeline();
+      try {
+        await this.initializationPromise;
+      } catch (e) {
+        throw this.initializationPromise = null, e;
+      }
+    }
+  }
+  async dispose() {
+    this.generator && (await this.generator.dispose(), this.generator = null, this.initializationPromise = null);
+  }
+  get isLoaded() {
+    return this.generator !== null;
+  }
+  async parse(e) {
+    const t = e.trim();
+    if (t.length === 0) return null;
+    await this.initialize();
+    const s = [
+      { role: "system", content: this.introspection.systemPrompt },
+      { role: "user", content: t }
+    ], r = await this.generator(s, {
+      max_new_tokens: this.maxTokens,
+      temperature: this.temperature,
+      do_sample: this.temperature > 0,
+      return_full_text: !1
+    }), n = this.extractContent(r);
+    return n ? this.parseResponse(n, t) : null;
+  }
+  extractContent(e) {
+    var r;
+    if (!Array.isArray(e) || e.length === 0) return null;
+    const t = (r = e[0]) == null ? void 0 : r.generated_text;
+    if (!Array.isArray(t) || t.length === 0) return null;
+    const s = t.find(
+      (n) => n.role === "assistant"
+    );
+    return s != null && s.content ? this.cleanJsonResponse(s.content) : null;
+  }
+  cleanJsonResponse(e) {
+    let t = e.trim();
+    const s = t.indexOf("</think>");
+    s !== -1 && (t = t.slice(s + 8).trim());
+    const r = t.match(/```(?:json)?\s*([\s\S]*?)```/);
+    r && (t = r[1].trim());
+    const n = t.match(/\{[\s\S]*\}/);
+    return n ? n[0] : null;
+  }
+  parseResponse(e, t) {
+    let s;
+    try {
+      s = JSON.parse(e);
+    } catch {
+      return null;
+    }
+    const r = s.target;
+    if (typeof r != "string") return null;
+    if (r === "unsupported")
+      return {
+        intent: "unsupported",
+        arguments: {
+          target: "unsupported",
+          filterType: null,
+          filterAttribute: null,
+          filterValue: null,
+          throughType: null,
+          search: null,
+          limit: null,
+          confidence: 0.8
+        },
+        originalQuery: t,
+        confidence: 0.8
+      };
+    if (!new Set(this.introspection.typeNames).has(r)) return null;
+    const i = typeof s.confidence == "number" ? Math.max(0, Math.min(1, s.confidence)) : 0.7, o = {
+      target: r,
+      filterType: this.parseNullableString(s.filter_type),
+      filterAttribute: this.parseNullableString(s.filter_attribute),
+      filterValue: this.parseNullableString(s.filter_value),
+      throughType: this.parseNullableString(s.through_type),
+      search: this.parseNullableString(s.search),
+      limit: this.parseNullableNumber(s.limit),
+      confidence: i
+    };
+    return {
+      intent: `generic:${r}`,
+      arguments: o,
+      originalQuery: t,
+      confidence: i
+    };
+  }
+  parseNullableString(e) {
+    return typeof e != "string" || e === "none" || e === "null" || e === "" ? null : e;
+  }
+  parseNullableNumber(e) {
+    if (typeof e == "number") return Math.max(1, Math.min(100, e));
+    if (typeof e != "string" || e === "none" || e === "null" || e === "") return null;
+    const t = parseInt(e, 10);
+    return Number.isNaN(t) ? null : Math.max(1, Math.min(100, t));
+  }
+  async loadPipeline() {
+    let e;
+    try {
+      e = await import("@huggingface/transformers");
+    } catch {
+      throw new Error(
+        "@huggingface/transformers is required for SchemaLlmIntentParser. Install it with: pnpm add @huggingface/transformers"
+      );
+    }
+    const t = {
+      dtype: this.dtype
+    };
+    this.device !== null && (t.device = this.device), this.onProgress && (t.progress_callback = (s) => {
+      this.onProgress({
+        progress: typeof s.progress == "number" ? s.progress : 0,
+        status: typeof s.status == "string" ? s.status : "unknown",
+        file: typeof s.file == "string" ? s.file : void 0
+      });
+    }), this.generator = await e.pipeline(
+      "text-generation",
+      this.modelId,
+      t
+    );
+  }
+}
+const Z = "Xenova/all-MiniLM-L6-v2", ee = "onnx-community/Qwen2.5-1.5B-Instruct", te = 0.1, se = 200, re = 0.55, ne = 0.25, ie = [
+  { name: "filter_by_name", description: "find, show, or get records by a specific person or author name, what someone wrote or posted" },
+  { name: "filter_by_title", description: "find records about or on a specific titled item, like comments on a specific post" },
+  { name: "who_created", description: "identify who wrote, created, authored, or made something" },
+  { name: "who_interacted", description: "identify who commented on, reviewed, replied to, or interacted with something" },
+  { name: "multi_hop", description: "find records through a chain of relationships, like comments on posts by someone" },
+  { name: "compound", description: "find records by a specific person about a specific topic, combining author filter with text search" },
+  { name: "search", description: "search or find records containing specific text, keywords, or about a topic" },
+  { name: "list_recent", description: "list, show, or get recent, latest, newest, or last records" },
+  { name: "profile", description: "get profile, details, or information about a specific person or user" },
+  { name: "unsupported", description: "general conversation, weather, jokes, math, translations, or anything unrelated to stored data" }
+];
+function oe(u) {
+  return u.endsWith("s") ? u : u.endsWith("y") ? `${u.slice(0, -1)}ies` : `${u}s`;
+}
+class ye {
+  constructor(e, t = {}) {
+    this.embeddingPipeline = null, this.llmPipeline = null, this.initializationPromise = null, this.categories = [], this.introspection = e, this.embeddingModelId = t.embeddingModelId ?? Z, this.llmModelId = t.llmModelId ?? ee, this.device = t.device ?? null, this.dtype = t.dtype ?? "q4", this.onProgress = t.onProgress, this.temperature = t.temperature ?? te, this.maxTokens = t.maxTokens ?? se, this.focusedThreshold = t.focusedThreshold ?? re, this.fallbackThreshold = t.fallbackThreshold ?? ne;
+  }
+  async initialize() {
+    if (!(this.embeddingPipeline && this.llmPipeline)) {
+      if (this.initializationPromise)
+        return this.initializationPromise;
+      this.initializationPromise = this.loadPipelines();
+      try {
+        await this.initializationPromise;
+      } catch (e) {
+        throw this.initializationPromise = null, e;
+      }
+    }
+  }
+  async dispose() {
+    const e = [];
+    this.embeddingPipeline && e.push(this.embeddingPipeline.dispose()), this.llmPipeline && e.push(this.llmPipeline.dispose()), await Promise.all(e), this.embeddingPipeline = null, this.llmPipeline = null, this.initializationPromise = null, this.categories = [];
+  }
+  get isLoaded() {
+    return this.embeddingPipeline !== null && this.llmPipeline !== null;
+  }
+  async parse(e) {
+    const t = e.trim();
+    if (t.length === 0) return null;
+    await this.initialize();
+    const s = await this.embed(t), r = this.classifyByEmbedding(s);
+    if (!r || r.confidence < this.fallbackThreshold)
+      return null;
+    if (r.category === "unsupported")
+      return this.buildUnsupportedResult(t, r.confidence);
+    let n;
+    if (r.confidence >= this.focusedThreshold ? n = await this.focusedExtraction(
+      r.category,
+      t,
+      r.confidence
+    ) : n = await this.fullLlmFallback(t), !n) return null;
+    const i = this.validateAgainstSchema(n);
+    return i ? {
+      intent: i.target === "unsupported" ? "unsupported" : `generic:${i.target}`,
+      arguments: i,
+      originalQuery: t,
+      confidence: i.confidence
+    } : null;
+  }
+  // ─── Stage 1: Embedding ──────────────────────────────────────
+  async embed(e) {
+    const r = (await this.embeddingPipeline(e, {
+      pooling: "mean",
+      normalize: !0
+    })).tolist()[0];
+    if (!r)
+      throw new Error("Embedding produced no output vectors");
+    return r;
+  }
+  classifyByEmbedding(e) {
+    let t = "", s = -1;
+    for (const r of this.categories) {
+      if (!r.embedding) continue;
+      const n = this.dotProduct(e, r.embedding);
+      n > s && (s = n, t = r.name);
+    }
+    return t ? { category: t, confidence: s } : null;
+  }
+  dotProduct(e, t) {
+    let s = 0;
+    for (let r = 0; r < e.length; r++)
+      s += (e[r] ?? 0) * (t[r] ?? 0);
+    return s;
+  }
+  // ─── Stage 2A: Focused Extraction ────────────────────────────
+  async focusedExtraction(e, t, s) {
+    const r = this.buildExtractionPrompt(e), n = await this.callLlm(r, t);
+    return n ? this.assembleFromCategory(e, n, s) : null;
+  }
+  buildExtractionPrompt(e) {
+    const t = this.buildTypeSummary(), s = this.introspection.typeNames.join(", ");
+    switch (e) {
+      case "filter_by_name":
+        return this.promptForFilterByName(t, s);
+      case "filter_by_title":
+        return this.promptForFilterByTitle(t, s);
+      case "who_created":
+        return this.promptForWhoCreated(t);
+      case "who_interacted":
+        return this.promptForWhoInteracted(t);
+      case "multi_hop":
+        return this.promptForMultiHop(t, s);
+      case "compound":
+        return this.promptForCompound(t, s);
+      case "search":
+        return this.promptForSearch(t, s);
+      case "list_recent":
+        return this.promptForListRecent(t, s);
+      case "profile":
+        return this.promptForProfile(t);
+      default:
+        return this.introspection.systemPrompt;
+    }
+  }
+  buildTypeSummary() {
+    const e = [];
+    for (const t of this.introspection.typeNames) {
+      const s = this.introspection.types.get(t), r = s.attributes.map((i) => i.name).join(", "), n = s.relationships.map((i) => `${i.name}(${i.kind})→${i.relatedType}`).join(", ");
+      e.push(`${t}: attrs[${r}] rels[${n}]`);
+    }
+    return e.join(`
+`);
+  }
+  promptForFilterByName(e, t) {
+    return [
+      "Extract the record type and person's name from a query about data.",
+      e,
+      `target must be one of: ${t}`,
+      'Output ONLY JSON: {"target":"<type>","name":"<person name>"}',
+      '"posts by Alice" → {"target":"post","name":"Alice"}',
+      '"what has Bob written" → {"target":"post","name":"Bob"}',
+      '"Bob comments" → {"target":"comment","name":"Bob"}',
+      '"lmk what Carol wrote" → {"target":"post","name":"Carol"}',
+      '"anything from Alice?" → {"target":"post","name":"Alice"}'
+    ].join(`
+`);
+  }
+  promptForFilterByTitle(e, t) {
+    return [
+      "Extract the record type and title of the referenced item from a data query.",
+      e,
+      `target must be one of: ${t}`,
+      'Output ONLY JSON: {"target":"<type>","title":"<title text>"}',
+      '"comments on Hello World" → {"target":"comment","title":"Hello World"}',
+      '"replies on the Weekend post" → {"target":"comment","title":"Weekend"}',
+      '"feedback on On MobX" → {"target":"comment","title":"On MobX"}'
+    ].join(`
+`);
+  }
+  promptForWhoCreated(e) {
+    return [
+      "Extract the title of the thing whose creator/author the user wants to identify.",
+      e,
+      'Output ONLY JSON: {"title":"<title value>"}',
+      '"who wrote On MobX?" → {"title":"On MobX"}',
+      '"who authored the Weekend post?" → {"title":"Weekend"}',
+      '"who is the author of Hello World" → {"title":"Hello World"}',
+      '"I wonder who wrote the Weekend post" → {"title":"Weekend"}'
+    ].join(`
+`);
+  }
+  promptForWhoInteracted(e) {
+    return [
+      "Extract the title of the thing whose commenters/interactors the user wants to know.",
+      e,
+      'Output ONLY JSON: {"title":"<title value>"}',
+      '"who commented on Hello World?" → {"title":"Hello World"}',
+      '"who are the users that commented on Weekend" → {"title":"Weekend"}'
+    ].join(`
+`);
+  }
+  promptForMultiHop(e, t) {
+    return [
+      "Extract the target type, person's name, and intermediate type from a chained query.",
+      e,
+      `Types: ${t}`,
+      'Output ONLY JSON: {"target":"<type>","name":"<person name>","through":"<intermediate type>"}',
+      '"comments on posts by Alice" → {"target":"comment","name":"Alice","through":"post"}',
+      '"all comments people left on Alice posts" → {"target":"comment","name":"Alice","through":"post"}'
+    ].join(`
+`);
+  }
+  promptForCompound(e, t) {
+    return [
+      "Extract the target type, person's name, and search topic from a combined query.",
+      e,
+      `target must be one of: ${t}`,
+      'Output ONLY JSON: {"target":"<type>","name":"<person name>","search":"<topic>"}',
+      '"posts by Alice about reactive" → {"target":"post","name":"Alice","search":"reactive"}',
+      '"show me posts from Bob about MobX" → {"target":"post","name":"Bob","search":"MobX"}'
+    ].join(`
+`);
+  }
+  promptForSearch(e, t) {
+    return [
+      "Extract the record type and search keywords from a data query.",
+      e,
+      `target must be one of: ${t}`,
+      'Output ONLY JSON: {"target":"<type>","search":"<keywords>"}',
+      '"search posts about TypeScript" → {"target":"post","search":"TypeScript"}',
+      '"articles about state management" → {"target":"post","search":"state management"}',
+      '"any discussions about observables" → {"target":"post","search":"observables"}'
+    ].join(`
+`);
+  }
+  promptForListRecent(e, t) {
+    return [
+      "Extract the record type and optional limit from a query about recent records.",
+      e,
+      `target must be one of: ${t}`,
+      'Output ONLY JSON: {"target":"<type>","limit":"<number or 10>"}',
+      '"recent posts" → {"target":"post","limit":"10"}',
+      '"latest 5 comments" → {"target":"comment","limit":"5"}',
+      '"could you show me the latest posts?" → {"target":"post","limit":"10"}'
+    ].join(`
+`);
+  }
+  promptForProfile(e) {
+    return [
+      "Extract the person's name from a profile/details query.",
+      e,
+      'Output ONLY JSON: {"name":"<person name>"}',
+      '"profile of Alice" → {"name":"Alice"}',
+      '"tell me about Carol" → {"name":"Carol"}',
+      '"user Carol" → {"name":"Carol"}',
+      '"can someone tell me about Alice" → {"name":"Alice"}'
+    ].join(`
+`);
+  }
+  // ─── Stage 2B: Full LLM Fallback ────────────────────────────
+  async fullLlmFallback(e) {
+    const t = await this.callLlm(this.introspection.systemPrompt, e);
+    return t ? this.parseFullLlmResponse(t) : null;
+  }
+  parseFullLlmResponse(e) {
+    const t = e.target;
+    if (typeof t != "string") return null;
+    if (t === "unsupported")
+      return {
+        target: "unsupported",
+        filterType: null,
+        filterAttribute: null,
+        filterValue: null,
+        throughType: null,
+        search: null,
+        limit: null,
+        confidence: 0.8
+      };
+    new Set(this.introspection.typeNames);
+    const s = this.resolveTypeName(t);
+    if (!s) return null;
+    const r = typeof e.confidence == "number" ? Math.max(0, Math.min(1, e.confidence)) : 0.7;
+    return {
+      target: s,
+      filterType: this.resolveNullableType(e.filter_type),
+      filterAttribute: this.parseNullableString(e.filter_attribute),
+      filterValue: this.parseNullableString(e.filter_value),
+      throughType: this.resolveNullableType(e.through_type),
+      search: this.parseNullableString(e.search),
+      limit: this.parseNullableNumber(e.limit),
+      confidence: r
+    };
+  }
+  resolveNullableType(e) {
+    return typeof e != "string" ? null : this.resolveTypeName(e);
+  }
+  parseNullableString(e) {
+    return typeof e != "string" || e === "none" || e === "null" || e === "" ? null : e;
+  }
+  parseNullableNumber(e) {
+    if (typeof e == "number") return Math.max(1, Math.min(100, e));
+    if (typeof e != "string" || e === "none" || e === "null" || e === "") return null;
+    const t = parseInt(e, 10);
+    return Number.isNaN(t) ? null : Math.max(1, Math.min(100, t));
+  }
+  // ─── Shared LLM Call ─────────────────────────────────────────
+  async callLlm(e, t) {
+    const s = [
+      { role: "system", content: e },
+      { role: "user", content: t }
+    ], r = await this.llmPipeline(s, {
+      max_new_tokens: this.maxTokens,
+      temperature: this.temperature,
+      do_sample: this.temperature > 0,
+      return_full_text: !1
+    }), n = this.extractLlmContent(r);
+    if (!n) return null;
+    try {
+      const i = JSON.parse(n);
+      return typeof i != "object" || i === null ? null : i;
+    } catch {
+      return null;
+    }
+  }
+  extractLlmContent(e) {
+    var r;
+    if (!Array.isArray(e) || e.length === 0) return null;
+    const t = (r = e[0]) == null ? void 0 : r.generated_text;
+    if (!Array.isArray(t) || t.length === 0) return null;
+    const s = t.find(
+      (n) => n.role === "assistant"
+    );
+    return s != null && s.content ? this.cleanJsonResponse(s.content) : null;
+  }
+  cleanJsonResponse(e) {
+    let t = e.trim();
+    const s = t.indexOf("</think>");
+    s !== -1 && (t = t.slice(s + 8).trim());
+    const r = t.match(/```(?:json)?\s*([\s\S]*?)```/);
+    r && (t = r[1].trim());
+    const n = t.match(/\{[\s\S]*?\}/);
+    return n ? n[0] : null;
+  }
+  // ─── Stage 3: Assembly from Category ─────────────────────────
+  assembleFromCategory(e, t, s) {
+    switch (e) {
+      case "filter_by_name":
+        return this.assembleFilterByName(t, s);
+      case "filter_by_title":
+        return this.assembleFilterByTitle(t, s);
+      case "who_created":
+        return this.assembleWhoCreated(t, s);
+      case "who_interacted":
+        return this.assembleWhoInteracted(t, s);
+      case "multi_hop":
+        return this.assembleMultiHop(t, s);
+      case "compound":
+        return this.assembleCompound(t, s);
+      case "search":
+        return this.assembleSearch(t, s);
+      case "list_recent":
+        return this.assembleListRecent(t, s);
+      case "profile":
+        return this.assembleProfile(t, s);
+      default:
+        return null;
+    }
+  }
+  assembleFilterByName(e, t) {
+    const s = this.resolveTypeName(String(e.target ?? "")), r = this.findTypeWithAttribute("name");
+    return r ? {
+      target: s ?? this.defaultTargetExcluding(r),
+      filterType: r,
+      filterAttribute: "name",
+      filterValue: this.parseNullableString(e.name),
+      throughType: null,
+      search: null,
+      limit: null,
+      confidence: t
+    } : null;
+  }
+  assembleFilterByTitle(e, t) {
+    const s = this.resolveTypeName(String(e.target ?? "")), r = this.findTypeWithAttribute("title");
+    return r ? {
+      target: s ?? this.defaultTargetExcluding(r),
+      filterType: r,
+      filterAttribute: "title",
+      filterValue: this.parseNullableString(e.title),
+      throughType: null,
+      search: null,
+      limit: null,
+      confidence: t
+    } : null;
+  }
+  assembleWhoCreated(e, t) {
+    const s = this.findTypeWithAttribute("name"), r = this.findTypeWithAttribute("title");
+    return !s || !r ? null : {
+      target: s,
+      filterType: r,
+      filterAttribute: "title",
+      filterValue: this.parseNullableString(e.title),
+      throughType: null,
+      search: null,
+      limit: null,
+      confidence: t
+    };
+  }
+  assembleWhoInteracted(e, t) {
+    const s = this.findTypeWithAttribute("name"), r = this.findTypeWithAttribute("title");
+    if (!s || !r) return null;
+    const n = this.findThroughType(s, r);
+    return {
+      target: s,
+      filterType: r,
+      filterAttribute: "title",
+      filterValue: this.parseNullableString(e.title),
+      throughType: n,
+      search: null,
+      limit: null,
+      confidence: t
+    };
+  }
+  assembleMultiHop(e, t) {
+    const s = this.resolveTypeName(String(e.target ?? ""));
+    if (!s) return null;
+    const r = this.findTypeWithAttribute("name");
+    if (!r) return null;
+    const n = this.resolveTypeName(String(e.through ?? ""));
+    return {
+      target: s,
+      filterType: r,
+      filterAttribute: "name",
+      filterValue: this.parseNullableString(e.name),
+      throughType: n,
+      search: null,
+      limit: null,
+      confidence: t
+    };
+  }
+  assembleCompound(e, t) {
+    const s = this.resolveTypeName(String(e.target ?? "")), r = this.findTypeWithAttribute("name");
+    return r ? {
+      target: s ?? this.defaultTargetExcluding(r),
+      filterType: r,
+      filterAttribute: "name",
+      filterValue: this.parseNullableString(e.name),
+      throughType: null,
+      search: this.parseNullableString(e.search),
+      limit: null,
+      confidence: t
+    } : null;
+  }
+  assembleSearch(e, t) {
+    return {
+      target: this.resolveTypeName(String(e.target ?? "")) ?? this.introspection.typeNames[0] ?? "unknown",
+      filterType: null,
+      filterAttribute: null,
+      filterValue: null,
+      throughType: null,
+      search: this.parseNullableString(e.search),
+      limit: null,
+      confidence: t
+    };
+  }
+  assembleListRecent(e, t) {
+    const s = this.resolveTypeName(String(e.target ?? "")), r = this.parseNullableNumber(e.limit) ?? 10;
+    return {
+      target: s ?? this.introspection.typeNames[0] ?? "unknown",
+      filterType: null,
+      filterAttribute: null,
+      filterValue: null,
+      throughType: null,
+      search: null,
+      limit: r,
+      confidence: t
+    };
+  }
+  assembleProfile(e, t) {
+    const s = this.findTypeWithAttribute("name");
+    return s ? {
+      target: s,
+      filterType: s,
+      filterAttribute: "name",
+      filterValue: this.parseNullableString(e.name),
+      throughType: null,
+      search: null,
+      limit: null,
+      confidence: t
+    } : null;
+  }
+  // ─── Stage 3: Schema Validation ──────────────────────────────
+  validateAgainstSchema(e) {
+    if (e.target === "unsupported") return e;
+    if (!this.introspection.typeNames.includes(e.target)) {
+      const t = this.resolveTypeName(e.target);
+      if (!t) return null;
+      e.target = t;
+    }
+    if (e.filterType && !this.introspection.typeNames.includes(e.filterType)) {
+      const t = this.resolveTypeName(e.filterType);
+      e.filterType = t, t || (e.filterAttribute = null, e.filterValue = null);
+    }
+    if (e.throughType && !this.introspection.typeNames.includes(e.throughType)) {
+      const t = this.resolveTypeName(e.throughType);
+      e.throughType = t;
+    }
+    return e;
+  }
+  // ─── Schema Helpers ──────────────────────────────────────────
+  findTypeWithAttribute(e) {
+    for (const [t, s] of this.introspection.types)
+      if (s.attributes.some((r) => r.name === e))
+        return t;
+    return null;
+  }
+  findThroughType(e, t) {
+    for (const [s, r] of this.introspection.types) {
+      if (s === e || s === t) continue;
+      const n = r.relationships.some(
+        (o) => o.kind === "belongsTo" && o.relatedType === e
+      ), i = r.relationships.some(
+        (o) => o.kind === "belongsTo" && o.relatedType === t
+      );
+      if (n && i)
+        return s;
+    }
+    return null;
+  }
+  defaultTargetExcluding(e) {
+    for (const t of this.introspection.typeNames) {
+      if (t === e) continue;
+      if (this.introspection.types.get(t).relationships.some(
+        (r) => r.kind === "belongsTo" && r.relatedType === e
+      ))
+        return t;
+    }
+    return this.introspection.typeNames[0] ?? "unknown";
+  }
+  resolveTypeName(e) {
+    if (!e || e === "none" || e === "null" || e === "") return null;
+    const t = e.toLowerCase().trim();
+    for (const s of this.introspection.typeNames)
+      if (s.toLowerCase() === t) return s;
+    for (const s of this.introspection.typeNames)
+      if (oe(s).toLowerCase() === t || `${s.toLowerCase()}s` === t)
+        return s;
+    for (const s of this.introspection.typeNames)
+      if (t.includes(s.toLowerCase())) return s;
+    return null;
+  }
+  buildUnsupportedResult(e, t) {
+    return {
+      intent: "unsupported",
+      arguments: {
+        target: "unsupported",
+        filterType: null,
+        filterAttribute: null,
+        filterValue: null,
+        throughType: null,
+        search: null,
+        limit: null,
+        confidence: t
+      },
+      originalQuery: e,
+      confidence: t
+    };
+  }
+  // ─── Pipeline Loading ────────────────────────────────────────
+  async loadPipelines() {
+    let e;
+    try {
+      e = await import("@huggingface/transformers");
+    } catch {
+      throw new Error(
+        "@huggingface/transformers is required for MultiStageLlmIntentParser. Install it with: pnpm add @huggingface/transformers"
+      );
+    }
+    const t = {}, s = { dtype: this.dtype };
+    this.device !== null && (s.device = this.device), this.onProgress && (t.progress_callback = (i) => {
+      this.onProgress({
+        stage: "embedding",
+        progress: typeof i.progress == "number" ? i.progress : 0,
+        status: typeof i.status == "string" ? i.status : "unknown",
+        file: typeof i.file == "string" ? i.file : void 0
+      });
+    }, s.progress_callback = (i) => {
+      this.onProgress({
+        stage: "llm",
+        progress: typeof i.progress == "number" ? i.progress : 0,
+        status: typeof i.status == "string" ? i.status : "unknown",
+        file: typeof i.file == "string" ? i.file : void 0
+      });
+    });
+    const [r, n] = await Promise.all([
+      e.pipeline("feature-extraction", this.embeddingModelId, t),
+      e.pipeline("text-generation", this.llmModelId, s)
+    ]);
+    this.embeddingPipeline = r, this.llmPipeline = n, this.categories = [];
+    for (const i of ie) {
+      const o = await this.embed(i.description);
+      this.categories.push({ ...i, embedding: o });
+    }
+  }
+}
+const ae = "Xenova/all-MiniLM-L6-v2", le = 0.25;
+function g(u) {
+  return u.endsWith("s") ? u : u.endsWith("y") ? `${u.slice(0, -1)}ies` : `${u}s`;
+}
+class be {
+  constructor(e, t = {}) {
+    this.pipeline = null, this.initializationPromise = null, this.templates = [], this.nlp = null, this.introspection = e, this.modelId = t.modelId ?? ae, this.onProgress = t.onProgress, this.similarityThreshold = t.similarityThreshold ?? le;
+  }
+  async initialize() {
+    if (!this.pipeline) {
+      if (this.initializationPromise)
+        return this.initializationPromise;
+      this.initializationPromise = this.loadModelsAndTemplates();
+      try {
+        await this.initializationPromise;
+      } catch (e) {
+        throw this.initializationPromise = null, e;
+      }
+    }
+  }
+  async dispose() {
+    this.pipeline && (await this.pipeline.dispose(), this.pipeline = null, this.initializationPromise = null, this.templates = [], this.nlp = null);
+  }
+  get isLoaded() {
+    return this.pipeline !== null;
+  }
+  async parse(e) {
+    const t = e.trim();
+    if (t.length === 0) return null;
+    await this.initialize();
+    const s = this.correctTypos(t), r = await this.embed(s), n = this.findBestTemplate(r);
+    if (!n || n.score < this.similarityThreshold)
+      return null;
+    const { template: i } = n;
+    if (i.category === "unsupported")
+      return {
+        intent: "unsupported",
+        arguments: {
+          target: "unsupported",
+          filterType: null,
+          filterAttribute: null,
+          filterValue: null,
+          throughType: null,
+          search: null,
+          limit: null,
+          confidence: n.score
+        },
+        originalQuery: t,
+        confidence: n.score
+      };
+    const o = this.buildIntent(t, i);
+    return o.confidence = n.score, {
+      intent: `generic:${o.target}`,
+      arguments: o,
+      originalQuery: t,
+      confidence: n.score
+    };
+  }
+  // ─── Initialization ──────────────────────────────────────────
+  async loadModelsAndTemplates() {
+    let e;
+    try {
+      e = await import("@huggingface/transformers");
+    } catch {
+      throw new Error(
+        "@huggingface/transformers is required. Install: pnpm add @huggingface/transformers"
+      );
+    }
+    try {
+      const r = await import("../three-BdZdFcoN.js");
+      this.nlp = r.default;
+    } catch {
+      throw new Error(
+        "compromise is required. Install: pnpm add compromise"
+      );
+    }
+    const t = {};
+    this.onProgress && (t.progress_callback = (r) => {
+      this.onProgress({
+        progress: typeof r.progress == "number" ? r.progress : 0,
+        status: typeof r.status == "string" ? r.status : "unknown",
+        file: typeof r.file == "string" ? r.file : void 0
+      });
+    }), this.pipeline = await e.pipeline(
+      "feature-extraction",
+      this.modelId,
+      t
+    );
+    const s = this.generateTemplates();
+    this.templates = [];
+    for (const r of s) {
+      const n = await this.embed(r.text);
+      this.templates.push({ ...r, embedding: n });
+    }
+  }
+  // ─── Template Generation (auto from schema) ──────────────────
+  generateTemplates() {
+    const e = [];
+    for (const [t, s] of this.introspection.types) {
+      const r = g(t);
+      e.push(...this.makeListRecentTemplates(t, r));
+      const n = s.attributes.some(
+        (a) => a.type === "string" || a.type === null
+      ), i = s.attributes.some(
+        (a) => a.name === "title" || a.name === "body" || a.name === "description" || a.name === "content"
+      );
+      n && e.push(...this.makeSearchTemplates(t, r, i)), s.attributes.some((a) => a.name === "name") && e.push(...this.makeProfileTemplates(t));
+      for (const a of s.relationships) {
+        if (a.kind !== "belongsTo") continue;
+        const l = this.introspection.types.get(a.relatedType);
+        if (!l) continue;
+        const c = l.attributes.some(
+          (h) => h.name === "name"
+        ), p = l.attributes.some(
+          (h) => h.name === "title"
+        );
+        c && (e.push(...this.makeFilterByNameTemplates(t, r, a.relatedType, i)), e.push(...this.makeCompoundTemplates(t, r, a.relatedType))), p && e.push(...this.makeOnAboutTemplates(t, r, a.relatedType));
+      }
+    }
+    return e.push(...this.makeMultiHopTemplates()), e.push(...this.makeWhoCreatedTemplates()), e.push(...this.makeWhoInteractedTemplates()), e.push(...this.makeUnsupportedTemplates()), e;
+  }
+  makeFilterByNameTemplates(e, t, s, r) {
+    const n = {
+      category: "filter_by_name",
+      target: e,
+      filterType: s,
+      filterAttribute: "name",
+      throughType: null,
+      extractName: !0,
+      extractTitle: !1,
+      extractSearch: !1,
+      extractLimit: !1
+    }, i = [
+      { text: `${t} by someone`, ...n },
+      { text: `show me ${t} from someone`, ...n },
+      { text: `someone's ${t}`, ...n },
+      { text: `${t} written by someone`, ...n },
+      { text: `find ${t} from someone`, ...n },
+      { text: "everything someone posted", ...n },
+      { text: "what did someone write", ...n },
+      { text: "what someone has been writing lately", ...n },
+      { text: `someone ${t}`, ...n },
+      { text: "show me what someone wrote", ...n },
+      { text: "content from someone", ...n },
+      { text: "let me know what someone wrote", ...n },
+      { text: "got anything from someone", ...n },
+      { text: "everything written by someone", ...n },
+      { text: "what has someone contributed", ...n }
+    ];
+    return r && i.push(
+      { text: "articles by someone", ...n },
+      { text: "entries by someone", ...n },
+      { text: "writings by someone", ...n },
+      { text: "pieces by someone", ...n }
+    ), i;
+  }
+  makeOnAboutTemplates(e, t, s) {
+    const r = {
+      category: "on_about",
+      target: e,
+      filterType: s,
+      filterAttribute: "title",
+      throughType: null,
+      extractName: !1,
+      extractTitle: !0,
+      extractSearch: !1,
+      extractLimit: !1
+    };
+    return [
+      { text: `${t} on a specific ${s}`, ...r },
+      { text: `${t} about a ${s}`, ...r },
+      { text: `${t} for the ${s}`, ...r },
+      { text: `show ${t} on a ${s}`, ...r },
+      { text: `reactions to a ${s}`, ...r },
+      { text: `feedback on a ${s}`, ...r },
+      { text: `responses to a ${s}`, ...r },
+      { text: `replies on a ${s}`, ...r },
+      { text: `${t} on something specific`, ...r },
+      { text: `${t} on the thing`, ...r },
+      { text: `show me ${t} on this`, ...r },
+      { text: `what ${t} are there on the item`, ...r },
+      { text: `I would like to see ${t} on something`, ...r },
+      { text: `${t} on the named item`, ...r },
+      { text: `${t} on the titled item`, ...r },
+      { text: `${t} on a titled thing`, ...r },
+      { text: `the ${t} left on a thing`, ...r }
+    ];
+  }
+  makeCompoundTemplates(e, t, s) {
+    const r = {
+      category: "compound",
+      target: e,
+      filterType: s,
+      filterAttribute: "name",
+      throughType: null,
+      extractName: !0,
+      extractTitle: !1,
+      extractSearch: !0,
+      extractLimit: !1
+    };
+    return [
+      { text: `${t} by someone about something`, ...r },
+      { text: `someone's ${t} about a topic`, ...r },
+      { text: `${t} from someone about something`, ...r },
+      { text: `show me ${t} from someone about a topic`, ...r },
+      { text: `${t} about a topic by someone`, ...r }
+    ];
+  }
+  makeSearchTemplates(e, t, s) {
+    const r = {
+      category: "search",
+      target: e,
+      filterType: null,
+      filterAttribute: null,
+      throughType: null,
+      extractName: !1,
+      extractTitle: !1,
+      extractSearch: !0,
+      extractLimit: !1
+    }, n = [
+      { text: `search ${t} about something`, ...r },
+      { text: `find ${t} about something`, ...r },
+      { text: `${t} about a topic`, ...r },
+      { text: `${t} related to something`, ...r },
+      { text: `${t} mentioning something`, ...r },
+      { text: `look for ${t} discussing something`, ...r },
+      { text: `${t} that discuss a topic`, ...r },
+      { text: `${t} where the topic is something`, ...r },
+      { text: `looking for ${t} about a subject`, ...r }
+    ];
+    return s && n.push(
+      { text: "content about a subject", ...r },
+      { text: "any discussions about something", ...r },
+      { text: "articles about a topic", ...r },
+      { text: "writings related to something", ...r },
+      { text: "entries about a subject", ...r },
+      { text: "anything about a topic", ...r },
+      { text: "content related to something specific", ...r }
+    ), n;
+  }
+  makeListRecentTemplates(e, t) {
+    const s = {
+      category: "list_recent",
+      target: e,
+      filterType: null,
+      filterAttribute: null,
+      throughType: null,
+      extractName: !1,
+      extractTitle: !1,
+      extractSearch: !1,
+      extractLimit: !0
+    };
+    return [
+      { text: `recent ${t}`, ...s },
+      { text: `latest ${t}`, ...s },
+      { text: `newest ${t}`, ...s },
+      { text: `show me the latest ${t}`, ...s },
+      { text: `last few ${t}`, ...s },
+      { text: `could you show me the latest ${t}`, ...s }
+    ];
+  }
+  makeProfileTemplates(e) {
+    const t = {
+      category: "profile",
+      target: e,
+      filterType: e,
+      filterAttribute: "name",
+      throughType: null,
+      extractName: !0,
+      extractTitle: !1,
+      extractSearch: !1,
+      extractLimit: !1
+    };
+    return [
+      { text: "profile of someone", ...t },
+      { text: "get profile for someone", ...t },
+      { text: "tell me about someone", ...t },
+      { text: "who is someone", ...t },
+      { text: "information about someone", ...t },
+      { text: "can someone tell me about a person", ...t },
+      { text: `${e} someone`, ...t }
+    ];
+  }
+  makeMultiHopTemplates() {
+    const e = [];
+    for (const [t, s] of this.introspection.types) {
+      const r = g(t);
+      for (const n of s.relationships) {
+        if (n.kind !== "belongsTo") continue;
+        const i = n.relatedType, o = this.introspection.types.get(i);
+        if (!o) continue;
+        const a = g(i);
+        for (const l of o.relationships) {
+          if (l.kind !== "belongsTo") continue;
+          const c = l.relatedType;
+          if (c === t) continue;
+          const p = this.introspection.types.get(c);
+          if (!p || !p.attributes.some(
+            (d) => d.name === "name"
+          )) continue;
+          const m = {
+            category: "multi_hop",
+            target: t,
+            filterType: c,
+            filterAttribute: "name",
+            throughType: i,
+            extractName: !0,
+            extractTitle: !1,
+            extractSearch: !1,
+            extractLimit: !1
+          };
+          e.push(
+            { text: `${r} on ${a} by someone`, ...m },
+            { text: `${r} on someone's ${a}`, ...m },
+            { text: `all ${r} on ${a} from someone`, ...m },
+            { text: `all the ${r} people left on someone's ${a}`, ...m }
+          );
+        }
+      }
+    }
+    return e;
+  }
+  makeWhoCreatedTemplates() {
+    const e = [];
+    for (const [t, s] of this.introspection.types)
+      if (s.attributes.some((n) => n.name === "title"))
+        for (const n of s.relationships) {
+          if (n.kind !== "belongsTo") continue;
+          const i = this.introspection.types.get(n.relatedType);
+          if (!i || !i.attributes.some(
+            (l) => l.name === "name"
+          )) continue;
+          const a = {
+            category: "who_created",
+            target: n.relatedType,
+            filterType: t,
+            filterAttribute: "title",
+            throughType: null,
+            extractName: !1,
+            extractTitle: !0,
+            extractSearch: !1,
+            extractLimit: !1
+          };
+          e.push(
+            { text: `who wrote the ${t}`, ...a },
+            { text: `who created the ${t}`, ...a },
+            { text: `who authored the ${t}`, ...a },
+            { text: `author of the ${t}`, ...a },
+            { text: `who is the author of the ${t}`, ...a },
+            { text: `I wonder who wrote that ${t}`, ...a },
+            { text: "who wrote something", ...a },
+            { text: "who is the author of something", ...a },
+            { text: "who authored something", ...a }
+          );
+          break;
+        }
+    return e;
+  }
+  makeWhoInteractedTemplates() {
+    const e = [];
+    for (const [t, s] of this.introspection.types)
+      if (s.attributes.some(
+        (n) => n.name === "title"
+      )) {
+        for (const [n, i] of this.introspection.types)
+          if (!(n === t || !i.relationships.some(
+            (a) => a.kind === "belongsTo" && a.relatedType === t
+          )))
+            for (const a of i.relationships) {
+              if (a.kind !== "belongsTo" || a.relatedType === t) continue;
+              const l = this.introspection.types.get(
+                a.relatedType
+              );
+              if (!l || !l.attributes.some(
+                (m) => m.name === "name"
+              )) continue;
+              const p = g(n), h = {
+                category: "who_interacted",
+                target: a.relatedType,
+                filterType: t,
+                filterAttribute: "title",
+                throughType: n,
+                extractName: !1,
+                extractTitle: !0,
+                extractSearch: !1,
+                extractLimit: !1
+              };
+              e.push(
+                { text: `who has ${p} on the ${t}`, ...h },
+                { text: `who left ${p} on the ${t}`, ...h },
+                { text: `who commented on the ${t}`, ...h },
+                { text: `people who interacted with the ${t}`, ...h },
+                { text: `who are the people commenting on the ${t}`, ...h }
+              );
+              break;
+            }
+      }
+    return e;
+  }
+  makeUnsupportedTemplates() {
+    const e = {
+      category: "unsupported",
+      target: "unsupported",
+      filterType: null,
+      filterAttribute: null,
+      throughType: null,
+      extractName: !1,
+      extractTitle: !1,
+      extractSearch: !1,
+      extractLimit: !1
+    };
+    return [
+      { text: "what is the weather today", ...e },
+      { text: "tell me a joke", ...e },
+      { text: "translate this to Spanish", ...e },
+      { text: "what time is it", ...e },
+      { text: "how are you doing", ...e }
+    ];
+  }
+  // ─── Template Matching ──────────────────────────────────────
+  findBestTemplate(e) {
+    let t = null, s = -1;
+    for (const r of this.templates) {
+      if (!r.embedding) continue;
+      const n = this.dotProduct(e, r.embedding);
+      n > s && (s = n, t = r);
+    }
+    return t ? { template: t, score: s } : null;
+  }
+  // ─── Intent Building ────────────────────────────────────────
+  buildIntent(e, t) {
+    const s = {
+      target: t.target,
+      filterType: t.filterType,
+      filterAttribute: t.filterAttribute,
+      filterValue: null,
+      throughType: t.throughType,
+      search: null,
+      limit: null,
+      confidence: 0
+    };
+    return t.extractName && (s.filterValue = this.extractPersonName(e)), t.extractTitle && (s.filterValue = this.extractTitleValue(e)), t.extractSearch && (s.search = this.extractSearchTerms(e, s.filterValue)), t.extractLimit && (s.limit = this.extractLimit(e)), s;
+  }
+  // ─── NLP Value Extraction ────────────────────────────────────
+  extractPersonName(e) {
+    if (!this.nlp) return this.extractProperNounFallback(e);
+    const t = this.nlp(e), s = t.people().text();
+    if (s && s.trim().length > 0)
+      return s.trim().replace(/'s$/i, "");
+    const r = t.possessives().text();
+    if (r) {
+      const n = r.replace(/'s$/i, "").trim();
+      if (n.length > 0 && this.isLikelyName(n))
+        return n;
+    }
+    return this.extractProperNounFallback(e);
+  }
+  extractTitleValue(e) {
+    const t = e.replace(/[?!.]+$/, "").trim(), s = t.match(/["'](.+?)["']/);
+    if (s) return s[1].trim();
+    const r = this.stripTrailingTypeWords(t), n = r.match(
+      /(?:wrote|authored|created|made)\s+(?:the\s+)?(.+?)\s*$/i
+    );
+    if (n) return n[1].trim();
+    const i = r.match(
+      /(?:on|about|of)\s+(?:the\s+)?(.+?)\s*$/i
+    );
+    return i ? i[1].trim() : null;
+  }
+  extractSearchTerms(e, t) {
+    const s = e.replace(/[?!.]+$/, "").trim(), r = [
+      /(?:about|regarding|related to|on the topic of)\s+(.+?)$/i,
+      /(?:discuss(?:ing)?|contain(?:ing)?|mentioning)\s+(.+?)$/i,
+      /(?:topic|subject)\s+(?:is|of)\s+(.+?)$/i
+    ];
+    for (const n of r) {
+      const i = s.match(n);
+      if (i) {
+        let o = i[1].trim();
+        if (t && (o = o.replace(
+          new RegExp(`\\s*by\\s+${this.escapeRegex(t)}\\s*$`, "i"),
+          ""
+        ).trim()), o = this.stripTrailingTypeWords(o).trim(), o.length > 0) return o;
+      }
+    }
+    return null;
+  }
+  extractLimit(e) {
+    if (this.nlp) {
+      const r = this.nlp(e).numbers().get();
+      if (typeof r == "number")
+        return Math.max(1, Math.min(100, r));
+      if (Array.isArray(r) && r.length > 0 && typeof r[0] == "number")
+        return Math.max(1, Math.min(100, r[0]));
+    }
+    const t = e.match(/(\d+)/);
+    return t ? Math.max(1, Math.min(100, parseInt(t[1], 10))) : 10;
+  }
+  // ─── Typo Correction ──────────────────────────────────────────
+  correctTypos(e) {
+    const t = this.buildTypeVocabulary(), s = e.split(/(\s+)/);
+    for (let r = 0; r < s.length; r++) {
+      const n = s[r];
+      if (/^\s+$/.test(n) || /^[A-Z]/.test(n)) continue;
+      const i = n.toLowerCase().replace(/[^a-z]/g, "");
+      if (!(i.length < 3) && !t.has(i))
+        for (const o of t) {
+          if (Math.abs(o.length - i.length) > 1) continue;
+          if (this.damerauLevenshteinDistance(i, o) === 1) {
+            s[r] = o;
+            break;
+          }
+        }
+    }
+    return s.join("");
+  }
+  buildTypeVocabulary() {
+    const e = /* @__PURE__ */ new Set();
+    for (const t of this.introspection.typeNames)
+      e.add(t.toLowerCase()), e.add(g(t).toLowerCase());
+    return e;
+  }
+  damerauLevenshteinDistance(e, t) {
+    const s = e.length, r = t.length;
+    if (s === 0) return r;
+    if (r === 0) return s;
+    const n = [];
+    for (let i = 0; i <= s; i++)
+      n[i] = [i];
+    for (let i = 0; i <= r; i++)
+      n[0][i] = i;
+    for (let i = 1; i <= s; i++)
+      for (let o = 1; o <= r; o++) {
+        const a = e[i - 1] === t[o - 1] ? 0 : 1;
+        n[i][o] = Math.min(
+          n[i - 1][o] + 1,
+          n[i][o - 1] + 1,
+          n[i - 1][o - 1] + a
+        ), i > 1 && o > 1 && e[i - 1] === t[o - 2] && e[i - 2] === t[o - 1] && (n[i][o] = Math.min(
+          n[i][o],
+          n[i - 2][o - 2] + 1
+        ));
+      }
+    return n[s][r];
+  }
+  // ─── Helpers ─────────────────────────────────────────────────
+  stripTrailingTypeWords(e) {
+    let t = e;
+    for (const s of this.introspection.typeNames) {
+      const r = g(s), n = new RegExp(
+        `\\s+(?:${s}|${r})\\s*$`,
+        "i"
+      );
+      t = t.replace(n, "");
+    }
+    return t = t.replace(
+      /\s+(?:article|articles|entry|entries|piece|pieces|item|items)\s*$/i,
+      ""
+    ), t;
+  }
+  isLikelyName(e) {
+    const t = e.toLowerCase();
+    for (const r of this.introspection.typeNames)
+      if (t === r.toLowerCase() || t === g(r).toLowerCase()) return !1;
+    return !(/* @__PURE__ */ new Set([
+      "i",
+      "me",
+      "my",
+      "the",
+      "a",
+      "an",
+      "is",
+      "are",
+      "was",
+      "were",
+      "what",
+      "who",
+      "which",
+      "where",
+      "when",
+      "how",
+      "did",
+      "do",
+      "does",
+      "show",
+      "get",
+      "find",
+      "list",
+      "give",
+      "tell",
+      "want",
+      "see",
+      "has",
+      "have",
+      "had",
+      "all",
+      "any",
+      "some",
+      "every",
+      "most",
+      "latest",
+      "recent",
+      "last",
+      "new",
+      "everything",
+      "something"
+    ])).has(t);
+  }
+  extractProperNounFallback(e) {
+    const t = /* @__PURE__ */ new Set();
+    for (const n of this.introspection.typeNames)
+      t.add(n.toLowerCase()), t.add(g(n).toLowerCase());
+    const s = /* @__PURE__ */ new Set([
+      "i",
+      "me",
+      "my",
+      "the",
+      "a",
+      "an",
+      "is",
+      "are",
+      "was",
+      "were",
+      "what",
+      "who",
+      "which",
+      "where",
+      "when",
+      "how",
+      "did",
+      "do",
+      "does",
+      "show",
+      "get",
+      "find",
+      "list",
+      "give",
+      "tell",
+      "want",
+      "see",
+      "has",
+      "have",
+      "had",
+      "all",
+      "any",
+      "some",
+      "every",
+      "most",
+      "latest",
+      "recent",
+      "last",
+      "new",
+      "everything",
+      "something",
+      "about",
+      "to",
+      "for",
+      "from",
+      "by",
+      "on",
+      "with",
+      "please",
+      "could",
+      "would",
+      "should",
+      "need",
+      "like",
+      "hey",
+      "hi",
+      "im",
+      "lmk",
+      "let",
+      "know",
+      "can",
+      "anyone",
+      "somebody",
+      "someone",
+      "got",
+      "been",
+      "lately",
+      "also",
+      "just",
+      "really",
+      "very",
+      "much"
+    ]), r = e.split(/\s+/);
+    for (const n of r) {
+      const i = n.replace(/[^a-zA-Z']/g, "").replace(/'s$/i, "");
+      if (i.length > 1 && /^[A-Z]/.test(i) && !s.has(i.toLowerCase()) && !t.has(i.toLowerCase()))
+        return i;
+    }
+    return null;
+  }
+  escapeRegex(e) {
+    return e.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+  async embed(e) {
+    const r = (await this.pipeline(e, {
+      pooling: "mean",
+      normalize: !0
+    })).tolist()[0];
+    if (!r)
+      throw new Error("Embedding produced no output vectors");
+    return r;
+  }
+  dotProduct(e, t) {
+    let s = 0;
+    for (let r = 0; r < e.length; r++)
+      s += (e[r] ?? 0) * (t[r] ?? 0);
+    return s;
+  }
+}
+const ce = [
   {
     intent: "get_posts_by_user",
     patterns: [
       /(?:dame|muestra|show|get|find|list)\s+(?:todos?\s+)?(?:los?\s+)?posts?\s+(?:del?\s+|de\s+|from\s+|by\s+|for\s+)(?:usuario?\s+|user\s+)?(\S+)/i,
       /posts?\s+(?:del?\s+|de\s+|from\s+|by\s+|for\s+)(?:usuario?\s+|user\s+)?(\S+)/i
     ],
-    extractArguments: (c) => ({ userName: c[1] }),
+    extractArguments: (u) => ({ userName: u[1] }),
     confidence: 0.9
   },
   {
@@ -2047,7 +3469,7 @@ const Y = [
       /(?:perfil|profile)\s+(?:del?\s+|de\s+|for\s+|of\s+)(?:usuario?\s+|user\s+)?(\S+)/i,
       /(?:dame|muestra|show|get|find)\s+(?:usuario?\s+|user\s+)(\S+)/i
     ],
-    extractArguments: (c) => ({ userName: c[1] }),
+    extractArguments: (u) => ({ userName: u[1] }),
     confidence: 0.85
   },
   {
@@ -2056,8 +3478,8 @@ const Y = [
       /(?:dame|muestra|show|get|find|list)\s+(?:todos?\s+)?(?:los?\s+)?(?:comentarios|comments)\s+(?:del?\s+|de\s+|for\s+|of\s+|from\s+)(?:post\s+)?(\S+)/i,
       /(?:comentarios|comments)\s+(?:del?\s+|de\s+|for\s+|of\s+|from\s+)(?:post\s+)?(\S+)/i
     ],
-    extractArguments: (c) => {
-      const e = c[1];
+    extractArguments: (u) => {
+      const e = u[1];
       return /^\d+$/.test(e) ? { postId: e } : { postTitle: e };
     },
     confidence: 0.9
@@ -2068,7 +3490,7 @@ const Y = [
       /(?:buscar?|search|find)\s+posts?\s+(?:sobre|about|with|containing)\s+(.+)/i,
       /(?:buscar?|search)\s+(.+)\s+(?:en|in)\s+posts?/i
     ],
-    extractArguments: (c) => ({ text: c[1].trim() }),
+    extractArguments: (u) => ({ text: u[1].trim() }),
     confidence: 0.8
   },
   {
@@ -2078,19 +3500,19 @@ const Y = [
       /(?:posts?\s+recientes|recent\s+posts?)/i,
       /(?:últimos?|latest|last)\s+(?:(\d+)\s+)?posts?/i
     ],
-    extractArguments: (c) => {
-      const e = c[1];
+    extractArguments: (u) => {
+      const e = u[1];
       return e && /^\d+$/.test(e) ? { limit: parseInt(e, 10) } : {};
     },
     confidence: 0.85
   }
 ];
-class se {
+class Te {
   async parse(e) {
     const t = e.trim();
     if (t.length === 0)
       return null;
-    for (const s of Y)
+    for (const s of ce)
       for (const r of s.patterns) {
         const n = t.match(r);
         if (n)
@@ -2104,14 +3526,14 @@ class se {
     return null;
   }
 }
-class re {
+class we {
   async parse(e) {
     throw new Error(
       "ModelBackedLocalAiIntentParser is not implemented. Use WebLlmIntentParser for local model-backed parsing, or DeterministicLocalAiIntentParser for regex-based parsing."
     );
   }
 }
-class ne {
+class xe {
   constructor() {
     this.tools = /* @__PURE__ */ new Map();
   }
@@ -2142,38 +3564,38 @@ class ne {
     }
   }
 }
-const Q = 100, N = 20;
-function _(c) {
+const ue = 100, P = 20;
+function $(u) {
   return {
     status: "validation_error",
-    message: c
+    message: u
   };
 }
-function g(c) {
-  return typeof c == "string" && c.trim().length > 0;
+function y(u) {
+  return typeof u == "string" && u.trim().length > 0;
 }
-function S(c) {
-  return !g(c.userId) && !g(c.userName) ? _("Either userId or userName must be provided.") : null;
+function k(u) {
+  return !y(u.userId) && !y(u.userName) ? $("Either userId or userName must be provided.") : null;
 }
-function X(c) {
-  return !g(c.postId) && !g(c.postTitle) ? _("Either postId or postTitle must be provided.") : null;
+function pe(u) {
+  return !y(u.postId) && !y(u.postTitle) ? $("Either postId or postTitle must be provided.") : null;
 }
-function K(c) {
-  return g(c.text) ? null : _("Search text must be a non-empty string.");
+function he(u) {
+  return y(u.text) ? null : $("Search text must be a non-empty string.");
 }
-function Z(c) {
-  const e = c.limit;
+function me(u) {
+  const e = u.limit;
   if (e == null)
-    return N;
+    return P;
   const t = typeof e == "number" ? e : parseInt(String(e), 10);
-  return Number.isNaN(t) || t < 1 ? N : Math.min(t, Q);
+  return Number.isNaN(t) || t < 1 ? P : Math.min(t, ue);
 }
-class ie {
+class $e {
   constructor() {
     this.name = "get_posts_by_user";
   }
   async execute(e, t) {
-    const s = S(e);
+    const s = k(e);
     if (s)
       return { ...s, intent: this.name };
     const r = t.peekAll("user");
@@ -2181,10 +3603,10 @@ class ie {
     if (e.userId)
       n = t.peekRecord("user", e.userId) ?? void 0;
     else if (e.userName) {
-      const l = e.userName.toLowerCase();
+      const c = e.userName.toLowerCase();
       n = r.toArray().find((p) => {
-        const f = p.name;
-        return typeof f == "string" && f.toLowerCase() === l;
+        const h = p.name;
+        return typeof h == "string" && h.toLowerCase() === c;
       });
     }
     if (!n)
@@ -2194,24 +3616,24 @@ class ie {
         data: [],
         message: `No user found matching "${e.userId ?? e.userName}".`
       };
-    const i = n.id, a = t.peekAll("post").toArray().filter((l) => {
-      const p = l.author;
-      return p && p.id === i ? !0 : l.authorId === i;
-    }), u = e.userName ?? e.userId;
+    const i = n.id, a = t.peekAll("post").toArray().filter((c) => {
+      const p = c.author;
+      return p && p.id === i ? !0 : c.authorId === i;
+    }), l = e.userName ?? e.userId;
     return {
       status: "success",
       intent: this.name,
       data: a,
-      message: a.length > 0 ? `Found ${a.length} post(s) for ${u}.` : `No posts found for ${u}.`
+      message: a.length > 0 ? `Found ${a.length} post(s) for ${l}.` : `No posts found for ${l}.`
     };
   }
 }
-class oe {
+class Ne {
   constructor() {
     this.name = "get_user_profile";
   }
   async execute(e, t) {
-    const s = S(e);
+    const s = k(e);
     if (s)
       return { ...s, intent: this.name };
     let r = null;
@@ -2236,22 +3658,22 @@ class oe {
     };
   }
 }
-class ae {
+class _e {
   constructor() {
     this.name = "get_comments_by_post";
   }
   async execute(e, t) {
-    const s = X(e);
+    const s = pe(e);
     if (s)
       return { ...s, intent: this.name };
     let r = null;
     if (e.postId)
       r = t.peekRecord("post", e.postId);
     else if (e.postTitle) {
-      const u = e.postTitle.toLowerCase();
+      const l = e.postTitle.toLowerCase();
       r = t.peekAll("post").toArray().find((p) => {
-        const f = p.title;
-        return typeof f == "string" && f.toLowerCase().includes(u);
+        const h = p.title;
+        return typeof h == "string" && h.toLowerCase().includes(l);
       }) ?? null;
     }
     if (!r)
@@ -2261,9 +3683,9 @@ class ae {
         data: [],
         message: `No post found matching "${e.postId ?? e.postTitle}".`
       };
-    const n = r.id, o = t.peekAll("comment").toArray().filter((u) => {
-      const l = u.post;
-      return l && l.id === n ? !0 : u.postId === n;
+    const n = r.id, o = t.peekAll("comment").toArray().filter((l) => {
+      const c = l.post;
+      return c && c.id === n ? !0 : l.postId === n;
     }), a = e.postTitle ?? e.postId;
     return {
       status: "success",
@@ -2273,21 +3695,21 @@ class ae {
     };
   }
 }
-const ee = ["title", "body", "content", "description", "tags"];
-class le {
+const fe = ["title", "body", "content", "description", "tags"];
+class Ae {
   constructor() {
     this.name = "search_posts";
   }
   async execute(e, t) {
-    const s = K(e);
+    const s = he(e);
     if (s)
       return { ...s, intent: this.name };
     const r = e.text.toLowerCase(), i = t.peekAll("post").toArray().filter((o) => {
       const a = o;
-      for (const u of ee) {
-        const l = a[u];
-        if (typeof l == "string" && l.toLowerCase().includes(r) || Array.isArray(l) && l.some(
-          (f) => typeof f == "string" && f.toLowerCase().includes(r)
+      for (const l of fe) {
+        const c = a[l];
+        if (typeof c == "string" && c.toLowerCase().includes(r) || Array.isArray(c) && c.some(
+          (h) => typeof h == "string" && h.toLowerCase().includes(r)
         ))
           return !0;
       }
@@ -2301,12 +3723,12 @@ class le {
     };
   }
 }
-class ue {
+class Pe {
   constructor() {
     this.name = "get_recent_posts";
   }
   async execute(e, t) {
-    const s = Z(e), n = t.peekAll("post").toArray().slice(-s).reverse();
+    const s = me(e), n = t.peekAll("post").toArray().slice(-s).reverse();
     return {
       status: "success",
       intent: this.name,
@@ -2316,28 +3738,31 @@ class ue {
   }
 }
 export {
-  b as CascadeLocalAiIntentParser,
-  se as DeterministicLocalAiIntentParser,
-  M as DeterministicSchemaIntentParser,
-  x as EmbeddingIntentParser,
-  L as GenericQueryExecutor,
-  ae as GetCommentsByPostTool,
-  ie as GetPostsByUserTool,
-  ue as GetRecentPostsTool,
-  oe as GetUserProfileTool,
-  T as LocalAiQueryService,
-  H as LocalAiResultFormatter,
-  te as LocalAiSchemaQueryService,
-  ne as LocalAiToolRegistry,
-  re as ModelBackedLocalAiIntentParser,
-  P as NotADataQueryError,
-  I as SchemaIntrospector,
-  le as SearchPostsTool,
-  A as TransformersJsIntentParser,
-  $ as WebLlmIntentParser,
-  Z as normalizeLimit,
-  X as validatePostArguments,
-  K as validateSearchArguments,
-  S as validateUserArguments
+  T as CascadeLocalAiIntentParser,
+  Te as DeterministicLocalAiIntentParser,
+  v as DeterministicSchemaIntentParser,
+  A as EmbeddingIntentParser,
+  I as GenericQueryExecutor,
+  _e as GetCommentsByPostTool,
+  $e as GetPostsByUserTool,
+  Pe as GetRecentPostsTool,
+  Ne as GetUserProfileTool,
+  x as LocalAiQueryService,
+  Y as LocalAiResultFormatter,
+  de as LocalAiSchemaQueryService,
+  xe as LocalAiToolRegistry,
+  we as ModelBackedLocalAiIntentParser,
+  ye as MultiStageLlmIntentParser,
+  be as NlpEmbeddingIntentParser,
+  S as NotADataQueryError,
+  R as SchemaIntrospector,
+  ge as SchemaLlmIntentParser,
+  Ae as SearchPostsTool,
+  _ as TransformersJsIntentParser,
+  N as WebLlmIntentParser,
+  me as normalizeLimit,
+  pe as validatePostArguments,
+  he as validateSearchArguments,
+  k as validateUserArguments
 };
 //# sourceMappingURL=index.js.map

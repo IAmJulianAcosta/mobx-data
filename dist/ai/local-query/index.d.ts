@@ -10,6 +10,9 @@ export { CascadeLocalAiIntentParser } from './CascadeLocalAiIntentParser.js';
 export { WebLlmIntentParser, type WebLlmIntentParserOptions, type WebLlmProgressReport, } from './WebLlmIntentParser.js';
 export { TransformersJsIntentParser, type TransformersJsIntentParserOptions, type TransformersJsProgressReport, } from './TransformersJsIntentParser.js';
 export { EmbeddingIntentParser, type EmbeddingIntentParserOptions, type EmbeddingProgressReport, } from './EmbeddingIntentParser.js';
+export { SchemaLlmIntentParser, type SchemaLlmIntentParserOptions, type SchemaLlmProgressReport, } from './SchemaLlmIntentParser.js';
+export { MultiStageLlmIntentParser, type MultiStageLlmIntentParserOptions, type MultiStageProgressReport, } from './MultiStageLlmIntentParser.js';
+export { NlpEmbeddingIntentParser, type NlpEmbeddingIntentParserOptions, type NlpEmbeddingProgressReport, } from './NlpEmbeddingIntentParser.js';
 export { LocalAiResultFormatter } from './LocalAiResultFormatter.js';
 /** @deprecated Use DeterministicSchemaIntentParser instead. */
 export { DeterministicLocalAiIntentParser } from './DeterministicLocalAiIntentParser.js';

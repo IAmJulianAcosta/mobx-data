@@ -1,0 +1,80 @@
+import type { GenericIntent, LocalAiIntent, LocalAiIntentParser, SchemaIntrospectionResult } from './LocalAiTypes.js';
+export interface MultiStageProgressReport {
+    stage: 'embedding' | 'llm';
+    progress: number;
+    status: string;
+    file?: string;
+}
+export interface MultiStageLlmIntentParserOptions {
+    embeddingModelId?: string;
+    llmModelId?: string;
+    device?: string | null;
+    dtype?: string;
+    onProgress?: (report: MultiStageProgressReport) => void;
+    temperature?: number;
+    maxTokens?: number;
+    focusedThreshold?: number;
+    fallbackThreshold?: number;
+}
+export declare class MultiStageLlmIntentParser implements LocalAiIntentParser {
+    private embeddingPipeline;
+    private llmPipeline;
+    private initializationPromise;
+    private categories;
+    private readonly introspection;
+    private readonly embeddingModelId;
+    private readonly llmModelId;
+    private readonly device;
+    private readonly dtype;
+    private readonly onProgress?;
+    private readonly temperature;
+    private readonly maxTokens;
+    private readonly focusedThreshold;
+    private readonly fallbackThreshold;
+    constructor(introspection: SchemaIntrospectionResult, options?: MultiStageLlmIntentParserOptions);
+    initialize(): Promise<void>;
+    dispose(): Promise<void>;
+    get isLoaded(): boolean;
+    parse(query: string): Promise<LocalAiIntent<GenericIntent> | null>;
+    private embed;
+    private classifyByEmbedding;
+    private dotProduct;
+    private focusedExtraction;
+    private buildExtractionPrompt;
+    private buildTypeSummary;
+    private promptForFilterByName;
+    private promptForFilterByTitle;
+    private promptForWhoCreated;
+    private promptForWhoInteracted;
+    private promptForMultiHop;
+    private promptForCompound;
+    private promptForSearch;
+    private promptForListRecent;
+    private promptForProfile;
+    private fullLlmFallback;
+    private parseFullLlmResponse;
+    private resolveNullableType;
+    private parseNullableString;
+    private parseNullableNumber;
+    private callLlm;
+    private extractLlmContent;
+    private cleanJsonResponse;
+    private assembleFromCategory;
+    private assembleFilterByName;
+    private assembleFilterByTitle;
+    private assembleWhoCreated;
+    private assembleWhoInteracted;
+    private assembleMultiHop;
+    private assembleCompound;
+    private assembleSearch;
+    private assembleListRecent;
+    private assembleProfile;
+    private validateAgainstSchema;
+    private findTypeWithAttribute;
+    private findThroughType;
+    private defaultTargetExcluding;
+    private resolveTypeName;
+    private buildUnsupportedResult;
+    private loadPipelines;
+}
+//# sourceMappingURL=MultiStageLlmIntentParser.d.ts.map

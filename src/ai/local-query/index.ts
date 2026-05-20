@@ -45,6 +45,21 @@ export {
   type EmbeddingIntentParserOptions,
   type EmbeddingProgressReport,
 } from './EmbeddingIntentParser.js';
+export {
+  SchemaLlmIntentParser,
+  type SchemaLlmIntentParserOptions,
+  type SchemaLlmProgressReport,
+} from './SchemaLlmIntentParser.js';
+export {
+  MultiStageLlmIntentParser,
+  type MultiStageLlmIntentParserOptions,
+  type MultiStageProgressReport,
+} from './MultiStageLlmIntentParser.js';
+export {
+  NlpEmbeddingIntentParser,
+  type NlpEmbeddingIntentParserOptions,
+  type NlpEmbeddingProgressReport,
+} from './NlpEmbeddingIntentParser.js';
 export { LocalAiResultFormatter } from './LocalAiResultFormatter.js';
 
 // ─── Legacy (backward compat) ──────────────────────────────
