@@ -5,10 +5,12 @@ export declare class IndexedDBCache implements CacheLike {
     private _defaultTTL;
     private _database;
     private _openPromise;
+    private _writeQueue;
     constructor(options?: IndexedDBCacheOptions);
     get defaultTTL(): number;
     private open;
-    static cacheKey(modelName: string, id: string): string;
+    private ensureObjectStore;
+    private enqueueWrite;
     get(modelName: string, id: string): Promise<CacheEntryData | null>;
     set(modelName: string, id: string, attributes: Record<string, unknown>, options?: {
         relationships?: Record<string, RelationshipRef>;
