@@ -42,6 +42,7 @@ export declare class EmbeddingIntentParser implements LocalAiIntentParser {
     private resolveListRecent;
     private resolveProfile;
     private extractValueAfterPreposition;
+    private extractProperNoun;
     private extractTitleValue;
     private extractCreatedValue;
     private extractSearchText;

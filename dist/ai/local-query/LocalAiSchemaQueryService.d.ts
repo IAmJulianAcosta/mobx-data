@@ -3,7 +3,7 @@ import type { DataSourceMode, LocalAiQueryResult } from './LocalAiTypes.js';
 import { type WebLlmIntentParserOptions } from './WebLlmIntentParser.js';
 import { type TransformersJsIntentParserOptions } from './TransformersJsIntentParser.js';
 import { type EmbeddingIntentParserOptions } from './EmbeddingIntentParser.js';
-export type SchemaParserMode = 'deterministic' | 'webllm' | 'transformers' | 'embedding' | 'cascade' | 'cascade-transformers';
+export type SchemaParserMode = 'deterministic' | 'webllm' | 'transformers' | 'embedding' | 'cascade' | 'cascade-transformers' | 'cascade-embedding';
 export interface LocalAiSchemaQueryServiceOptions {
     parserMode?: SchemaParserMode;
     dataSourceMode?: DataSourceMode;

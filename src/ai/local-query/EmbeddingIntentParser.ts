@@ -579,13 +579,45 @@ export class EmbeddingIntentParser implements LocalAiIntentParser {
   private extractValueAfterPreposition(query: string): string | null {
     const normalized = query.replace(/[?!.]+$/, '').trim();
 
-    const possessivePattern = /^(.+?)'s\s+/i;
+    const possessivePattern = /(.+?)'s\s+/i;
     const possessiveMatch = normalized.match(possessivePattern);
     if (possessiveMatch) return possessiveMatch[1]!.trim();
 
     const prepositionPattern = /(?:by|from|for|of|on|about|de|del|por)\s+(?:the\s+)?(?:(?:user|post|comment|usuario)\s+)?(.+?)\s*$/i;
     const match = normalized.match(prepositionPattern);
-    return match ? match[1]!.trim() : null;
+    if (match) return match[1]!.trim();
+
+    return this.extractProperNoun(normalized);
+  }
+
+  private extractProperNoun(text: string): string | null {
+    const typeNames = new Set<string>();
+    for (const typeName of this.introspection.typeNames) {
+      typeNames.add(typeName.toLowerCase());
+      typeNames.add(pluralize(typeName).toLowerCase());
+    }
+
+    const stopWords = new Set([
+      'i', 'me', 'my', 'the', 'a', 'an', 'is', 'are', 'was', 'were',
+      'what', 'who', 'which', 'where', 'when', 'how', 'did', 'do', 'does',
+      'show', 'get', 'find', 'list', 'give', 'tell', 'want', 'see', 'has',
+      'have', 'had', 'all', 'any', 'some', 'every', 'most', 'latest',
+      'recent', 'last', 'new', 'everything', 'something', 'about', 'to',
+    ]);
+
+    const words = text.split(/\s+/);
+    for (const word of words) {
+      const cleaned = word.replace(/[^a-zA-Z]/g, '');
+      if (
+        cleaned.length > 1
+        && /^[A-Z]/.test(cleaned)
+        && !stopWords.has(cleaned.toLowerCase())
+        && !typeNames.has(cleaned.toLowerCase())
+      ) {
+        return cleaned;
+      }
+    }
+    return null;
   }
 
   private extractTitleValue(query: string, filterType: string): string | null {

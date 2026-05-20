@@ -23,7 +23,7 @@ import { CascadeLocalAiIntentParser } from './CascadeLocalAiIntentParser.js';
 import { LocalAiQueryService } from './LocalAiQueryService.js';
 import { LocalAiResultFormatter } from './LocalAiResultFormatter.js';
 
-export type SchemaParserMode = 'deterministic' | 'webllm' | 'transformers' | 'embedding' | 'cascade' | 'cascade-transformers';
+export type SchemaParserMode = 'deterministic' | 'webllm' | 'transformers' | 'embedding' | 'cascade' | 'cascade-transformers' | 'cascade-embedding';
 
 export interface LocalAiSchemaQueryServiceOptions {
   parserMode?: SchemaParserMode;
@@ -86,6 +86,9 @@ export class LocalAiSchemaQueryService {
     } else if (options.parserMode === 'cascade-transformers') {
       transformersParser = new TransformersJsIntentParser(transformersParserOptions);
       parser = new CascadeLocalAiIntentParser([deterministicParser, transformersParser]);
+    } else if (options.parserMode === 'cascade-embedding') {
+      embeddingParser = new EmbeddingIntentParser(introspection, options.embeddingOptions);
+      parser = new CascadeLocalAiIntentParser([deterministicParser, embeddingParser]);
     } else {
       parser = deterministicParser;
     }
