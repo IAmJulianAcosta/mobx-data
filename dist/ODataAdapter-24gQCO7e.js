@@ -1,6 +1,6 @@
 import { injectable as u } from "tsyringe";
 import h from "pluralize";
-import { R as l, c as p } from "./RestAdapter-DYUoyV5h.js";
+import { R as l, c as p } from "./RestAdapter-CYInlScn.js";
 var y = Object.getOwnPropertyDescriptor, _ = (t, r, e, o) => {
   for (var s = o > 1 ? void 0 : o ? y(r, e) : r, n = t.length - 1, a; n >= 0; n--)
     (a = t[n]) && (s = a(s) || s);
@@ -157,4 +157,4 @@ i = _([
 export {
   i as O
 };
-//# sourceMappingURL=ODataAdapter-CeBJblLQ.js.map
+//# sourceMappingURL=ODataAdapter-24gQCO7e.js.map

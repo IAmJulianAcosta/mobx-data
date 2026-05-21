@@ -12,8 +12,8 @@ interface PatternRule {
 }
 
 function pluralize(typeName: string): string {
-  if (typeName.endsWith('s')) return typeName;
-  if (typeName.endsWith('y')) return `${typeName.slice(0, -1)}ies`;
+  if (typeName.endsWith('s')) { return typeName; }
+  if (typeName.endsWith('y')) { return `${typeName.slice(0, -1)}ies`; }
   return `${typeName}s`;
 }
 
@@ -92,7 +92,7 @@ export class DeterministicSchemaIntentParser implements LocalAiIntentParser {
 
     for (const [typeName, descriptor] of introspection.types) {
       const nameAttribute = this.findNameAttribute(descriptor);
-      if (!nameAttribute) continue;
+      if (!nameAttribute) { continue; }
 
       const typePattern = escapeRegex(typeName);
       rules.push({
@@ -110,15 +110,15 @@ export class DeterministicSchemaIntentParser implements LocalAiIntentParser {
             'i',
           ),
           new RegExp(
-            `tell\\s+me\\s+about\\s+(.+?)\\s*$`,
+            'tell\\s+me\\s+about\\s+(.+?)\\s*$',
             'i',
           ),
           new RegExp(
-            `(?:get|show|find)\\s+(?:me\\s+)?(.+?)\\s+(?:profile|perfil)\\s*$`,
+            '(?:get|show|find)\\s+(?:me\\s+)?(.+?)\\s+(?:profile|perfil)\\s*$',
             'i',
           ),
           new RegExp(
-            `(\\w+)'s\\s+(?:profile|perfil)\\s*$`,
+            '(\\w+)\'s\\s+(?:profile|perfil)\\s*$',
             'i',
           ),
         ],
@@ -145,15 +145,15 @@ export class DeterministicSchemaIntentParser implements LocalAiIntentParser {
       const typePatterns = typePatternFor(typeName);
 
       for (const relationship of descriptor.relationships) {
-        if (relationship.kind !== 'belongsTo') continue;
+        if (relationship.kind !== 'belongsTo') { continue; }
 
         const relatedDescriptor = introspection.types.get(relationship.relatedType);
-        if (!relatedDescriptor) continue;
+        if (!relatedDescriptor) { continue; }
 
         const relatedNameAttribute = this.findNameAttribute(relatedDescriptor);
-        if (!relatedNameAttribute) continue;
+        if (!relatedNameAttribute) { continue; }
 
-        const relatedType = relationship.relatedType;
+        const { relatedType } = relationship;
         const relatedPatterns = typePatternFor(relatedType);
 
         rules.push({
@@ -211,25 +211,25 @@ export class DeterministicSchemaIntentParser implements LocalAiIntentParser {
       const targetPatterns = typePatternFor(targetType);
 
       for (const relationship of targetDescriptor.relationships) {
-        if (relationship.kind !== 'belongsTo') continue;
+        if (relationship.kind !== 'belongsTo') { continue; }
 
         const intermediateType = relationship.relatedType;
         const intermediateDescriptor = introspection.types.get(intermediateType);
-        if (!intermediateDescriptor) continue;
+        if (!intermediateDescriptor) { continue; }
 
         const intermediatePatterns = typePatternFor(intermediateType);
 
         for (const intermediateRelationship of intermediateDescriptor.relationships) {
-          if (intermediateRelationship.kind !== 'belongsTo') continue;
+          if (intermediateRelationship.kind !== 'belongsTo') { continue; }
 
           const filterType = intermediateRelationship.relatedType;
-          if (filterType === targetType) continue;
+          if (filterType === targetType) { continue; }
 
           const filterDescriptor = introspection.types.get(filterType);
-          if (!filterDescriptor) continue;
+          if (!filterDescriptor) { continue; }
 
           const filterNameAttribute = this.findNameAttribute(filterDescriptor);
-          if (!filterNameAttribute) continue;
+          if (!filterNameAttribute) { continue; }
 
           rules.push({
             patterns: [
@@ -275,20 +275,20 @@ export class DeterministicSchemaIntentParser implements LocalAiIntentParser {
       const titleAttribute = descriptor.attributes.find(
         (attribute) => attribute.name === 'title',
       );
-      if (!titleAttribute) continue;
+      if (!titleAttribute) { continue; }
 
       const typePatterns = typePatternFor(typeName);
 
       for (const relationship of descriptor.relationships) {
-        if (relationship.kind !== 'belongsTo') continue;
+        if (relationship.kind !== 'belongsTo') { continue; }
 
         const relatedDescriptor = introspection.types.get(relationship.relatedType);
-        if (!relatedDescriptor) continue;
+        if (!relatedDescriptor) { continue; }
 
         const nameAttribute = relatedDescriptor.attributes.find(
           (attribute) => attribute.name === 'name',
         );
-        if (!nameAttribute) continue;
+        if (!nameAttribute) { continue; }
 
         rules.push({
           patterns: [
@@ -297,7 +297,7 @@ export class DeterministicSchemaIntentParser implements LocalAiIntentParser {
               'i',
             ),
             new RegExp(
-              `who\\s+(?:wrote|created|authored|made)\\s+(.+?)\\s*\\??\\s*$`,
+              'who\\s+(?:wrote|created|authored|made)\\s+(.+?)\\s*\\??\\s*$',
               'i',
             ),
             new RegExp(
@@ -305,11 +305,11 @@ export class DeterministicSchemaIntentParser implements LocalAiIntentParser {
               'i',
             ),
             new RegExp(
-              `(?:author|creator)\\s+(?:of|de|del)\\s+(?:the\\s+)?(.+?)\\s*\\??\\s*$`,
+              '(?:author|creator)\\s+(?:of|de|del)\\s+(?:the\\s+)?(.+?)\\s*\\??\\s*$',
               'i',
             ),
             new RegExp(
-              `quién\\s+(?:escribió|creó|hizo)\\s+(.+?)\\s*\\??\\s*$`,
+              'quién\\s+(?:escribió|creó|hizo)\\s+(.+?)\\s*\\??\\s*$',
               'i',
             ),
           ],
@@ -336,18 +336,18 @@ export class DeterministicSchemaIntentParser implements LocalAiIntentParser {
     for (const [typeName, descriptor] of introspection.types) {
       const typePatterns = typePatternFor(typeName);
       const stringAttributes = introspection.stringAttributes.get(typeName) ?? [];
-      if (stringAttributes.length === 0) continue;
+      if (stringAttributes.length === 0) { continue; }
 
       for (const relationship of descriptor.relationships) {
-        if (relationship.kind !== 'belongsTo') continue;
+        if (relationship.kind !== 'belongsTo') { continue; }
 
         const relatedDescriptor = introspection.types.get(relationship.relatedType);
-        if (!relatedDescriptor) continue;
+        if (!relatedDescriptor) { continue; }
 
         const relatedNameAttribute = this.findNameAttribute(relatedDescriptor);
-        if (!relatedNameAttribute) continue;
+        if (!relatedNameAttribute) { continue; }
 
-        const relatedType = relationship.relatedType;
+        const { relatedType } = relationship;
 
         rules.push({
           patterns: [
@@ -399,17 +399,17 @@ export class DeterministicSchemaIntentParser implements LocalAiIntentParser {
       const typePatterns = typePatternFor(typeName);
 
       for (const relationship of descriptor.relationships) {
-        if (relationship.kind !== 'belongsTo') continue;
+        if (relationship.kind !== 'belongsTo') { continue; }
 
         const relatedDescriptor = introspection.types.get(relationship.relatedType);
-        if (!relatedDescriptor) continue;
+        if (!relatedDescriptor) { continue; }
 
         const titleAttribute = relatedDescriptor.attributes.find(
           (attribute) => attribute.name === 'title',
         );
-        if (!titleAttribute) continue;
+        if (!titleAttribute) { continue; }
 
-        const relatedType = relationship.relatedType;
+        const { relatedType } = relationship;
         const relatedPatterns = typePatternFor(relatedType);
 
         rules.push({
@@ -427,11 +427,11 @@ export class DeterministicSchemaIntentParser implements LocalAiIntentParser {
               'i',
             ),
             new RegExp(
-              `(?:any\\s+)?(?:feedback|responses|reactions)\\s+(?:on|about)\\s+(?:the\\s+)?(.+?)\\s+(?:article|post|entry|blog|piece)\\s*\\??\\s*$`,
+              '(?:any\\s+)?(?:feedback|responses|reactions)\\s+(?:on|about)\\s+(?:the\\s+)?(.+?)\\s+(?:article|post|entry|blog|piece)\\s*\\??\\s*$',
               'i',
             ),
             new RegExp(
-              `(?:any\\s+)?(?:feedback|responses|reactions)\\s+(?:on|about)\\s+(?:the\\s+)?(.+?)\\s*\\??\\s*$`,
+              '(?:any\\s+)?(?:feedback|responses|reactions)\\s+(?:on|about)\\s+(?:the\\s+)?(.+?)\\s*\\??\\s*$',
               'i',
             ),
           ],
@@ -459,22 +459,22 @@ export class DeterministicSchemaIntentParser implements LocalAiIntentParser {
       const belongsToRelationships = intermediateDescriptor.relationships.filter(
         (relationship) => relationship.kind === 'belongsTo',
       );
-      if (belongsToRelationships.length < 2) continue;
+      if (belongsToRelationships.length < 2) { continue; }
 
       for (const filterRelationship of belongsToRelationships) {
         const filterDescriptor = introspection.types.get(filterRelationship.relatedType);
-        if (!filterDescriptor) continue;
+        if (!filterDescriptor) { continue; }
 
         const filterTitleAttribute = filterDescriptor.attributes.find(
           (attribute) => attribute.name === 'title',
         );
-        if (!filterTitleAttribute) continue;
+        if (!filterTitleAttribute) { continue; }
 
         const filterType = filterRelationship.relatedType;
         const filterPatterns = typePatternFor(filterType);
 
         for (const targetRelationship of belongsToRelationships) {
-          if (targetRelationship.relatedType === filterType) continue;
+          if (targetRelationship.relatedType === filterType) { continue; }
 
           const targetType = targetRelationship.relatedType;
 
@@ -517,7 +517,7 @@ export class DeterministicSchemaIntentParser implements LocalAiIntentParser {
     for (const typeName of introspection.typeNames) {
       const typePatterns = typePatternFor(typeName);
       const stringAttributes = introspection.stringAttributes.get(typeName) ?? [];
-      if (stringAttributes.length === 0) continue;
+      if (stringAttributes.length === 0) { continue; }
 
       rules.push({
         patterns: [
@@ -638,12 +638,12 @@ export class DeterministicSchemaIntentParser implements LocalAiIntentParser {
     const nameAttribute = descriptor.attributes.find(
       (attribute) => attribute.name === 'name',
     );
-    if (nameAttribute) return nameAttribute.name;
+    if (nameAttribute) { return nameAttribute.name; }
 
     const titleAttribute = descriptor.attributes.find(
       (attribute) => attribute.name === 'title',
     );
-    if (titleAttribute) return titleAttribute.name;
+    if (titleAttribute) { return titleAttribute.name; }
 
     return null;
   }
@@ -652,7 +652,7 @@ export class DeterministicSchemaIntentParser implements LocalAiIntentParser {
     const rules: PatternRule[] = [];
 
     const contentType = this.defaultContentType;
-    const personType = this.personType;
+    const { personType } = this;
     const commentType = this.commentLikeType;
 
     if (personType) {
@@ -663,23 +663,23 @@ export class DeterministicSchemaIntentParser implements LocalAiIntentParser {
         rules.push({
           patterns: [
             new RegExp(
-              `(?:give me|show me|get me)\\s+(?:everything|all)\\s+(?:by|from)\\s+(.+?)\\s*$`,
+              '(?:give me|show me|get me)\\s+(?:everything|all)\\s+(?:by|from)\\s+(.+?)\\s*$',
               'i',
             ),
             new RegExp(
-              `what\\s+did\\s+(.+?)\\s+(?:write|post|create|publish)\\s*\\??\\s*$`,
+              'what\\s+did\\s+(.+?)\\s+(?:write|post|create|publish)\\s*\\??\\s*$',
               'i',
             ),
             new RegExp(
-              `(?:can you|could you)\\s+(?:show|get|find)\\s+(.+?)\\s+(?:stuff|things|content)\\s*\\??\\s*$`,
+              '(?:can you|could you)\\s+(?:show|get|find)\\s+(.+?)\\s+(?:stuff|things|content)\\s*\\??\\s*$',
               'i',
             ),
             new RegExp(
-              `everything\\s+(.+?)\\s+(?:wrote|posted|created|published)\\s*$`,
+              'everything\\s+(.+?)\\s+(?:wrote|posted|created|published)\\s*$',
               'i',
             ),
             new RegExp(
-              `(.+?)\\s+(?:wrote|posted|created)\\s+what\\s*\\??\\s*$`,
+              '(.+?)\\s+(?:wrote|posted|created)\\s+what\\s*\\??\\s*$',
               'i',
             ),
           ],
@@ -700,7 +700,7 @@ export class DeterministicSchemaIntentParser implements LocalAiIntentParser {
         rules.push({
           patterns: [
             new RegExp(
-              `everything\\s+(.+?)\\s+(?:said|commented|mentioned)\\s*$`,
+              'everything\\s+(.+?)\\s+(?:said|commented|mentioned)\\s*$',
               'i',
             ),
           ],
@@ -722,7 +722,7 @@ export class DeterministicSchemaIntentParser implements LocalAiIntentParser {
       rules.push({
         patterns: [
           new RegExp(
-            `(?:the\\s+)?(?:latest|newest|recent)\\s+(?:stuff|things|content|items)\\s*$`,
+            '(?:the\\s+)?(?:latest|newest|recent)\\s+(?:stuff|things|content|items)\\s*$',
             'i',
           ),
         ],
@@ -741,7 +741,7 @@ export class DeterministicSchemaIntentParser implements LocalAiIntentParser {
       rules.push({
         patterns: [
           new RegExp(
-            `(?:find|search|get|show)\\s+(?:me\\s+)?(?:all\\s+)?(?:the\\s+)?(?:stuff|things|content)\\s+(?:about|on|regarding)\\s+(.+)`,
+            '(?:find|search|get|show)\\s+(?:me\\s+)?(?:all\\s+)?(?:the\\s+)?(?:stuff|things|content)\\s+(?:about|on|regarding)\\s+(.+)',
             'i',
           ),
         ],
@@ -788,7 +788,7 @@ export class DeterministicSchemaIntentParser implements LocalAiIntentParser {
       if (personNameAttribute) {
         rules.push({
           patterns: [
-            new RegExp(`^([A-Z][a-z]+)$`),
+            new RegExp('^([A-Z][a-z]+)$'),
           ],
           buildIntent: (match: RegExpMatchArray): GenericIntent => ({
             target: personType,
@@ -809,10 +809,10 @@ export class DeterministicSchemaIntentParser implements LocalAiIntentParser {
 
   private findDefaultContentType(introspection: SchemaIntrospectionResult): string | null {
     for (const [typeName, descriptor] of introspection.types) {
-      if (descriptor.attributes.some((attribute) => attribute.name === 'title')) return typeName;
+      if (descriptor.attributes.some((attribute) => attribute.name === 'title')) { return typeName; }
     }
     for (const [typeName, descriptor] of introspection.types) {
-      if (descriptor.attributes.some((attribute) => attribute.name === 'body')) return typeName;
+      if (descriptor.attributes.some((attribute) => attribute.name === 'body')) { return typeName; }
     }
     return introspection.typeNames[0] ?? null;
   }
@@ -830,7 +830,7 @@ export class DeterministicSchemaIntentParser implements LocalAiIntentParser {
     for (const [typeName, descriptor] of introspection.types) {
       const hasBody = descriptor.attributes.some((attribute) => attribute.name === 'body');
       const hasTitle = descriptor.attributes.some((attribute) => attribute.name === 'title');
-      if (hasBody && !hasTitle) return typeName;
+      if (hasBody && !hasTitle) { return typeName; }
     }
     return null;
   }

@@ -11,9 +11,7 @@ export class MdqlMemoryExecutor {
     items: T[],
     query: MdqlQueryObject,
   ): T[] {
-    let result = items.filter((record) =>
-      MdqlMemoryExecutor.matchesNode(record, query.filters),
-    );
+    let result = items.filter((record) => MdqlMemoryExecutor.matchesNode(record, query.filters));
 
     if (query.orderBy.length > 0) {
       result = MdqlMemoryExecutor.sortRecords(result, query.orderBy);
@@ -53,9 +51,7 @@ export class MdqlMemoryExecutor {
     items: T[],
     query: MdqlQueryObject,
   ): boolean {
-    return items.some((record) =>
-      MdqlMemoryExecutor.matchesNode(record, query.filters),
-    );
+    return items.some((record) => MdqlMemoryExecutor.matchesNode(record, query.filters));
   }
 
   static compilePredicate<T extends Model = Model>(
@@ -70,21 +66,15 @@ export class MdqlMemoryExecutor {
     }
 
     if (node.kind === 'and') {
-      return node.children.every((child) =>
-        MdqlMemoryExecutor.matchesNode(record, child),
-      );
+      return node.children.every((child) => MdqlMemoryExecutor.matchesNode(record, child));
     }
 
     if (node.kind === 'or') {
-      return node.children.some((child) =>
-        MdqlMemoryExecutor.matchesNode(record, child),
-      );
+      return node.children.some((child) => MdqlMemoryExecutor.matchesNode(record, child));
     }
 
     // not
-    return !node.children.some((child) =>
-      MdqlMemoryExecutor.matchesNode(record, child),
-    );
+    return !node.children.some((child) => MdqlMemoryExecutor.matchesNode(record, child));
   }
 
   private static resolveFieldValues(record: Model, field: string): unknown[] {
@@ -93,10 +83,10 @@ export class MdqlMemoryExecutor {
     for (const part of parts) {
       const nextValues: unknown[] = [];
       for (const current of currentValues) {
-        if (current === null || current === undefined) continue;
+        if (current === null || current === undefined) { continue; }
         if (Array.isArray(current)) {
           for (const item of current) {
-            if (item === null || item === undefined) continue;
+            if (item === null || item === undefined) { continue; }
             nextValues.push((item as Record<string, unknown>)[part]);
           }
         } else {
@@ -116,9 +106,7 @@ export class MdqlMemoryExecutor {
   private static evaluateCondition(record: Model, condition: MdqlCondition): boolean {
     const resolvedValues = MdqlMemoryExecutor.resolveFieldValues(record, condition.field);
     if (resolvedValues.length > 1) {
-      return resolvedValues.some((fieldValue) =>
-        MdqlMemoryExecutor.evaluateSingleCondition(fieldValue, condition.operator, condition.value),
-      );
+      return resolvedValues.some((fieldValue) => MdqlMemoryExecutor.evaluateSingleCondition(fieldValue, condition.operator, condition.value));
     }
     const fieldValue = resolvedValues[0];
     return MdqlMemoryExecutor.evaluateSingleCondition(fieldValue, condition.operator, condition.value);
@@ -172,7 +160,7 @@ export class MdqlMemoryExecutor {
         return MdqlMemoryExecutor.compareValues(fieldValue, value) <= 0;
 
       case 'between': {
-        if (!Array.isArray(value) || value.length !== 2) return false;
+        if (!Array.isArray(value) || value.length !== 2) { return false; }
         const lower = MdqlMemoryExecutor.compareValues(fieldValue, value[0]);
         const upper = MdqlMemoryExecutor.compareValues(fieldValue, value[1]);
         return lower >= 0 && upper <= 0;
@@ -184,8 +172,8 @@ export class MdqlMemoryExecutor {
   }
 
   private static compareValues(a: unknown, b: unknown): number {
-    if (a === null || a === undefined) return -1;
-    if (b === null || b === undefined) return 1;
+    if (a === null || a === undefined) { return -1; }
+    if (b === null || b === undefined) { return 1; }
 
     if (a instanceof Date && b instanceof Date) {
       return a.getTime() - b.getTime();
@@ -211,11 +199,11 @@ export class MdqlMemoryExecutor {
         const valueA = MdqlMemoryExecutor.resolveFieldValue(a, clause.field);
         const valueB = MdqlMemoryExecutor.resolveFieldValue(b, clause.field);
 
-        if (valueA === valueB) continue;
+        if (valueA === valueB) { continue; }
 
         // Nulls always sort last regardless of direction
-        if (valueA === null || valueA === undefined) return 1;
-        if (valueB === null || valueB === undefined) return -1;
+        if (valueA === null || valueA === undefined) { return 1; }
+        if (valueB === null || valueB === undefined) { return -1; }
 
         const comparison = MdqlMemoryExecutor.compareValues(valueA, valueB);
         if (comparison !== 0) {

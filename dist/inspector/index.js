@@ -1,5 +1,5 @@
 import { reaction as C } from "mobx";
-import { M as D } from "../MdqlMemoryExecutor-BWMP31zG.js";
+import { M as D } from "../MdqlMemoryExecutor-ClRyEFJj.js";
 const L = /* @__PURE__ */ new Set([
   "where",
   "and",
@@ -116,12 +116,20 @@ class k {
   }
   parseQuery() {
     const e = this.advance();
-    if (!e) throw new Error("Expected model name");
+    if (!e)
+      throw new Error("Expected model name");
     const s = e.value;
     let t = { kind: "and", children: [] };
     const r = [];
     let n = null, o = null;
-    return this.matchKeyword("where") && (t = this.parseFilterExpression()), this.matchKeyword("order") ? (this.expect("keyword", "by"), this.parseOrderBy(r)) : this.matchKeyword("sort") && this.parseOrderBy(r), this.matchKeyword("limit") && (n = this.expect("number").raw), this.matchKeyword("offset") && (o = this.expect("number").raw), { modelName: s, filters: t, orderBy: r, limit: n, offset: o, includes: [] };
+    return this.matchKeyword("where") && (t = this.parseFilterExpression()), this.matchKeyword("order") ? (this.expect("keyword", "by"), this.parseOrderBy(r)) : this.matchKeyword("sort") && this.parseOrderBy(r), this.matchKeyword("limit") && (n = this.expect("number").raw), this.matchKeyword("offset") && (o = this.expect("number").raw), {
+      modelName: s,
+      filters: t,
+      orderBy: r,
+      limit: n,
+      offset: o,
+      includes: []
+    };
   }
   parseFilterExpression() {
     const e = this.parseCondition(), s = [e];
@@ -142,43 +150,73 @@ class k {
     if (this.matchKeyword("not"))
       return { kind: "not", children: [this.parseCondition()] };
     const e = this.advance();
-    if (!e) throw new Error("Expected field name");
+    if (!e)
+      throw new Error("Expected field name");
     const s = e.value;
     if (((o = this.peek()) == null ? void 0 : o.type) === "keyword" && ((i = this.peek()) == null ? void 0 : i.value) === "is")
-      return this.advance(), this.matchKeyword("not") ? (this.expectNullToken(), { kind: "condition", field: s, operator: "isNotNull", value: void 0 }) : (this.expectNullToken(), { kind: "condition", field: s, operator: "isNull", value: void 0 });
+      return this.advance(), this.matchKeyword("not") ? (this.expectNullToken(), {
+        kind: "condition",
+        field: s,
+        operator: "isNotNull",
+        value: void 0
+      }) : (this.expectNullToken(), {
+        kind: "condition",
+        field: s,
+        operator: "isNull",
+        value: void 0
+      });
     if (((l = this.peek()) == null ? void 0 : l.type) === "keyword" && ((h = this.peek()) == null ? void 0 : h.value) === "in") {
       this.advance();
       const f = this.parseArray();
-      return { kind: "condition", field: s, operator: "in", value: f };
+      return {
+        kind: "condition",
+        field: s,
+        operator: "in",
+        value: f
+      };
     }
     if (((p = this.peek()) == null ? void 0 : p.type) === "keyword" && ((d = this.peek()) == null ? void 0 : d.value) === "between") {
       this.advance();
       const f = this.parseValue(), _ = this.parseValue();
-      return { kind: "condition", field: s, operator: "between", value: [f, _] };
+      return {
+        kind: "condition",
+        field: s,
+        operator: "between",
+        value: [f, _]
+      };
     }
     const t = this.advance();
-    if (!t) throw new Error(`Expected operator after field "${s}"`);
+    if (!t)
+      throw new Error(`Expected operator after field "${s}"`);
     let r;
     if (t.type === "operator") {
-      if (r = S[t.value], !r) throw new Error(`Unknown operator: ${t.value}`);
+      if (r = S[t.value], !r)
+        throw new Error(`Unknown operator: ${t.value}`);
     } else if (t.type === "keyword" && S[t.value])
       r = S[t.value];
     else
       throw new Error(`Expected operator, got ${t.type}:${t.value}`);
     const n = this.parseValue();
-    return { kind: "condition", field: s, operator: r, value: n };
+    return {
+      kind: "condition",
+      field: s,
+      operator: r,
+      value: n
+    };
   }
   parseOrderBy(e) {
     var t, r;
     const s = this.advance();
-    if (!s) throw new Error("Expected field name after order by / sort");
+    if (!s)
+      throw new Error("Expected field name after order by / sort");
     for (e.push({
       field: s.value,
       direction: this.parseDirection()
     }); ((t = this.peek()) == null ? void 0 : t.type) === "bracket" && ((r = this.peek()) == null ? void 0 : r.value) === ","; ) {
       this.advance();
       const n = this.advance();
-      if (!n) break;
+      if (!n)
+        break;
       e.push({
         field: n.value,
         direction: this.parseDirection()
@@ -191,10 +229,14 @@ class k {
   }
   parseValue() {
     const e = this.advance();
-    if (!e) throw new Error("Expected value");
-    if (e.type === "string" || e.type === "number") return e.raw;
-    if (e.type === "null" || e.type === "keyword" && e.value === "null") return null;
-    if (e.type === "identifier") return e.value;
+    if (!e)
+      throw new Error("Expected value");
+    if (e.type === "string" || e.type === "number")
+      return e.raw;
+    if (e.type === "null" || e.type === "keyword" && e.value === "null")
+      return null;
+    if (e.type === "identifier")
+      return e.value;
     throw new Error(`Unexpected value token: ${e.type}:${e.value}`);
   }
   parseArray() {
@@ -782,12 +824,14 @@ class W {
     const { payload: s } = e.data, t = "storeId" in s ? s.storeId : void 0, r = t ? this.stores.get(t) : void 0;
     switch (s.type) {
       case "requestSummary": {
-        if (!r) return;
+        if (!r)
+          return;
         this.sendToPanel({ type: "summary", storeId: t, data: r.summary() });
         break;
       }
       case "requestRecords": {
-        if (!r || !("modelName" in s)) return;
+        if (!r || !("modelName" in s))
+          return;
         this.sendToPanel({
           type: "records",
           storeId: t,
@@ -797,9 +841,11 @@ class W {
         break;
       }
       case "requestRecordDetail": {
-        if (!r || !("modelName" in s) || !("id" in s)) return;
+        if (!r || !("modelName" in s) || !("id" in s))
+          return;
         const n = r.record(s.modelName, s.id);
-        if (!n) return;
+        if (!n)
+          return;
         this.sendToPanel({
           type: "recordDetail",
           storeId: t,
@@ -810,7 +856,8 @@ class W {
         break;
       }
       case "requestSchema": {
-        if (!r || !("modelName" in s)) return;
+        if (!r || !("modelName" in s))
+          return;
         this.sendToPanel({
           type: "schema",
           storeId: t,
@@ -820,13 +867,15 @@ class W {
         break;
       }
       case "requestSnapshot": {
-        if (!r) return;
+        if (!r)
+          return;
         this.sendToPanel({ type: "snapshot", storeId: t, data: r.snapshot() });
         break;
       }
       case "requestQuery": {
-        if (!r || !("queryText" in s)) return;
-        const n = s.queryText;
+        if (!r || !("queryText" in s))
+          return;
+        const { queryText: n } = s;
         try {
           const { modelName: o, results: i } = r.queryWithMeta(n), l = r.records(o), h = new Map(l.map((d) => [d.id, d])), p = i.map((d) => h.get(d.id)).filter(Boolean);
           this.sendToPanel({
@@ -850,13 +899,15 @@ class W {
     }
   }
   isValidPayload(e) {
-    if (!e || typeof e != "object") return !1;
+    if (!e || typeof e != "object")
+      return !1;
     const s = e, t = ["requestSummary", "requestRecords", "requestRecordDetail", "requestSchema", "requestSnapshot", "requestQuery"];
     return typeof s.type == "string" && t.includes(s.type) && typeof s.storeId == "string";
   }
   sendToPanel(e) {
     const s = R();
-    if (!(s != null && s.postMessage)) return;
+    if (!(s != null && s.postMessage))
+      return;
     const t = {
       source: O,
       direction: "page-to-panel",

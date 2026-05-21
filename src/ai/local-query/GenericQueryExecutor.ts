@@ -252,11 +252,11 @@ export class GenericQueryExecutor {
     store: Store,
   ): Model[] {
     const recordId = (record as unknown as { id: string }).id;
-    if (!recordId) return [];
+    if (!recordId) { return []; }
 
     const reverseEdges = (this.introspection.relationshipGraph.get(step.toType) ?? [])
       .filter((edge) => edge.relatedType === step.fromType);
-    if (reverseEdges.length === 0) return [];
+    if (reverseEdges.length === 0) { return []; }
 
     const candidates = store.peekAll(step.toType).toArray();
     return candidates.filter((candidate) => {
@@ -264,10 +264,10 @@ export class GenericQueryExecutor {
       for (const edge of reverseEdges) {
         const related = candidateData[edge.relationshipName];
         if (related && typeof related === 'object' && 'id' in (related as object)) {
-          if ((related as { id: string }).id === recordId) return true;
+          if ((related as { id: string }).id === recordId) { return true; }
         }
         const fk = candidateData[`${edge.relationshipName}Id`];
-        if (fk === recordId) return true;
+        if (fk === recordId) { return true; }
       }
       return false;
     });
@@ -294,7 +294,7 @@ export class GenericQueryExecutor {
       const edges = graph.get(current.type) ?? [];
 
       for (const edge of edges) {
-        if (visited.has(edge.relatedType)) continue;
+        if (visited.has(edge.relatedType)) { continue; }
 
         const newPath: TraversalStep[] = [
           ...current.path,
@@ -319,9 +319,7 @@ export class GenericQueryExecutor {
     }
 
     if (throughType && allPaths.length > 0) {
-      const pathThroughType = allPaths.find((path) =>
-        path.some((step) => step.toType === throughType || step.fromType === throughType),
-      );
+      const pathThroughType = allPaths.find((path) => path.some((step) => step.toType === throughType || step.fromType === throughType));
       return pathThroughType ?? allPaths[0] ?? null;
     }
 
@@ -332,7 +330,7 @@ export class GenericQueryExecutor {
     const seen = new Set<string>();
     return records.filter((record) => {
       const key = `${record.modelName}:${record.id}`;
-      if (seen.has(key)) return false;
+      if (seen.has(key)) { return false; }
       seen.add(key);
       return true;
     });

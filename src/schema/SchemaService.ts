@@ -127,7 +127,7 @@ export class SchemaService {
    */
   private linkPolymorphicChild(childName: string, childClass: ModelClass): void {
     for (const [parentName, parentEntry] of this.entries) {
-      if (!parentEntry.discriminator || parentName === childName) continue;
+      if (!parentEntry.discriminator || parentName === childName) { continue; }
       for (const factory of Object.values(parentEntry.discriminator.map)) {
         if (factory() === childClass) {
           const childEntry = this.entries.get(childName);
@@ -256,7 +256,7 @@ export class SchemaService {
     payload: Record<string, unknown>,
   ): { modelName: string; modelClass: ModelClass } | null {
     const entry = this.entries.get(modelName);
-    if (!entry?.discriminator) return null;
+    if (!entry?.discriminator) { return null; }
 
     const { key, map } = entry.discriminator;
     const discriminatorValue = payload[key];

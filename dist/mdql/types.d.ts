@@ -1,3 +1,4 @@
+import type { Model } from '@mobx-data/model';
 export type MdqlOperator = 'equals' | 'notEquals' | 'in' | 'notIn' | 'isNull' | 'isNotNull' | 'contains' | 'startsWith' | 'endsWith' | 'greaterThan' | 'greaterThanOrEquals' | 'lessThan' | 'lessThanOrEquals' | 'between';
 export type MdqlUnaryOperator = 'isNull' | 'isNotNull';
 export type MdqlSortDirection = 'asc' | 'desc';
@@ -30,7 +31,6 @@ export interface MdqlValidationError {
 }
 export declare const OPERATORS_FOR_TYPE: Record<string, ReadonlySet<MdqlOperator>>;
 export declare const ALL_OPERATORS: ReadonlySet<MdqlOperator>;
-import type { Model } from '@mobx-data/model';
 export type ModelFields<T extends Model> = Omit<T, keyof Model>;
 export type MdqlStringOperator = 'equals' | 'notEquals' | 'in' | 'notIn' | 'isNull' | 'isNotNull' | 'contains' | 'startsWith' | 'endsWith';
 export type MdqlNumberOperator = 'equals' | 'notEquals' | 'in' | 'notIn' | 'isNull' | 'isNotNull' | 'greaterThan' | 'greaterThanOrEquals' | 'lessThan' | 'lessThanOrEquals' | 'between';

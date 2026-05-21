@@ -203,7 +203,7 @@ export class WebLlmIntentParser implements LocalAiIntentParser {
       return null;
     }
 
-    const target = parsed.target;
+    const { target } = parsed;
     if (typeof target !== 'string') {
       return null;
     }
@@ -261,7 +261,7 @@ export class WebLlmIntentParser implements LocalAiIntentParser {
       return null;
     }
 
-    const intent = parsed.intent;
+    const { intent } = parsed;
     if (typeof intent !== 'string') {
       return null;
     }
@@ -291,15 +291,15 @@ export class WebLlmIntentParser implements LocalAiIntentParser {
   }
 
   private parseNullableString(value: unknown): string | null {
-    if (typeof value !== 'string') return null;
-    if (value === 'none' || value === 'null' || value === '') return null;
+    if (typeof value !== 'string') { return null; }
+    if (value === 'none' || value === 'null' || value === '') { return null; }
     return value;
   }
 
   private parseNullableNumber(value: unknown): number | null {
-    if (typeof value === 'number') return Math.max(1, Math.min(100, value));
-    if (typeof value !== 'string') return null;
-    if (value === 'none' || value === 'null' || value === '') return null;
+    if (typeof value === 'number') { return Math.max(1, Math.min(100, value)); }
+    if (typeof value !== 'string') { return null; }
+    if (value === 'none' || value === 'null' || value === '') { return null; }
     const parsed = parseInt(value, 10);
     return Number.isNaN(parsed) ? null : Math.max(1, Math.min(100, parsed));
   }

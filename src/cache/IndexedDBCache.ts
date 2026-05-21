@@ -208,7 +208,7 @@ export class IndexedDBCache implements CacheLike {
         const request = transaction.objectStore(name).clear();
         request.onsuccess = () => {
           remaining -= 1;
-          if (remaining === 0) resolve();
+          if (remaining === 0) { resolve(); }
         };
         request.onerror = () => reject(request.error);
       }

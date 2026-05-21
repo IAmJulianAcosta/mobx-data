@@ -13,7 +13,7 @@ function w(n) {
     if (s)
       return parseInt(s[1], 10) * 1e3;
   }
-  const r = n.expires;
+  const { expires: r } = n;
   if (r) {
     const t = new Date(r).getTime();
     if (!Number.isNaN(t))
@@ -61,19 +61,19 @@ function T(n, e) {
   return r + t.map(f(e == null ? void 0 : e.locale)).join((e == null ? void 0 : e.delimiter) ?? " ") + s;
 }
 function I(n, e) {
-  const [r, t, s] = R(n, e), c = f(e == null ? void 0 : e.locale), o = E(e == null ? void 0 : e.locale), a = g(c, o);
+  const [r, t, s] = R(n, e), c = f(e == null ? void 0 : e.locale), o = g(e == null ? void 0 : e.locale), a = x(c, o);
   return r + t.map(a).join("") + s;
 }
-function x(n, e) {
+function E(n, e) {
   return T(n, { delimiter: "-", ...e });
 }
 function f(n) {
   return n === !1 ? (e) => e.toLowerCase() : (e) => e.toLocaleLowerCase(n);
 }
-function E(n) {
+function g(n) {
   return (e) => e.toLocaleUpperCase(n);
 }
-function g(n, e) {
+function x(n, e) {
   return (r, t) => {
     const s = r[0];
     return (t > 0 && s >= "0" && s <= "9" ? "_" + s : e(s)) + n(r.slice(1));
@@ -117,7 +117,7 @@ class A {
    * Default: dasherized, pluralized form — e.g. `userPost` → `user-posts`.
    */
   pathForType(e) {
-    return y.plural(x(e));
+    return y.plural(E(e));
   }
   /**
    * Assembles a full URL from `host`, `namespace`, and the supplied `path`.
@@ -396,4 +396,4 @@ export {
   j as e,
   w as p
 };
-//# sourceMappingURL=RestAdapter-DYUoyV5h.js.map
+//# sourceMappingURL=RestAdapter-CYInlScn.js.map

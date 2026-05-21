@@ -1,6 +1,6 @@
 import { A as s, M as T, a as _, R as o } from "../types-CC2fG3FP.js";
 import { a as e, b as r, h as A, m as S } from "../decorators-CKneHgoF.js";
-import { S as t } from "../SchemaService-C_pkh-vI.js";
+import { S as t } from "../SchemaService-C6OJhSg-.js";
 export {
   s as ATTRIBUTES_META_KEY,
   T as MODEL_NAME_META_KEY,

@@ -27,7 +27,7 @@ export class GetPostsByUserTool implements LocalAiTool<GetPostsByUserArguments, 
     } else if (arguments_.userName) {
       const lowerName = arguments_.userName.toLowerCase();
       user = allUsers.toArray().find((record: Model) => {
-        const name = (record as unknown as Record<string, unknown>).name;
+        const { name } = (record as unknown as Record<string, unknown>);
         return typeof name === 'string' && name.toLowerCase() === lowerName;
       });
     }
@@ -48,7 +48,7 @@ export class GetPostsByUserTool implements LocalAiTool<GetPostsByUserArguments, 
       if (author && author.id === userId) {
         return true;
       }
-      const authorId = (post as unknown as Record<string, unknown>).authorId;
+      const { authorId } = (post as unknown as Record<string, unknown>);
       return authorId === userId;
     });
 

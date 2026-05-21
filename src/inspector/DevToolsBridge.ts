@@ -14,8 +14,8 @@ const SOURCE = 'mobx-data-devtools' as const;
 const VERSION = '1.4.0';
 
 function getGlobal(): Record<string, unknown> {
-  if (typeof globalThis !== 'undefined') return globalThis as unknown as Record<string, unknown>;
-  if (typeof window !== 'undefined') return window as unknown as Record<string, unknown>;
+  if (typeof globalThis !== 'undefined') { return globalThis as unknown as Record<string, unknown>; }
+  if (typeof window !== 'undefined') { return window as unknown as Record<string, unknown>; }
   return {};
 }
 
@@ -25,7 +25,7 @@ function getEventTarget(): {
   postMessage?(data: unknown, origin?: string): void;
 } | null {
   const global = getGlobal();
-  if (typeof global.addEventListener === 'function') return global as unknown as typeof window;
+  if (typeof global.addEventListener === 'function') { return global as unknown as typeof window; }
   return null;
 }
 
@@ -55,9 +55,9 @@ export class DevToolsBridge {
     if (eventTarget?.addEventListener) {
       this.messageHandler = (event: unknown) => {
         const messageEvent = event as MessageEvent;
-        if (messageEvent.origin && typeof location !== 'undefined' && messageEvent.origin !== location.origin) return;
-        if (messageEvent.data?.source !== SOURCE || messageEvent.data?.direction !== 'panel-to-page') return;
-        if (!this.isValidPayload(messageEvent.data?.payload)) return;
+        if (messageEvent.origin && typeof location !== 'undefined' && messageEvent.origin !== location.origin) { return; }
+        if (messageEvent.data?.source !== SOURCE || messageEvent.data?.direction !== 'panel-to-page') { return; }
+        if (!this.isValidPayload(messageEvent.data?.payload)) { return; }
         this.handleMessage(messageEvent as MessageEvent<DevToolsMessage>);
       };
       eventTarget.addEventListener('message', this.messageHandler);
@@ -118,12 +118,12 @@ export class DevToolsBridge {
 
     switch (payload.type) {
       case 'requestSummary': {
-        if (!inspector) return;
+        if (!inspector) { return; }
         this.sendToPanel({ type: 'summary', storeId: storeId!, data: inspector.summary() });
         break;
       }
       case 'requestRecords': {
-        if (!inspector || !('modelName' in payload)) return;
+        if (!inspector || !('modelName' in payload)) { return; }
         this.sendToPanel({
           type: 'records',
           storeId: storeId!,
@@ -133,9 +133,9 @@ export class DevToolsBridge {
         break;
       }
       case 'requestRecordDetail': {
-        if (!inspector || !('modelName' in payload) || !('id' in payload)) return;
+        if (!inspector || !('modelName' in payload) || !('id' in payload)) { return; }
         const detail = inspector.record(payload.modelName, payload.id);
-        if (!detail) return;
+        if (!detail) { return; }
         this.sendToPanel({
           type: 'recordDetail',
           storeId: storeId!,
@@ -146,7 +146,7 @@ export class DevToolsBridge {
         break;
       }
       case 'requestSchema': {
-        if (!inspector || !('modelName' in payload)) return;
+        if (!inspector || !('modelName' in payload)) { return; }
         this.sendToPanel({
           type: 'schema',
           storeId: storeId!,
@@ -156,13 +156,13 @@ export class DevToolsBridge {
         break;
       }
       case 'requestSnapshot': {
-        if (!inspector) return;
+        if (!inspector) { return; }
         this.sendToPanel({ type: 'snapshot', storeId: storeId!, data: inspector.snapshot() });
         break;
       }
       case 'requestQuery': {
-        if (!inspector || !('queryText' in payload)) return;
-        const queryText = (payload as { queryText: string }).queryText;
+        if (!inspector || !('queryText' in payload)) { return; }
+        const { queryText } = (payload as { queryText: string });
         try {
           const { modelName, results } = inspector.queryWithMeta(queryText);
           const allRecords = inspector.records(modelName);
@@ -194,7 +194,7 @@ export class DevToolsBridge {
   }
 
   private isValidPayload(payload: unknown): boolean {
-    if (!payload || typeof payload !== 'object') return false;
+    if (!payload || typeof payload !== 'object') { return false; }
     const typed = payload as Record<string, unknown>;
     const validTypes = ['requestSummary', 'requestRecords', 'requestRecordDetail', 'requestSchema', 'requestSnapshot', 'requestQuery'];
     return typeof typed.type === 'string' && validTypes.includes(typed.type) && typeof typed.storeId === 'string';
@@ -202,7 +202,7 @@ export class DevToolsBridge {
 
   private sendToPanel(payload: DevToolsPayload): void {
     const eventTarget = getEventTarget();
-    if (!eventTarget?.postMessage) return;
+    if (!eventTarget?.postMessage) { return; }
     const message: DevToolsMessage = {
       source: SOURCE,
       direction: 'page-to-panel',

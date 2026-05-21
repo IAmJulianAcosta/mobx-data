@@ -32,9 +32,9 @@ const OPERATOR_MAP: Record<string, MdqlOperator> = {
   '~': 'contains',
   '^=': 'startsWith',
   '$=': 'endsWith',
-  'contains': 'contains',
-  'startswith': 'startsWith',
-  'endswith': 'endsWith',
+  contains: 'contains',
+  startswith: 'startsWith',
+  endswith: 'endsWith',
 };
 
 const OPERATOR_CHARS = new Set(['=', '!', '<', '>', '~', '^', '$']);
@@ -164,7 +164,7 @@ export class QueryParser {
 
   private parseQuery(): MdqlQueryObject {
     const modelToken = this.advance();
-    if (!modelToken) throw new Error('Expected model name');
+    if (!modelToken) { throw new Error('Expected model name'); }
     const modelName = modelToken.value;
 
     let filters: MdqlLogicalGroup = { kind: 'and', children: [] };
@@ -193,7 +193,9 @@ export class QueryParser {
       offset = token.raw as number;
     }
 
-    return { modelName, filters, orderBy, limit, offset, includes: [] };
+    return {
+      modelName, filters, orderBy, limit, offset, includes: [],
+    };
   }
 
   private parseFilterExpression(): MdqlLogicalGroup {
@@ -230,39 +232,47 @@ export class QueryParser {
     }
 
     const fieldToken = this.advance();
-    if (!fieldToken) throw new Error('Expected field name');
+    if (!fieldToken) { throw new Error('Expected field name'); }
     const field = fieldToken.value;
 
     if (this.peek()?.type === 'keyword' && this.peek()?.value === 'is') {
       this.advance();
       if (this.matchKeyword('not')) {
         this.expectNullToken();
-        return { kind: 'condition', field, operator: 'isNotNull', value: undefined };
+        return {
+          kind: 'condition', field, operator: 'isNotNull', value: undefined,
+        };
       }
       this.expectNullToken();
-      return { kind: 'condition', field, operator: 'isNull', value: undefined };
+      return {
+        kind: 'condition', field, operator: 'isNull', value: undefined,
+      };
     }
 
     if (this.peek()?.type === 'keyword' && this.peek()?.value === 'in') {
       this.advance();
       const values = this.parseArray();
-      return { kind: 'condition', field, operator: 'in', value: values };
+      return {
+        kind: 'condition', field, operator: 'in', value: values,
+      };
     }
 
     if (this.peek()?.type === 'keyword' && this.peek()?.value === 'between') {
       this.advance();
       const low = this.parseValue();
       const high = this.parseValue();
-      return { kind: 'condition', field, operator: 'between', value: [low, high] };
+      return {
+        kind: 'condition', field, operator: 'between', value: [low, high],
+      };
     }
 
     const operatorToken = this.advance();
-    if (!operatorToken) throw new Error(`Expected operator after field "${field}"`);
+    if (!operatorToken) { throw new Error(`Expected operator after field "${field}"`); }
 
     let operator: MdqlOperator;
     if (operatorToken.type === 'operator') {
       operator = OPERATOR_MAP[operatorToken.value] as MdqlOperator;
-      if (!operator) throw new Error(`Unknown operator: ${operatorToken.value}`);
+      if (!operator) { throw new Error(`Unknown operator: ${operatorToken.value}`); }
     } else if (operatorToken.type === 'keyword' && OPERATOR_MAP[operatorToken.value]) {
       operator = OPERATOR_MAP[operatorToken.value] as MdqlOperator;
     } else {
@@ -271,12 +281,14 @@ export class QueryParser {
 
     const value = this.parseValue();
 
-    return { kind: 'condition', field, operator, value } as MdqlCondition;
+    return {
+      kind: 'condition', field, operator, value,
+    } as MdqlCondition;
   }
 
   private parseOrderBy(orderBy: MdqlOrderByClause[]): void {
     const fieldToken = this.advance();
-    if (!fieldToken) throw new Error('Expected field name after order by / sort');
+    if (!fieldToken) { throw new Error('Expected field name after order by / sort'); }
     orderBy.push({
       field: fieldToken.value,
       direction: this.parseDirection(),
@@ -285,7 +297,7 @@ export class QueryParser {
     while (this.peek()?.type === 'bracket' && this.peek()?.value === ',') {
       this.advance();
       const nextField = this.advance();
-      if (!nextField) break;
+      if (!nextField) { break; }
       orderBy.push({
         field: nextField.value,
         direction: this.parseDirection(),
@@ -304,13 +316,13 @@ export class QueryParser {
 
   private parseValue(): unknown {
     const token = this.advance();
-    if (!token) throw new Error('Expected value');
+    if (!token) { throw new Error('Expected value'); }
 
-    if (token.type === 'string') return token.raw;
-    if (token.type === 'number') return token.raw;
-    if (token.type === 'null') return null;
-    if (token.type === 'keyword' && token.value === 'null') return null;
-    if (token.type === 'identifier') return token.value;
+    if (token.type === 'string') { return token.raw; }
+    if (token.type === 'number') { return token.raw; }
+    if (token.type === 'null') { return null; }
+    if (token.type === 'keyword' && token.value === 'null') { return null; }
+    if (token.type === 'identifier') { return token.value; }
 
     throw new Error(`Unexpected value token: ${token.type}:${token.value}`);
   }

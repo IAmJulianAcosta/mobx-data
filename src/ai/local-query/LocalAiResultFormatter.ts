@@ -23,9 +23,9 @@ export class LocalAiResultFormatter {
     not_found: (result) => result.message,
     unsupported: () => 'I don\'t understand that query. Try something like "show posts by julian" or "recent posts".',
     validation_error: (result) => `Invalid query: ${result.message}`,
-    error: (result) => result.error
+    error: (result) => (result.error
       ? `Something went wrong: ${result.error}`
-      : 'Something went wrong while processing the query.',
+      : 'Something went wrong while processing the query.'),
   };
 
   private formatArrayResult(result: LocalAiQueryResult): string {

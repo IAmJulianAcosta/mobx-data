@@ -27,7 +27,7 @@ export class GetCommentsByUserTool implements LocalAiTool<GetCommentsByUserArgum
     } else if (arguments_.userName) {
       const lowerName = arguments_.userName.toLowerCase();
       user = allUsers.toArray().find((record: Model) => {
-        const name = (record as unknown as Record<string, unknown>).name;
+        const { name } = (record as unknown as Record<string, unknown>);
         return typeof name === 'string' && name.toLowerCase() === lowerName;
       });
     }
@@ -48,7 +48,7 @@ export class GetCommentsByUserTool implements LocalAiTool<GetCommentsByUserArgum
       allPosts
         .filter((post: Model) => {
           const author = (post as unknown as Record<string, unknown>).author as Model | null;
-          if (author && author.id === userId) return true;
+          if (author && author.id === userId) { return true; }
           return (post as unknown as Record<string, unknown>).authorId === userId;
         })
         .map((post: Model) => post.id),
@@ -57,7 +57,7 @@ export class GetCommentsByUserTool implements LocalAiTool<GetCommentsByUserArgum
     const allComments = store.peekAll('comment').toArray();
     const userComments = allComments.filter((comment: Model) => {
       const commentPost = (comment as unknown as Record<string, unknown>).post as Model | null;
-      if (commentPost && userPostIds.has(commentPost.id)) return true;
+      if (commentPost && userPostIds.has(commentPost.id)) { return true; }
       const commentPostId = (comment as unknown as Record<string, unknown>).postId as string | undefined;
       return commentPostId !== undefined && userPostIds.has(commentPostId);
     });

@@ -27,7 +27,7 @@ export class GetUserProfileTool implements LocalAiTool<GetUserProfileArguments, 
       const lowerName = arguments_.userName.toLowerCase();
       const allUsers = store.peekAll('user').toArray();
       user = allUsers.find((record: Model) => {
-        const name = (record as unknown as Record<string, unknown>).name;
+        const { name } = (record as unknown as Record<string, unknown>);
         return typeof name === 'string' && name.toLowerCase() === lowerName;
       }) ?? null;
     }

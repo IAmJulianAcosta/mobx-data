@@ -2,7 +2,9 @@ import type { Model } from '@mobx-data/model';
 import type { Store } from '@mobx-data/store';
 import { StoreInspector } from './StoreInspector.js';
 import { summarizeRecord, detailRecord } from './serialization.js';
-import type { RecordSummary, RecordDetail, StoreSummary, SchemaInfo } from './types.js';
+import type {
+  RecordSummary, RecordDetail, StoreSummary, SchemaInfo,
+} from './types.js';
 
 const STYLE_HEADER = 'color: #2196f3; font-weight: bold';
 const STYLE_DIRTY = 'color: #ff9800; font-weight: bold';
@@ -11,18 +13,18 @@ const STYLE_SAVED = 'color: #4caf50';
 const STYLE_RESET = 'color: inherit';
 
 function stateLabel(record: RecordSummary): string {
-  if (record.isError) return 'ERROR';
-  if (record.isSaving) return 'SAVING';
-  if (record.isNew) return 'NEW';
-  if (record.isDirty) return 'DIRTY';
-  if (record.isDeleted) return 'DELETED';
-  if (record.isLoading) return 'LOADING';
+  if (record.isError) { return 'ERROR'; }
+  if (record.isSaving) { return 'SAVING'; }
+  if (record.isNew) { return 'NEW'; }
+  if (record.isDirty) { return 'DIRTY'; }
+  if (record.isDeleted) { return 'DELETED'; }
+  if (record.isLoading) { return 'LOADING'; }
   return 'SAVED';
 }
 
 function stateStyle(record: RecordSummary): string {
-  if (record.isError || record.hasErrors) return STYLE_ERROR;
-  if (record.isDirty || record.isNew) return STYLE_DIRTY;
+  if (record.isError || record.hasErrors) { return STYLE_ERROR; }
+  if (record.isDirty || record.isNew) { return STYLE_DIRTY; }
   return STYLE_SAVED;
 }
 
@@ -57,7 +59,7 @@ function createRecordResult(
       return Reflect.get(target, property);
     },
     has(target, property) {
-      if (typeof property === 'string' && INSPECTOR_METHODS.has(property)) return true;
+      if (typeof property === 'string' && INSPECTOR_METHODS.has(property)) { return true; }
       return Reflect.has(target, property);
     },
   }) as RecordResult;
@@ -98,7 +100,7 @@ export class ConsoleInspector {
 
   record(modelName: string, id: string): RecordResult | null {
     const model = this.inspector.liveModel(modelName, id);
-    if (!model) return null;
+    if (!model) { return null; }
     return this.wrapModel(model);
   }
 
@@ -252,8 +254,9 @@ export class ConsoleInspector {
   }
 
   help(): void {
-    console.log(`%cCLI commands:`, STYLE_HEADER);
-    console.log(`
+    console.log('%cCLI commands:', STYLE_HEADER);
+    console.log(
+      `
   %c$m('help')%c                          Show this help
   %c$m('summary')%c                       Overview of all types and counts
   %c$m('types')%c                         List registered model names
@@ -269,20 +272,34 @@ export class ConsoleInspector {
   %c$m('snapshot')%c                      Full store snapshot
   %c$m('watch')%c                         Live change logging (returns stop fn)
 `,
-      STYLE_DIRTY, STYLE_RESET,
-      STYLE_DIRTY, STYLE_RESET,
-      STYLE_DIRTY, STYLE_RESET,
-      STYLE_DIRTY, STYLE_RESET,
-      STYLE_DIRTY, STYLE_RESET,
-      STYLE_DIRTY, STYLE_RESET,
-      STYLE_DIRTY, STYLE_RESET,
-      STYLE_DIRTY, STYLE_RESET,
-      STYLE_DIRTY, STYLE_RESET,
-      STYLE_DIRTY, STYLE_RESET,
-      STYLE_DIRTY, STYLE_RESET,
-      STYLE_DIRTY, STYLE_RESET,
-      STYLE_DIRTY, STYLE_RESET,
-      STYLE_DIRTY, STYLE_RESET,
+      STYLE_DIRTY,
+      STYLE_RESET,
+      STYLE_DIRTY,
+      STYLE_RESET,
+      STYLE_DIRTY,
+      STYLE_RESET,
+      STYLE_DIRTY,
+      STYLE_RESET,
+      STYLE_DIRTY,
+      STYLE_RESET,
+      STYLE_DIRTY,
+      STYLE_RESET,
+      STYLE_DIRTY,
+      STYLE_RESET,
+      STYLE_DIRTY,
+      STYLE_RESET,
+      STYLE_DIRTY,
+      STYLE_RESET,
+      STYLE_DIRTY,
+      STYLE_RESET,
+      STYLE_DIRTY,
+      STYLE_RESET,
+      STYLE_DIRTY,
+      STYLE_RESET,
+      STYLE_DIRTY,
+      STYLE_RESET,
+      STYLE_DIRTY,
+      STYLE_RESET,
     );
     console.log('%c  Operators: = != > >= < <= ~ (contains) ^= (startsWith) $= (endsWith) in between is null', STYLE_SAVED);
     console.log('%c  All methods return live objects. Use .show() to render, [0] for refs.', STYLE_SAVED);

@@ -1,10 +1,10 @@
 import "reflect-metadata";
-import { S as z } from "./SchemaService-C_pkh-vI.js";
+import { S as z } from "./SchemaService-C6OJhSg-.js";
 import { singleton as T, injectable as C, inject as I } from "tsyringe";
 import { makeObservable as M, action as v, observable as g, computed as f, runInAction as u } from "mobx";
 import { b as q, A as $, a as P, M as x } from "./relationships-DvSi8fVN.js";
-import { e as F, p as _, R as N } from "./RestAdapter-DYUoyV5h.js";
-import { M as R } from "./MdqlMemoryExecutor-BWMP31zG.js";
+import { e as F, p as _, R as N } from "./RestAdapter-CYInlScn.js";
+import { M as R } from "./MdqlMemoryExecutor-ClRyEFJj.js";
 import { J as j } from "./JsonSerializer-CFqo6GjC.js";
 class L {
   constructor() {
@@ -278,18 +278,15 @@ class p {
     let n = s;
     for (let l = 0; l < r.length - 1; l++) {
       const c = i.relationshipsDefinitionFor(n).get(r[l]);
-      if (!c || (n = c.type, !i.doesTypeExist(n))) return null;
+      if (!c || (n = c.type, !i.doesTypeExist(n)))
+        return null;
     }
     const o = r[r.length - 1];
     return o === "id" ? { name: "id", type: "string" } : i.attributesDefinitionFor(n).get(o) ?? null;
   }
   static validateFilterNode(t, s, i, r, n) {
     if (t.kind === "condition") {
-      const o = p.resolveFieldAttribute(
-        t.field,
-        n,
-        r
-      );
+      const o = p.resolveFieldAttribute(t.field, n, r);
       if (!o) {
         const l = t.field.includes(".") ? `Unknown attribute path "${t.field}".` : `Unknown attribute "${t.field}".`;
         i.push({ path: s, message: l });
@@ -484,7 +481,8 @@ let y = class {
     if (s === null)
       return null;
     const i = this.identityMap.get(e, s);
-    if (i) return i;
+    if (i)
+      return i;
     const r = this.schema.polymorphicRootFor(e);
     if (r) {
       const n = this.identityMap.get(r, s);
@@ -1226,4 +1224,4 @@ export {
   it as c,
   p as d
 };
-//# sourceMappingURL=createStore-BfmRfZ_2.js.map
+//# sourceMappingURL=createStore-CxuLvBVN.js.map

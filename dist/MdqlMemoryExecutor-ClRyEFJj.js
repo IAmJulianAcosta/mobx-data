@@ -1,8 +1,6 @@
 class n {
   static executeMany(t, e) {
-    let s = t.filter(
-      (i) => n.matchesNode(i, e.filters)
-    );
+    let s = t.filter((i) => n.matchesNode(i, e.filters));
     e.orderBy.length > 0 && (s = n.sortRecords(s, e.orderBy));
     const r = e.offset ?? 0;
     if (r > 0 || e.limit !== null) {
@@ -21,21 +19,13 @@ class n {
     return s;
   }
   static exists(t, e) {
-    return t.some(
-      (s) => n.matchesNode(s, e.filters)
-    );
+    return t.some((s) => n.matchesNode(s, e.filters));
   }
   static compilePredicate(t) {
     return (e) => n.matchesNode(e, t.filters);
   }
   static matchesNode(t, e) {
-    return e.kind === "condition" ? n.evaluateCondition(t, e) : e.kind === "and" ? e.children.every(
-      (s) => n.matchesNode(t, s)
-    ) : e.kind === "or" ? e.children.some(
-      (s) => n.matchesNode(t, s)
-    ) : !e.children.some(
-      (s) => n.matchesNode(t, s)
-    );
+    return e.kind === "condition" ? n.evaluateCondition(t, e) : e.kind === "and" ? e.children.every((s) => n.matchesNode(t, s)) : e.kind === "or" ? e.children.some((s) => n.matchesNode(t, s)) : !e.children.some((s) => n.matchesNode(t, s));
   }
   static resolveFieldValues(t, e) {
     const s = e.split(".");
@@ -60,9 +50,7 @@ class n {
   static evaluateCondition(t, e) {
     const s = n.resolveFieldValues(t, e.field);
     if (s.length > 1)
-      return s.some(
-        (i) => n.evaluateSingleCondition(i, e.operator, e.value)
-      );
+      return s.some((i) => n.evaluateSingleCondition(i, e.operator, e.value));
     const r = s[0];
     return n.evaluateSingleCondition(r, e.operator, e.value);
   }
@@ -95,7 +83,8 @@ class n {
       case "lessThanOrEquals":
         return n.compareValues(t, s) <= 0;
       case "between": {
-        if (!Array.isArray(s) || s.length !== 2) return !1;
+        if (!Array.isArray(s) || s.length !== 2)
+          return !1;
         const r = n.compareValues(t, s[0]), i = n.compareValues(t, s[1]);
         return r >= 0 && i <= 0;
       }
@@ -110,9 +99,12 @@ class n {
     return [...t].sort((s, r) => {
       for (const i of e) {
         const o = n.resolveFieldValue(s, i.field), a = n.resolveFieldValue(r, i.field);
-        if (o === a) continue;
-        if (o == null) return 1;
-        if (a == null) return -1;
+        if (o === a)
+          continue;
+        if (o == null)
+          return 1;
+        if (a == null)
+          return -1;
         const c = n.compareValues(o, a);
         if (c !== 0)
           return i.direction === "desc" ? -c : c;
@@ -124,4 +116,4 @@ class n {
 export {
   n as M
 };
-//# sourceMappingURL=MdqlMemoryExecutor-BWMP31zG.js.map
+//# sourceMappingURL=MdqlMemoryExecutor-ClRyEFJj.js.map

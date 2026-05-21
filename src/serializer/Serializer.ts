@@ -318,7 +318,7 @@ export abstract class Serializer {
     }
     const attributes: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(resourceHash)) {
-      if (key === this.primaryKey || relationshipKeys.has(key)) continue;
+      if (key === this.primaryKey || relationshipKeys.has(key)) { continue; }
       attributes[key] = value;
     }
     return attributes;

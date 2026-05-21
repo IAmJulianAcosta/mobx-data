@@ -81,8 +81,8 @@ interface TextGenerationPipeline {
 type GenerationOutput = Array<{ generated_text: Array<{ role: string; content: string }> }>;
 
 function pluralize(typeName: string): string {
-  if (typeName.endsWith('s')) return typeName;
-  if (typeName.endsWith('y')) return `${typeName.slice(0, -1)}ies`;
+  if (typeName.endsWith('s')) { return typeName; }
+  if (typeName.endsWith('y')) { return `${typeName.slice(0, -1)}ies`; }
   return `${typeName}s`;
 }
 
@@ -119,7 +119,7 @@ export class MultiStageLlmIntentParser implements LocalAiIntentParser {
   }
 
   public async initialize(): Promise<void> {
-    if (this.embeddingPipeline && this.llmPipeline) return;
+    if (this.embeddingPipeline && this.llmPipeline) { return; }
     if (this.initializationPromise) {
       return this.initializationPromise;
     }
@@ -153,7 +153,7 @@ export class MultiStageLlmIntentParser implements LocalAiIntentParser {
 
   public async parse(query: string): Promise<LocalAiIntent<GenericIntent> | null> {
     const trimmed = query.trim();
-    if (trimmed.length === 0) return null;
+    if (trimmed.length === 0) { return null; }
 
     await this.initialize();
 
@@ -182,11 +182,11 @@ export class MultiStageLlmIntentParser implements LocalAiIntentParser {
       genericIntent = await this.fullLlmFallback(trimmed);
     }
 
-    if (!genericIntent) return null;
+    if (!genericIntent) { return null; }
 
     // ─── Stage 3: Schema Validation ─────────────────────────────
     const validated = this.validateAgainstSchema(genericIntent);
-    if (!validated) return null;
+    if (!validated) { return null; }
 
     return {
       intent: validated.target === 'unsupported'
@@ -220,7 +220,7 @@ export class MultiStageLlmIntentParser implements LocalAiIntentParser {
     let bestScore = -1;
 
     for (const category of this.categories) {
-      if (!category.embedding) continue;
+      if (!category.embedding) { continue; }
       const score = this.dotProduct(queryEmbedding, category.embedding);
       if (score > bestScore) {
         bestScore = score;
@@ -228,7 +228,7 @@ export class MultiStageLlmIntentParser implements LocalAiIntentParser {
       }
     }
 
-    if (!bestCategory) return null;
+    if (!bestCategory) { return null; }
     return { category: bestCategory, confidence: bestScore };
   }
 
@@ -249,7 +249,7 @@ export class MultiStageLlmIntentParser implements LocalAiIntentParser {
   ): Promise<GenericIntent | null> {
     const systemPrompt = this.buildExtractionPrompt(category);
     const extracted = await this.callLlm(systemPrompt, query);
-    if (!extracted) return null;
+    if (!extracted) { return null; }
 
     return this.assembleFromCategory(category, extracted, confidence);
   }
@@ -405,7 +405,7 @@ export class MultiStageLlmIntentParser implements LocalAiIntentParser {
 
   private async fullLlmFallback(query: string): Promise<GenericIntent | null> {
     const extracted = await this.callLlm(this.introspection.systemPrompt, query);
-    if (!extracted) return null;
+    if (!extracted) { return null; }
 
     return this.parseFullLlmResponse(extracted);
   }
@@ -413,8 +413,8 @@ export class MultiStageLlmIntentParser implements LocalAiIntentParser {
   private parseFullLlmResponse(
     parsed: Record<string, unknown>,
   ): GenericIntent | null {
-    const target = parsed.target;
-    if (typeof target !== 'string') return null;
+    const { target } = parsed;
+    if (typeof target !== 'string') { return null; }
 
     if (target === 'unsupported') {
       return {
@@ -431,7 +431,7 @@ export class MultiStageLlmIntentParser implements LocalAiIntentParser {
 
     const validTargets = new Set(this.introspection.typeNames);
     const resolvedTarget = this.resolveTypeName(target);
-    if (!resolvedTarget) return null;
+    if (!resolvedTarget) { return null; }
 
     const confidence = typeof parsed.confidence === 'number'
       ? Math.max(0, Math.min(1, parsed.confidence))
@@ -450,20 +450,20 @@ export class MultiStageLlmIntentParser implements LocalAiIntentParser {
   }
 
   private resolveNullableType(value: unknown): string | null {
-    if (typeof value !== 'string') return null;
+    if (typeof value !== 'string') { return null; }
     return this.resolveTypeName(value);
   }
 
   private parseNullableString(value: unknown): string | null {
-    if (typeof value !== 'string') return null;
-    if (value === 'none' || value === 'null' || value === '') return null;
+    if (typeof value !== 'string') { return null; }
+    if (value === 'none' || value === 'null' || value === '') { return null; }
     return value;
   }
 
   private parseNullableNumber(value: unknown): number | null {
-    if (typeof value === 'number') return Math.max(1, Math.min(100, value));
-    if (typeof value !== 'string') return null;
-    if (value === 'none' || value === 'null' || value === '') return null;
+    if (typeof value === 'number') { return Math.max(1, Math.min(100, value)); }
+    if (typeof value !== 'string') { return null; }
+    if (value === 'none' || value === 'null' || value === '') { return null; }
     const parsed = parseInt(value, 10);
     return Number.isNaN(parsed) ? null : Math.max(1, Math.min(100, parsed));
   }
@@ -487,11 +487,11 @@ export class MultiStageLlmIntentParser implements LocalAiIntentParser {
     });
 
     const content = this.extractLlmContent(output);
-    if (!content) return null;
+    if (!content) { return null; }
 
     try {
       const parsed = JSON.parse(content);
-      if (typeof parsed !== 'object' || parsed === null) return null;
+      if (typeof parsed !== 'object' || parsed === null) { return null; }
       return parsed as Record<string, unknown>;
     } catch {
       return null;
@@ -499,15 +499,15 @@ export class MultiStageLlmIntentParser implements LocalAiIntentParser {
   }
 
   private extractLlmContent(output: GenerationOutput): string | null {
-    if (!Array.isArray(output) || output.length === 0) return null;
+    if (!Array.isArray(output) || output.length === 0) { return null; }
 
     const generatedText = output[0]?.generated_text;
-    if (!Array.isArray(generatedText) || generatedText.length === 0) return null;
+    if (!Array.isArray(generatedText) || generatedText.length === 0) { return null; }
 
     const assistantMessage = generatedText.find(
       (message) => message.role === 'assistant',
     );
-    if (!assistantMessage?.content) return null;
+    if (!assistantMessage?.content) { return null; }
 
     return this.cleanJsonResponse(assistantMessage.content);
   }
@@ -526,7 +526,7 @@ export class MultiStageLlmIntentParser implements LocalAiIntentParser {
     }
 
     const jsonMatch = text.match(/\{[\s\S]*?\}/);
-    if (!jsonMatch) return null;
+    if (!jsonMatch) { return null; }
 
     return jsonMatch[0];
   }
@@ -568,7 +568,7 @@ export class MultiStageLlmIntentParser implements LocalAiIntentParser {
   ): GenericIntent | null {
     const target = this.resolveTypeName(String(extracted.target ?? ''));
     const nameType = this.findTypeWithAttribute('name');
-    if (!nameType) return null;
+    if (!nameType) { return null; }
 
     return {
       target: target ?? this.defaultTargetExcluding(nameType),
@@ -588,7 +588,7 @@ export class MultiStageLlmIntentParser implements LocalAiIntentParser {
   ): GenericIntent | null {
     const target = this.resolveTypeName(String(extracted.target ?? ''));
     const titleType = this.findTypeWithAttribute('title');
-    if (!titleType) return null;
+    if (!titleType) { return null; }
 
     return {
       target: target ?? this.defaultTargetExcluding(titleType),
@@ -608,7 +608,7 @@ export class MultiStageLlmIntentParser implements LocalAiIntentParser {
   ): GenericIntent | null {
     const nameType = this.findTypeWithAttribute('name');
     const titleType = this.findTypeWithAttribute('title');
-    if (!nameType || !titleType) return null;
+    if (!nameType || !titleType) { return null; }
 
     return {
       target: nameType,
@@ -628,7 +628,7 @@ export class MultiStageLlmIntentParser implements LocalAiIntentParser {
   ): GenericIntent | null {
     const nameType = this.findTypeWithAttribute('name');
     const titleType = this.findTypeWithAttribute('title');
-    if (!nameType || !titleType) return null;
+    if (!nameType || !titleType) { return null; }
 
     const throughType = this.findThroughType(nameType, titleType);
 
@@ -649,10 +649,10 @@ export class MultiStageLlmIntentParser implements LocalAiIntentParser {
     confidence: number,
   ): GenericIntent | null {
     const target = this.resolveTypeName(String(extracted.target ?? ''));
-    if (!target) return null;
+    if (!target) { return null; }
 
     const nameType = this.findTypeWithAttribute('name');
-    if (!nameType) return null;
+    if (!nameType) { return null; }
 
     const throughType = this.resolveTypeName(String(extracted.through ?? ''));
 
@@ -674,7 +674,7 @@ export class MultiStageLlmIntentParser implements LocalAiIntentParser {
   ): GenericIntent | null {
     const target = this.resolveTypeName(String(extracted.target ?? ''));
     const nameType = this.findTypeWithAttribute('name');
-    if (!nameType) return null;
+    if (!nameType) { return null; }
 
     return {
       target: target ?? this.defaultTargetExcluding(nameType),
@@ -730,7 +730,7 @@ export class MultiStageLlmIntentParser implements LocalAiIntentParser {
     confidence: number,
   ): GenericIntent | null {
     const nameType = this.findTypeWithAttribute('name');
-    if (!nameType) return null;
+    if (!nameType) { return null; }
 
     return {
       target: nameType,
@@ -747,11 +747,11 @@ export class MultiStageLlmIntentParser implements LocalAiIntentParser {
   // ─── Stage 3: Schema Validation ──────────────────────────────
 
   private validateAgainstSchema(intent: GenericIntent): GenericIntent | null {
-    if (intent.target === 'unsupported') return intent;
+    if (intent.target === 'unsupported') { return intent; }
 
     if (!this.introspection.typeNames.includes(intent.target)) {
       const resolved = this.resolveTypeName(intent.target);
-      if (!resolved) return null;
+      if (!resolved) { return null; }
       intent.target = resolved;
     }
 
@@ -785,7 +785,7 @@ export class MultiStageLlmIntentParser implements LocalAiIntentParser {
 
   private findThroughType(targetType: string, filterType: string): string | null {
     for (const [typeName, descriptor] of this.introspection.types) {
-      if (typeName === targetType || typeName === filterType) continue;
+      if (typeName === targetType || typeName === filterType) { continue; }
       const belongsToTarget = descriptor.relationships.some(
         (relationship) => relationship.kind === 'belongsTo' && relationship.relatedType === targetType,
       );
@@ -801,7 +801,7 @@ export class MultiStageLlmIntentParser implements LocalAiIntentParser {
 
   private defaultTargetExcluding(excludeType: string): string {
     for (const typeName of this.introspection.typeNames) {
-      if (typeName === excludeType) continue;
+      if (typeName === excludeType) { continue; }
       const descriptor = this.introspection.types.get(typeName)!;
       if (descriptor.relationships.some(
         (relationship) => relationship.kind === 'belongsTo' && relationship.relatedType === excludeType,
@@ -813,12 +813,12 @@ export class MultiStageLlmIntentParser implements LocalAiIntentParser {
   }
 
   private resolveTypeName(value: string | undefined): string | null {
-    if (!value || value === 'none' || value === 'null' || value === '') return null;
+    if (!value || value === 'none' || value === 'null' || value === '') { return null; }
 
     const normalized = value.toLowerCase().trim();
 
     for (const typeName of this.introspection.typeNames) {
-      if (typeName.toLowerCase() === normalized) return typeName;
+      if (typeName.toLowerCase() === normalized) { return typeName; }
     }
 
     for (const typeName of this.introspection.typeNames) {
@@ -829,7 +829,7 @@ export class MultiStageLlmIntentParser implements LocalAiIntentParser {
     }
 
     for (const typeName of this.introspection.typeNames) {
-      if (normalized.includes(typeName.toLowerCase())) return typeName;
+      if (normalized.includes(typeName.toLowerCase())) { return typeName; }
     }
 
     return null;

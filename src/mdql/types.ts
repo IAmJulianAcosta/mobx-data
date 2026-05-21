@@ -1,3 +1,7 @@
+// --- Type-level operator & value inference ---
+
+import type { Model } from '@mobx-data/model';
+
 export type MdqlOperator =
   | 'equals'
   | 'notEquals'
@@ -77,10 +81,6 @@ export const ALL_OPERATORS: ReadonlySet<MdqlOperator> = new Set<MdqlOperator>([
   'greaterThan', 'greaterThanOrEquals', 'lessThan', 'lessThanOrEquals', 'between',
 ]);
 
-// --- Type-level operator & value inference ---
-
-import type { Model } from '@mobx-data/model';
-
 export type ModelFields<T extends Model> = Omit<T, keyof Model>;
 
 export type MdqlStringOperator =
@@ -95,13 +95,13 @@ export type MdqlBooleanOperator = 'equals' | 'notEquals' | 'isNull' | 'isNotNull
 
 export type MdqlOperatorFor<T> =
   [T] extends [string] ? MdqlStringOperator :
-  [T] extends [number] ? MdqlNumberOperator :
-  [T] extends [boolean] ? MdqlBooleanOperator :
-  [T] extends [Date] ? MdqlNumberOperator :
-  MdqlOperator;
+    [T] extends [number] ? MdqlNumberOperator :
+      [T] extends [boolean] ? MdqlBooleanOperator :
+        [T] extends [Date] ? MdqlNumberOperator :
+          MdqlOperator;
 
 export type MdqlValueFor<TField, TOp extends MdqlOperator> =
   TOp extends 'isNull' | 'isNotNull' ? undefined :
-  TOp extends 'in' | 'notIn' ? TField[] :
-  TOp extends 'between' ? [TField, TField] :
-  TField;
+    TOp extends 'in' | 'notIn' ? TField[] :
+      TOp extends 'between' ? [TField, TField] :
+        TField;

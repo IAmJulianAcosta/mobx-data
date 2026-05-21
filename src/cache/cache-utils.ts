@@ -18,7 +18,7 @@ export function parseCacheTTLFromHeaders(
     }
   }
 
-  const expires = headers['expires'];
+  const { expires } = headers;
   if (expires) {
     const expiresMilliseconds = new Date(expires).getTime();
     if (!Number.isNaN(expiresMilliseconds)) {

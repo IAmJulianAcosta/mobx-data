@@ -73,8 +73,8 @@ interface CompromiseNumbers extends CompromiseView {
 type CompromiseFactory = (text: string) => CompromiseDocument;
 
 function pluralize(typeName: string): string {
-  if (typeName.endsWith('s')) return typeName;
-  if (typeName.endsWith('y')) return `${typeName.slice(0, -1)}ies`;
+  if (typeName.endsWith('s')) { return typeName; }
+  if (typeName.endsWith('y')) { return `${typeName.slice(0, -1)}ies`; }
   return `${typeName}s`;
 }
 
@@ -99,7 +99,7 @@ export class NlpEmbeddingIntentParser implements LocalAiIntentParser {
   }
 
   public async initialize(): Promise<void> {
-    if (this.pipeline) return;
+    if (this.pipeline) { return; }
     if (this.initializationPromise) {
       return this.initializationPromise;
     }
@@ -128,7 +128,7 @@ export class NlpEmbeddingIntentParser implements LocalAiIntentParser {
 
   public async parse(query: string): Promise<LocalAiIntent<GenericIntent> | null> {
     const trimmed = query.trim();
-    if (trimmed.length === 0) return null;
+    if (trimmed.length === 0) { return null; }
 
     await this.initialize();
 
@@ -245,10 +245,10 @@ export class NlpEmbeddingIntentParser implements LocalAiIntentParser {
       }
 
       for (const relationship of descriptor.relationships) {
-        if (relationship.kind !== 'belongsTo') continue;
+        if (relationship.kind !== 'belongsTo') { continue; }
 
         const relatedDescriptor = this.introspection.types.get(relationship.relatedType);
-        if (!relatedDescriptor) continue;
+        if (!relatedDescriptor) { continue; }
 
         const relatedHasName = relatedDescriptor.attributes.some(
           (attribute) => attribute.name === 'name',
@@ -300,16 +300,16 @@ export class NlpEmbeddingIntentParser implements LocalAiIntentParser {
       { text: `someone's ${targetPlural}`, ...base },
       { text: `${targetPlural} written by someone`, ...base },
       { text: `find ${targetPlural} from someone`, ...base },
-      { text: `everything someone posted`, ...base },
-      { text: `what did someone write`, ...base },
-      { text: `what someone has been writing lately`, ...base },
+      { text: 'everything someone posted', ...base },
+      { text: 'what did someone write', ...base },
+      { text: 'what someone has been writing lately', ...base },
       { text: `someone ${targetPlural}`, ...base },
-      { text: `show me what someone wrote`, ...base },
-      { text: `content from someone`, ...base },
-      { text: `let me know what someone wrote`, ...base },
-      { text: `got anything from someone`, ...base },
-      { text: `everything written by someone`, ...base },
-      { text: `what has someone contributed`, ...base },
+      { text: 'show me what someone wrote', ...base },
+      { text: 'content from someone', ...base },
+      { text: 'let me know what someone wrote', ...base },
+      { text: 'got anything from someone', ...base },
+      { text: 'everything written by someone', ...base },
+      { text: 'what has someone contributed', ...base },
     ];
 
     if (isContentType) {
@@ -486,27 +486,27 @@ export class NlpEmbeddingIntentParser implements LocalAiIntentParser {
       const plural = pluralize(typeName);
 
       for (const relationship of descriptor.relationships) {
-        if (relationship.kind !== 'belongsTo') continue;
+        if (relationship.kind !== 'belongsTo') { continue; }
 
         const intermediateType = relationship.relatedType;
         const intermediateDescriptor = this.introspection.types.get(intermediateType);
-        if (!intermediateDescriptor) continue;
+        if (!intermediateDescriptor) { continue; }
 
         const intermediatePlural = pluralize(intermediateType);
 
         for (const intermediateRelationship of intermediateDescriptor.relationships) {
-          if (intermediateRelationship.kind !== 'belongsTo') continue;
+          if (intermediateRelationship.kind !== 'belongsTo') { continue; }
 
           const finalType = intermediateRelationship.relatedType;
-          if (finalType === typeName) continue;
+          if (finalType === typeName) { continue; }
 
           const finalDescriptor = this.introspection.types.get(finalType);
-          if (!finalDescriptor) continue;
+          if (!finalDescriptor) { continue; }
 
           const finalHasName = finalDescriptor.attributes.some(
             (attribute) => attribute.name === 'name',
           );
-          if (!finalHasName) continue;
+          if (!finalHasName) { continue; }
 
           const base = {
             category: 'multi_hop',
@@ -538,18 +538,18 @@ export class NlpEmbeddingIntentParser implements LocalAiIntentParser {
 
     for (const [typeName, descriptor] of this.introspection.types) {
       const hasTitle = descriptor.attributes.some((attribute) => attribute.name === 'title');
-      if (!hasTitle) continue;
+      if (!hasTitle) { continue; }
 
       for (const relationship of descriptor.relationships) {
-        if (relationship.kind !== 'belongsTo') continue;
+        if (relationship.kind !== 'belongsTo') { continue; }
 
         const relatedDescriptor = this.introspection.types.get(relationship.relatedType);
-        if (!relatedDescriptor) continue;
+        if (!relatedDescriptor) { continue; }
 
         const relatedHasName = relatedDescriptor.attributes.some(
           (attribute) => attribute.name === 'name',
         );
-        if (!relatedHasName) continue;
+        if (!relatedHasName) { continue; }
 
         const base = {
           category: 'who_created',
@@ -589,30 +589,30 @@ export class NlpEmbeddingIntentParser implements LocalAiIntentParser {
       const hasTitle = titledDescriptor.attributes.some(
         (attribute) => attribute.name === 'title',
       );
-      if (!hasTitle) continue;
+      if (!hasTitle) { continue; }
 
       for (const [intermediateType, intermediateDescriptor] of this.introspection.types) {
-        if (intermediateType === titledType) continue;
+        if (intermediateType === titledType) { continue; }
 
         const belongsToTitled = intermediateDescriptor.relationships.some(
           (relationship) => relationship.kind === 'belongsTo'
             && relationship.relatedType === titledType,
         );
-        if (!belongsToTitled) continue;
+        if (!belongsToTitled) { continue; }
 
         for (const intermediateRelationship of intermediateDescriptor.relationships) {
-          if (intermediateRelationship.kind !== 'belongsTo') continue;
-          if (intermediateRelationship.relatedType === titledType) continue;
+          if (intermediateRelationship.kind !== 'belongsTo') { continue; }
+          if (intermediateRelationship.relatedType === titledType) { continue; }
 
           const namedDescriptor = this.introspection.types.get(
             intermediateRelationship.relatedType,
           );
-          if (!namedDescriptor) continue;
+          if (!namedDescriptor) { continue; }
 
           const hasName = namedDescriptor.attributes.some(
             (attribute) => attribute.name === 'name',
           );
-          if (!hasName) continue;
+          if (!hasName) { continue; }
 
           const intermediatePlural = pluralize(intermediateType);
           const base = {
@@ -674,7 +674,7 @@ export class NlpEmbeddingIntentParser implements LocalAiIntentParser {
     let bestScore = -1;
 
     for (const template of this.templates) {
-      if (!template.embedding) continue;
+      if (!template.embedding) { continue; }
       const score = this.dotProduct(queryEmbedding, template.embedding);
       if (score > bestScore) {
         bestScore = score;
@@ -682,7 +682,7 @@ export class NlpEmbeddingIntentParser implements LocalAiIntentParser {
       }
     }
 
-    if (!bestTemplate) return null;
+    if (!bestTemplate) { return null; }
     return { template: bestTemplate, score: bestScore };
   }
 
@@ -722,7 +722,7 @@ export class NlpEmbeddingIntentParser implements LocalAiIntentParser {
   // ─── NLP Value Extraction ────────────────────────────────────
 
   private extractPersonName(query: string): string | null {
-    if (!this.nlp) return this.extractProperNounFallback(query);
+    if (!this.nlp) { return this.extractProperNounFallback(query); }
 
     const document = this.nlp(query);
 
@@ -746,7 +746,7 @@ export class NlpEmbeddingIntentParser implements LocalAiIntentParser {
     const normalized = query.replace(/[?!.]+$/, '').trim();
 
     const quotedMatch = normalized.match(/["'](.+?)["']/);
-    if (quotedMatch) return quotedMatch[1]!.trim();
+    if (quotedMatch) { return quotedMatch[1]!.trim(); }
 
     const cleaned = this.stripTrailingTypeWords(normalized);
 
@@ -754,13 +754,13 @@ export class NlpEmbeddingIntentParser implements LocalAiIntentParser {
     const verbMatch = cleaned.match(
       /(?:wrote|authored|created|made)\s+(?:the\s+)?(.+?)\s*$/i,
     );
-    if (verbMatch) return verbMatch[1]!.trim();
+    if (verbMatch) { return verbMatch[1]!.trim(); }
 
     // "author of Hello World" / "comments on Hello World"
     const prepositionMatch = cleaned.match(
       /(?:on|about|of)\s+(?:the\s+)?(.+?)\s*$/i,
     );
-    if (prepositionMatch) return prepositionMatch[1]!.trim();
+    if (prepositionMatch) { return prepositionMatch[1]!.trim(); }
 
     return null;
   }
@@ -785,7 +785,7 @@ export class NlpEmbeddingIntentParser implements LocalAiIntentParser {
           ).trim();
         }
         topic = this.stripTrailingTypeWords(topic).trim();
-        if (topic.length > 0) return topic;
+        if (topic.length > 0) { return topic; }
       }
     }
 
@@ -820,15 +820,15 @@ export class NlpEmbeddingIntentParser implements LocalAiIntentParser {
 
     for (let index = 0; index < words.length; index++) {
       const word = words[index]!;
-      if (/^\s+$/.test(word)) continue;
-      if (/^[A-Z]/.test(word)) continue;
+      if (/^\s+$/.test(word)) { continue; }
+      if (/^[A-Z]/.test(word)) { continue; }
 
       const lower = word.toLowerCase().replace(/[^a-z]/g, '');
-      if (lower.length < 3) continue;
-      if (vocabulary.has(lower)) continue;
+      if (lower.length < 3) { continue; }
+      if (vocabulary.has(lower)) { continue; }
 
       for (const candidate of vocabulary) {
-        if (Math.abs(candidate.length - lower.length) > 1) continue;
+        if (Math.abs(candidate.length - lower.length) > 1) { continue; }
         const distance = this.damerauLevenshteinDistance(lower, candidate);
         if (distance === 1) {
           words[index] = candidate;
@@ -855,8 +855,8 @@ export class NlpEmbeddingIntentParser implements LocalAiIntentParser {
     const sourceLength = source.length;
     const targetLength = target.length;
 
-    if (sourceLength === 0) return targetLength;
-    if (targetLength === 0) return sourceLength;
+    if (sourceLength === 0) { return targetLength; }
+    if (targetLength === 0) { return sourceLength; }
 
     const matrix: number[][] = [];
 
@@ -915,8 +915,8 @@ export class NlpEmbeddingIntentParser implements LocalAiIntentParser {
   private isLikelyName(word: string): boolean {
     const lower = word.toLowerCase();
     for (const typeName of this.introspection.typeNames) {
-      if (lower === typeName.toLowerCase()) return false;
-      if (lower === pluralize(typeName).toLowerCase()) return false;
+      if (lower === typeName.toLowerCase()) { return false; }
+      if (lower === pluralize(typeName).toLowerCase()) { return false; }
     }
 
     const stopWords = new Set([

@@ -27,7 +27,7 @@ export class GetCommentsByPostTool implements LocalAiTool<GetCommentsByPostArgum
       const lowerTitle = arguments_.postTitle.toLowerCase();
       const allPosts = store.peekAll('post').toArray();
       post = allPosts.find((record: Model) => {
-        const title = (record as unknown as Record<string, unknown>).title;
+        const { title } = (record as unknown as Record<string, unknown>);
         return typeof title === 'string' && title.toLowerCase().includes(lowerTitle);
       }) ?? null;
     }

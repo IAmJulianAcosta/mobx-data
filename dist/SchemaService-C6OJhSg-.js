@@ -154,7 +154,8 @@ let h = class {
    */
   resolveConcreteModel(e, t) {
     const n = this.entries.get(e);
-    if (!(n != null && n.discriminator)) return null;
+    if (!(n != null && n.discriminator))
+      return null;
     const { key: i, map: o } = n.discriminator, r = t[i];
     if (r == null)
       throw new Error(
@@ -177,4 +178,4 @@ h = g([
 export {
   h as S
 };
-//# sourceMappingURL=SchemaService-C_pkh-vI.js.map
+//# sourceMappingURL=SchemaService-C6OJhSg-.js.map

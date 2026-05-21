@@ -65,8 +65,8 @@ interface TypeMatch {
 }
 
 function pluralize(typeName: string): string {
-  if (typeName.endsWith('s')) return typeName;
-  if (typeName.endsWith('y')) return `${typeName.slice(0, -1)}ies`;
+  if (typeName.endsWith('s')) { return typeName; }
+  if (typeName.endsWith('y')) { return `${typeName.slice(0, -1)}ies`; }
   return `${typeName}s`;
 }
 
@@ -90,7 +90,7 @@ export class EmbeddingIntentParser implements LocalAiIntentParser {
   }
 
   public async initialize(): Promise<void> {
-    if (this.pipeline) return;
+    if (this.pipeline) { return; }
     if (this.initializationPromise) {
       return this.initializationPromise;
     }
@@ -118,7 +118,7 @@ export class EmbeddingIntentParser implements LocalAiIntentParser {
 
   public async parse(query: string): Promise<LocalAiIntent<GenericIntent> | null> {
     const trimmed = query.trim();
-    if (trimmed.length === 0) return null;
+    if (trimmed.length === 0) { return null; }
 
     await this.initialize();
 
@@ -148,7 +148,7 @@ export class EmbeddingIntentParser implements LocalAiIntentParser {
     }
 
     const genericIntent = this.resolveIntent(trimmed, category.name);
-    if (!genericIntent) return null;
+    if (!genericIntent) { return null; }
 
     genericIntent.confidence = category.score;
 
@@ -218,7 +218,7 @@ export class EmbeddingIntentParser implements LocalAiIntentParser {
     let bestScore = -1;
 
     for (const category of this.categories) {
-      if (!category.embedding) continue;
+      if (!category.embedding) { continue; }
       const score = this.dotProduct(queryEmbedding, category.embedding);
       if (score > bestScore) {
         bestScore = score;
@@ -226,7 +226,7 @@ export class EmbeddingIntentParser implements LocalAiIntentParser {
       }
     }
 
-    if (!bestName) return null;
+    if (!bestName) { return null; }
     return { name: bestName, score: bestScore };
   }
 
@@ -317,7 +317,7 @@ export class EmbeddingIntentParser implements LocalAiIntentParser {
 
   private findBelongsToType(fromType: string, toType: string): boolean {
     const descriptor = this.introspection.types.get(fromType);
-    if (!descriptor) return false;
+    if (!descriptor) { return false; }
     return descriptor.relationships.some(
       (relationship) => relationship.kind === 'belongsTo' && relationship.relatedType === toType,
     );
@@ -325,7 +325,7 @@ export class EmbeddingIntentParser implements LocalAiIntentParser {
 
   private findTypeWithBelongsTo(toType: string): string | null {
     for (const [typeName, descriptor] of this.introspection.types) {
-      if (typeName === toType) continue;
+      if (typeName === toType) { continue; }
       for (const relationship of descriptor.relationships) {
         if (relationship.kind === 'belongsTo' && relationship.relatedType === toType) {
           return typeName;
@@ -339,7 +339,7 @@ export class EmbeddingIntentParser implements LocalAiIntentParser {
 
   private resolveFilterByName(query: string, typeMentions: TypeMatch[]): GenericIntent | null {
     const nameTypes = this.findTypesWithNameAttribute();
-    if (nameTypes.length === 0) return null;
+    if (nameTypes.length === 0) { return null; }
 
     const filterType = nameTypes[0]!;
     let target: string | null = null;
@@ -356,7 +356,7 @@ export class EmbeddingIntentParser implements LocalAiIntentParser {
       target = linked ?? this.introspection.typeNames[0] ?? null;
     }
 
-    if (!target) return null;
+    if (!target) { return null; }
 
     const filterValue = this.extractValueAfterPreposition(query);
 
@@ -374,7 +374,7 @@ export class EmbeddingIntentParser implements LocalAiIntentParser {
 
   private resolveFilterByTitle(query: string, typeMentions: TypeMatch[]): GenericIntent | null {
     const titleTypes = this.findTypesWithTitleAttribute();
-    if (titleTypes.length === 0) return null;
+    if (titleTypes.length === 0) { return null; }
 
     const filterType = titleTypes[0]!;
     let target: string | null = null;
@@ -391,7 +391,7 @@ export class EmbeddingIntentParser implements LocalAiIntentParser {
       target = linked ?? this.introspection.typeNames[0] ?? null;
     }
 
-    if (!target) return null;
+    if (!target) { return null; }
 
     const filterValue = this.extractTitleValue(query, filterType);
 
@@ -411,7 +411,7 @@ export class EmbeddingIntentParser implements LocalAiIntentParser {
     const titleTypes = this.findTypesWithTitleAttribute();
     const nameTypes = this.findTypesWithNameAttribute();
 
-    if (titleTypes.length === 0 || nameTypes.length === 0) return null;
+    if (titleTypes.length === 0 || nameTypes.length === 0) { return null; }
 
     const filterType = titleTypes[0]!;
     const target = nameTypes[0]!;
@@ -434,14 +434,14 @@ export class EmbeddingIntentParser implements LocalAiIntentParser {
     const titleTypes = this.findTypesWithTitleAttribute();
     const nameTypes = this.findTypesWithNameAttribute();
 
-    if (titleTypes.length === 0 || nameTypes.length === 0) return null;
+    if (titleTypes.length === 0 || nameTypes.length === 0) { return null; }
 
     const filterType = titleTypes[0]!;
     const target = nameTypes[0]!;
 
     let throughType: string | null = null;
     for (const [typeName, descriptor] of this.introspection.types) {
-      if (typeName === target || typeName === filterType) continue;
+      if (typeName === target || typeName === filterType) { continue; }
       const belongsToTarget = descriptor.relationships.some(
         (relationship) => relationship.kind === 'belongsTo' && relationship.relatedType === target,
       );
@@ -470,7 +470,7 @@ export class EmbeddingIntentParser implements LocalAiIntentParser {
 
   private resolveMultiHop(query: string, typeMentions: TypeMatch[]): GenericIntent | null {
     const nameTypes = this.findTypesWithNameAttribute();
-    if (nameTypes.length === 0) return null;
+    if (nameTypes.length === 0) { return null; }
 
     const filterType = nameTypes[0]!;
     let target: string | null = null;
@@ -491,7 +491,7 @@ export class EmbeddingIntentParser implements LocalAiIntentParser {
         ?? this.introspection.typeNames[0] ?? null;
     }
 
-    if (!target) return null;
+    if (!target) { return null; }
 
     const filterValue = this.extractValueAfterPreposition(query);
 
@@ -513,7 +513,7 @@ export class EmbeddingIntentParser implements LocalAiIntentParser {
       ? firstMention.typeName
       : this.introspection.typeNames[0];
 
-    if (!target) return null;
+    if (!target) { return null; }
 
     const searchText = this.extractSearchText(query);
 
@@ -535,7 +535,7 @@ export class EmbeddingIntentParser implements LocalAiIntentParser {
       ? firstMention.typeName
       : this.introspection.typeNames[0];
 
-    if (!target) return null;
+    if (!target) { return null; }
 
     const limit = this.extractLimit(query);
 
@@ -553,7 +553,7 @@ export class EmbeddingIntentParser implements LocalAiIntentParser {
 
   private resolveProfile(query: string, typeMentions: TypeMatch[]): GenericIntent | null {
     const nameTypes = this.findTypesWithNameAttribute();
-    if (nameTypes.length === 0) return null;
+    if (nameTypes.length === 0) { return null; }
 
     const firstMention = typeMentions[0];
     const target = firstMention && nameTypes.includes(firstMention.typeName)
@@ -581,11 +581,11 @@ export class EmbeddingIntentParser implements LocalAiIntentParser {
 
     const possessivePattern = /(.+?)'s\s+/i;
     const possessiveMatch = normalized.match(possessivePattern);
-    if (possessiveMatch) return possessiveMatch[1]!.trim();
+    if (possessiveMatch) { return possessiveMatch[1]!.trim(); }
 
     const prepositionPattern = /(?:by|from|for|of|on|about|de|del|por)\s+(?:the\s+)?(?:(?:user|post|comment|usuario)\s+)?(.+?)\s*$/i;
     const match = normalized.match(prepositionPattern);
-    if (match) return match[1]!.trim();
+    if (match) { return match[1]!.trim(); }
 
     return this.extractProperNoun(normalized);
   }
@@ -629,7 +629,7 @@ export class EmbeddingIntentParser implements LocalAiIntentParser {
       'i',
     );
     const trailingMatch = normalized.match(trailingTypePattern);
-    if (trailingMatch) return trailingMatch[1]!.trim();
+    if (trailingMatch) { return trailingMatch[1]!.trim(); }
 
     const prepositionPattern = /(?:on|about|of|for)\s+(?:the\s+)?(.+?)\s*$/i;
     const match = normalized.match(prepositionPattern);
@@ -645,7 +645,7 @@ export class EmbeddingIntentParser implements LocalAiIntentParser {
       'i',
     );
     const trailingMatch = normalized.match(trailingTypePattern);
-    if (trailingMatch) return trailingMatch[1]!.trim();
+    if (trailingMatch) { return trailingMatch[1]!.trim(); }
 
     const verbPattern = /(?:wrote|created|authored|made|escribió)\s+(.+?)\s*$/i;
     const match = normalized.match(verbPattern);
@@ -655,7 +655,7 @@ export class EmbeddingIntentParser implements LocalAiIntentParser {
   private extractSearchText(query: string): string | null {
     const searchPattern = /(?:about|for|with|containing|sobre|con)\s+(.+?)\s*$/i;
     const match = query.match(searchPattern);
-    if (match) return match[1]!.trim();
+    if (match) { return match[1]!.trim(); }
 
     const afterTypePattern = /(?:search|find|buscar?)\s+\S+\s+(.+?)\s*$/i;
     const afterTypeMatch = query.match(afterTypePattern);
@@ -665,7 +665,7 @@ export class EmbeddingIntentParser implements LocalAiIntentParser {
   private extractLimit(query: string): number {
     const limitPattern = /(\d+)/;
     const match = query.match(limitPattern);
-    if (match) return Math.max(1, Math.min(100, parseInt(match[1]!, 10)));
+    if (match) { return Math.max(1, Math.min(100, parseInt(match[1]!, 10))); }
     return 10;
   }
 }

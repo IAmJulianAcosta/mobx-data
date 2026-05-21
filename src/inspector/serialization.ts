@@ -49,12 +49,12 @@ export function detailRecord(record: Model): RecordDetail {
 
   const attributes = Object.create(null) as Record<string, unknown>;
   for (const key of Object.keys(internal._data)) {
-    if (key === '__proto__' || key === 'constructor') continue;
+    if (key === '__proto__' || key === 'constructor') { continue; }
     attributes[key] = internal._data[key];
   }
   const originalAttributes = Object.create(null) as Record<string, unknown>;
   for (const key of Object.keys(internal._originalData)) {
-    if (key === '__proto__' || key === 'constructor') continue;
+    if (key === '__proto__' || key === 'constructor') { continue; }
     originalAttributes[key] = internal._originalData[key];
   }
 

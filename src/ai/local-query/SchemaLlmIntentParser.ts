@@ -67,7 +67,7 @@ export class SchemaLlmIntentParser implements LocalAiIntentParser {
   }
 
   public async initialize(): Promise<void> {
-    if (this.generator) return;
+    if (this.generator) { return; }
     if (this.initializationPromise) {
       return this.initializationPromise;
     }
@@ -94,7 +94,7 @@ export class SchemaLlmIntentParser implements LocalAiIntentParser {
 
   public async parse(query: string): Promise<LocalAiIntent<GenericIntent> | null> {
     const trimmed = query.trim();
-    if (trimmed.length === 0) return null;
+    if (trimmed.length === 0) { return null; }
 
     await this.initialize();
 
@@ -111,21 +111,21 @@ export class SchemaLlmIntentParser implements LocalAiIntentParser {
     });
 
     const content = this.extractContent(output);
-    if (!content) return null;
+    if (!content) { return null; }
 
     return this.parseResponse(content, trimmed);
   }
 
   private extractContent(output: GenerationOutput): string | null {
-    if (!Array.isArray(output) || output.length === 0) return null;
+    if (!Array.isArray(output) || output.length === 0) { return null; }
 
     const generatedText = output[0]?.generated_text;
-    if (!Array.isArray(generatedText) || generatedText.length === 0) return null;
+    if (!Array.isArray(generatedText) || generatedText.length === 0) { return null; }
 
     const assistantMessage = generatedText.find(
       (message) => message.role === 'assistant',
     );
-    if (!assistantMessage?.content) return null;
+    if (!assistantMessage?.content) { return null; }
 
     return this.cleanJsonResponse(assistantMessage.content);
   }
@@ -144,7 +144,7 @@ export class SchemaLlmIntentParser implements LocalAiIntentParser {
     }
 
     const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) return null;
+    if (!jsonMatch) { return null; }
 
     return jsonMatch[0];
   }
@@ -157,8 +157,8 @@ export class SchemaLlmIntentParser implements LocalAiIntentParser {
       return null;
     }
 
-    const target = parsed.target;
-    if (typeof target !== 'string') return null;
+    const { target } = parsed;
+    if (typeof target !== 'string') { return null; }
 
     if (target === 'unsupported') {
       return {
@@ -179,7 +179,7 @@ export class SchemaLlmIntentParser implements LocalAiIntentParser {
     }
 
     const validTargets = new Set(this.introspection.typeNames);
-    if (!validTargets.has(target)) return null;
+    if (!validTargets.has(target)) { return null; }
 
     const confidence = typeof parsed.confidence === 'number'
       ? Math.max(0, Math.min(1, parsed.confidence))
@@ -205,15 +205,15 @@ export class SchemaLlmIntentParser implements LocalAiIntentParser {
   }
 
   private parseNullableString(value: unknown): string | null {
-    if (typeof value !== 'string') return null;
-    if (value === 'none' || value === 'null' || value === '') return null;
+    if (typeof value !== 'string') { return null; }
+    if (value === 'none' || value === 'null' || value === '') { return null; }
     return value;
   }
 
   private parseNullableNumber(value: unknown): number | null {
-    if (typeof value === 'number') return Math.max(1, Math.min(100, value));
-    if (typeof value !== 'string') return null;
-    if (value === 'none' || value === 'null' || value === '') return null;
+    if (typeof value === 'number') { return Math.max(1, Math.min(100, value)); }
+    if (typeof value !== 'string') { return null; }
+    if (value === 'none' || value === 'null' || value === '') { return null; }
     const parsed = parseInt(value, 10);
     return Number.isNaN(parsed) ? null : Math.max(1, Math.min(100, parsed));
   }

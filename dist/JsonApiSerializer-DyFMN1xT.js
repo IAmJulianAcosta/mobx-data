@@ -1,5 +1,5 @@
 import { injectable as f } from "tsyringe";
-import { R as h } from "./RestAdapter-DYUoyV5h.js";
+import { R as h } from "./RestAdapter-CYInlScn.js";
 import m from "pluralize";
 import { S as b } from "./Serializer-Ca6w_QNQ.js";
 var _ = Object.getOwnPropertyDescriptor, g = (t, i, a, s) => {
@@ -191,4 +191,4 @@ export {
   p as J,
   y as a
 };
-//# sourceMappingURL=JsonApiSerializer-BV61cFAZ.js.map
+//# sourceMappingURL=JsonApiSerializer-DyFMN1xT.js.map

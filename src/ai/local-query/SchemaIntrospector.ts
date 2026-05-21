@@ -158,15 +158,15 @@ export class SchemaIntrospector {
       const descriptor = types.get(typeName)!;
 
       for (const relationship of descriptor.relationships) {
-        if (relationship.kind !== 'belongsTo') continue;
+        if (relationship.kind !== 'belongsTo') { continue; }
 
         const relatedDescriptor = types.get(relationship.relatedType);
-        if (!relatedDescriptor) continue;
+        if (!relatedDescriptor) { continue; }
 
         const relatedNameAttribute = relatedDescriptor.attributes.find(
           (attribute) => attribute.name === 'name' || attribute.name === 'title',
         );
-        if (!relatedNameAttribute) continue;
+        if (!relatedNameAttribute) { continue; }
 
         examples.push(
           `"show ${typeName}s by Alice" → {"target":"${typeName}","filter_type":"${relationship.relatedType}","filter_attribute":"${relatedNameAttribute.name}","filter_value":"Alice","through_type":"none","search":"none","limit":"none","confidence":0.9}`,
@@ -181,7 +181,7 @@ export class SchemaIntrospector {
       const nameAttribute = descriptor.attributes.find(
         (attribute) => attribute.name === 'name',
       );
-      if (!nameAttribute) continue;
+      if (!nameAttribute) { continue; }
 
       examples.push(
         `"profile of Alice" → {"target":"${typeName}","filter_type":"${typeName}","filter_attribute":"${nameAttribute.name}","filter_value":"Alice","through_type":"none","search":"none","limit":"none","confidence":0.95}`,
@@ -252,20 +252,20 @@ export class SchemaIntrospector {
     for (const typeName of typeNames) {
       const descriptor = types.get(typeName)!;
       for (const relationship of descriptor.relationships) {
-        if (relationship.kind !== 'hasMany') continue;
+        if (relationship.kind !== 'hasMany') { continue; }
 
         const intermediateDescriptor = types.get(relationship.relatedType);
-        if (!intermediateDescriptor) continue;
+        if (!intermediateDescriptor) { continue; }
 
         for (const intermediateRelationship of intermediateDescriptor.relationships) {
-          if (intermediateRelationship.kind !== 'hasMany') continue;
-          if (intermediateRelationship.relatedType === typeName) continue;
+          if (intermediateRelationship.kind !== 'hasMany') { continue; }
+          if (intermediateRelationship.relatedType === typeName) { continue; }
 
           const targetType = intermediateRelationship.relatedType;
           const nameAttribute = descriptor.attributes.find(
             (attribute) => attribute.name === 'name',
           );
-          if (!nameAttribute) continue;
+          if (!nameAttribute) { continue; }
 
           return `"${targetType}s on ${relationship.relatedType}s by ${typeName} Alice" → {"target":"${targetType}","filter_type":"${typeName}","filter_attribute":"name","filter_value":"Alice","through_type":"${relationship.relatedType}","search":"none","limit":"none","confidence":0.9}`;
         }
@@ -284,18 +284,18 @@ export class SchemaIntrospector {
       const descriptor = types.get(typeName)!;
 
       for (const relationship of descriptor.relationships) {
-        if (relationship.kind !== 'belongsTo') continue;
+        if (relationship.kind !== 'belongsTo') { continue; }
 
         const relatedDescriptor = types.get(relationship.relatedType);
-        if (!relatedDescriptor) continue;
+        if (!relatedDescriptor) { continue; }
 
         const titleAttribute = relatedDescriptor.attributes.find(
           (attribute) => attribute.name === 'title',
         );
-        if (!titleAttribute) continue;
+        if (!titleAttribute) { continue; }
 
         const targetPlural = typeName.endsWith('s') ? typeName : `${typeName}s`;
-        const relatedType = relationship.relatedType;
+        const { relatedType } = relationship;
 
         examples.push(
           `"all ${targetPlural} on the Example ${relatedType}" → {"target":"${typeName}","filter_type":"${relatedType}","filter_attribute":"title","filter_value":"Example","through_type":"none","search":"none","limit":"none","confidence":0.9}`,
@@ -305,16 +305,16 @@ export class SchemaIntrospector {
         );
 
         for (const otherRelationship of descriptor.relationships) {
-          if (otherRelationship.kind !== 'belongsTo') continue;
-          if (otherRelationship.relatedType === relatedType) continue;
+          if (otherRelationship.kind !== 'belongsTo') { continue; }
+          if (otherRelationship.relatedType === relatedType) { continue; }
 
           const otherDescriptor = types.get(otherRelationship.relatedType);
-          if (!otherDescriptor) continue;
+          if (!otherDescriptor) { continue; }
 
           const otherNameAttribute = otherDescriptor.attributes.find(
             (attribute) => attribute.name === 'name' || attribute.name === 'title',
           );
-          if (!otherNameAttribute) continue;
+          if (!otherNameAttribute) { continue; }
 
           examples.push(
             `"who ${relationship.name === 'post' ? 'commented on' : `has ${targetPlural} on`} Example" → {"target":"${otherRelationship.relatedType}","filter_type":"${relatedType}","filter_attribute":"title","filter_value":"Example","through_type":"${typeName}","search":"none","limit":"none","confidence":0.85}`,

@@ -95,9 +95,11 @@ class R {
     for (const o of e) {
       const a = t.get(o);
       for (const l of a.relationships) {
-        if (l.kind !== "belongsTo") continue;
+        if (l.kind !== "belongsTo")
+          continue;
         const c = t.get(l.relatedType);
-        if (!c) continue;
+        if (!c)
+          continue;
         const p = c.attributes.find(
           (h) => h.name === "name" || h.name === "title"
         );
@@ -154,11 +156,13 @@ class R {
     for (const s of e) {
       const r = t.get(s);
       for (const n of r.relationships) {
-        if (n.kind !== "hasMany") continue;
+        if (n.kind !== "hasMany")
+          continue;
         const i = t.get(n.relatedType);
         if (i)
           for (const o of i.relationships) {
-            if (o.kind !== "hasMany" || o.relatedType === s) continue;
+            if (o.kind !== "hasMany" || o.relatedType === s)
+              continue;
             const a = o.relatedType;
             if (r.attributes.find(
               (c) => c.name === "name"
@@ -174,19 +178,22 @@ class R {
     for (const r of e) {
       const n = t.get(r);
       for (const i of n.relationships) {
-        if (i.kind !== "belongsTo") continue;
+        if (i.kind !== "belongsTo")
+          continue;
         const o = t.get(i.relatedType);
         if (!o || !o.attributes.find(
           (p) => p.name === "title"
-        )) continue;
-        const l = r.endsWith("s") ? r : `${r}s`, c = i.relatedType;
+        ))
+          continue;
+        const l = r.endsWith("s") ? r : `${r}s`, { relatedType: c } = i;
         s.push(
           `"all ${l} on the Example ${c}" → {"target":"${r}","filter_type":"${c}","filter_attribute":"title","filter_value":"Example","through_type":"none","search":"none","limit":"none","confidence":0.9}`
         ), s.push(
           `"${l} for ${c} Weekend" → {"target":"${r}","filter_type":"${c}","filter_attribute":"title","filter_value":"Weekend","through_type":"none","search":"none","limit":"none","confidence":0.9}`
         );
         for (const p of n.relationships) {
-          if (p.kind !== "belongsTo" || p.relatedType === c) continue;
+          if (p.kind !== "belongsTo" || p.relatedType === c)
+            continue;
           const h = t.get(p.relatedType);
           if (!(!h || !h.attributes.find(
             (d) => d.name === "name" || d.name === "title"
@@ -373,13 +380,15 @@ class I {
   }
   reverseScan(e, t, s) {
     const r = e.id;
-    if (!r) return [];
+    if (!r)
+      return [];
     const n = (this.introspection.relationshipGraph.get(t.toType) ?? []).filter((o) => o.relatedType === t.fromType);
     return n.length === 0 ? [] : s.peekAll(t.toType).toArray().filter((o) => {
       const a = o;
       for (const l of n) {
         const c = a[l.relationshipName];
-        if (c && typeof c == "object" && "id" in c && c.id === r || a[`${l.relationshipName}Id`] === r) return !0;
+        if (c && typeof c == "object" && "id" in c && c.id === r || a[`${l.relationshipName}Id`] === r)
+          return !0;
       }
       return !1;
     });
@@ -389,7 +398,8 @@ class I {
     for (; n.length > 0; ) {
       const a = n.shift(), l = r.get(a.type) ?? [];
       for (const c of l) {
-        if (i.has(c.relatedType)) continue;
+        if (i.has(c.relatedType))
+          continue;
         const p = [
           ...a.path,
           {
@@ -407,9 +417,7 @@ class I {
         i.add(c.relatedType), n.push({ type: c.relatedType, path: p });
       }
     }
-    return s && o.length > 0 ? o.find(
-      (l) => l.some((c) => c.toType === s || c.fromType === s)
-    ) ?? o[0] ?? null : null;
+    return s && o.length > 0 ? o.find((l) => l.some((c) => c.toType === s || c.fromType === s)) ?? o[0] ?? null : null;
   }
   deduplicateRecords(e) {
     const t = /* @__PURE__ */ new Set();
@@ -473,7 +481,8 @@ class v {
     const t = [];
     for (const [s, r] of e.types) {
       const n = this.findNameAttribute(r);
-      if (!n) continue;
+      if (!n)
+        continue;
       const i = w(s);
       t.push({
         patterns: [
@@ -521,12 +530,15 @@ class v {
     for (const [s, r] of e.types) {
       const n = f(s);
       for (const i of r.relationships) {
-        if (i.kind !== "belongsTo") continue;
+        if (i.kind !== "belongsTo")
+          continue;
         const o = e.types.get(i.relatedType);
-        if (!o) continue;
+        if (!o)
+          continue;
         const a = this.findNameAttribute(o);
-        if (!a) continue;
-        const l = i.relatedType, c = f(l);
+        if (!a)
+          continue;
+        const { relatedType: l } = i, c = f(l);
         t.push({
           patterns: [
             new RegExp(
@@ -578,16 +590,21 @@ class v {
     for (const [s, r] of e.types) {
       const n = f(s);
       for (const i of r.relationships) {
-        if (i.kind !== "belongsTo") continue;
+        if (i.kind !== "belongsTo")
+          continue;
         const o = i.relatedType, a = e.types.get(o);
-        if (!a) continue;
+        if (!a)
+          continue;
         const l = f(o);
         for (const c of a.relationships) {
-          if (c.kind !== "belongsTo") continue;
+          if (c.kind !== "belongsTo")
+            continue;
           const p = c.relatedType;
-          if (p === s) continue;
+          if (p === s)
+            continue;
           const h = e.types.get(p);
-          if (!h) continue;
+          if (!h)
+            continue;
           const m = this.findNameAttribute(h);
           m && t.push({
             patterns: [
@@ -629,10 +646,12 @@ class v {
     for (const [s, r] of e.types) {
       if (!r.attributes.find(
         (o) => o.name === "title"
-      )) continue;
+      ))
+        continue;
       const i = f(s);
       for (const o of r.relationships) {
-        if (o.kind !== "belongsTo") continue;
+        if (o.kind !== "belongsTo")
+          continue;
         const a = e.types.get(o.relatedType);
         !a || !a.attributes.find(
           (c) => c.name === "name"
@@ -680,12 +699,15 @@ class v {
       const n = f(s);
       if ((e.stringAttributes.get(s) ?? []).length !== 0)
         for (const o of r.relationships) {
-          if (o.kind !== "belongsTo") continue;
+          if (o.kind !== "belongsTo")
+            continue;
           const a = e.types.get(o.relatedType);
-          if (!a) continue;
+          if (!a)
+            continue;
           const l = this.findNameAttribute(a);
-          if (!l) continue;
-          const c = o.relatedType;
+          if (!l)
+            continue;
+          const { relatedType: c } = o;
           t.push({
             patterns: [
               new RegExp(
@@ -730,14 +752,17 @@ class v {
     for (const [s, r] of e.types) {
       const n = f(s);
       for (const i of r.relationships) {
-        if (i.kind !== "belongsTo") continue;
+        if (i.kind !== "belongsTo")
+          continue;
         const o = e.types.get(i.relatedType);
-        if (!o) continue;
+        if (!o)
+          continue;
         const a = o.attributes.find(
           (p) => p.name === "title"
         );
-        if (!a) continue;
-        const l = i.relatedType, c = f(l);
+        if (!a)
+          continue;
+        const { relatedType: l } = i, c = f(l);
         t.push({
           patterns: [
             new RegExp(
@@ -785,14 +810,17 @@ class v {
       if (!(n.length < 2))
         for (const i of n) {
           const o = e.types.get(i.relatedType);
-          if (!o) continue;
+          if (!o)
+            continue;
           const a = o.attributes.find(
             (p) => p.name === "title"
           );
-          if (!a) continue;
+          if (!a)
+            continue;
           const l = i.relatedType, c = f(l);
           for (const p of n) {
-            if (p.relatedType === l) continue;
+            if (p.relatedType === l)
+              continue;
             const h = p.relatedType, m = s === "comment" ? "commented|left comments" : `(?:wrote|created|has)\\s+${w(E(s))}`;
             t.push({
               patterns: [
@@ -934,14 +962,15 @@ class v {
     const t = e.attributes.find(
       (r) => r.name === "name"
     );
-    if (t) return t.name;
+    if (t)
+      return t.name;
     const s = e.attributes.find(
       (r) => r.name === "title"
     );
     return s ? s.name : null;
   }
   buildCatchAllRules(e) {
-    const t = [], s = this.defaultContentType, r = this.personType, n = this.commentLikeType;
+    const t = [], s = this.defaultContentType, { personType: r } = this, n = this.commentLikeType;
     if (r) {
       const i = e.types.get(r), o = i ? this.findNameAttribute(i) : null;
       s && o && t.push({
@@ -1073,9 +1102,11 @@ class v {
   }
   findDefaultContentType(e) {
     for (const [t, s] of e.types)
-      if (s.attributes.some((r) => r.name === "title")) return t;
+      if (s.attributes.some((r) => r.name === "title"))
+        return t;
     for (const [t, s] of e.types)
-      if (s.attributes.some((r) => r.name === "body")) return t;
+      if (s.attributes.some((r) => r.name === "body"))
+        return t;
     return e.typeNames[0] ?? null;
   }
   findPersonType(e) {
@@ -1087,7 +1118,8 @@ class v {
   findCommentLikeType(e) {
     for (const [t, s] of e.types) {
       const r = s.attributes.some((i) => i.name === "body"), n = s.attributes.some((i) => i.name === "title");
-      if (r && !n) return t;
+      if (r && !n)
+        return t;
     }
     return null;
   }
@@ -1193,7 +1225,7 @@ class N {
     } catch {
       return null;
     }
-    const r = s.target;
+    const { target: r } = s;
     if (typeof r != "string")
       return null;
     if (r === "unsupported")
@@ -1238,7 +1270,7 @@ class N {
     } catch {
       return null;
     }
-    const r = s.intent;
+    const { intent: r } = s;
     if (typeof r != "string" || r === "unsupported" || !L.has(r))
       return null;
     const n = typeof s.arguments == "object" && s.arguments !== null ? s.arguments : {}, i = typeof s.confidence == "number" ? Math.max(0, Math.min(1, s.confidence)) : 0.7;
@@ -1253,8 +1285,10 @@ class N {
     return typeof e != "string" || e === "none" || e === "null" || e === "" ? null : e;
   }
   parseNullableNumber(e) {
-    if (typeof e == "number") return Math.max(1, Math.min(100, e));
-    if (typeof e != "string" || e === "none" || e === "null" || e === "") return null;
+    if (typeof e == "number")
+      return Math.max(1, Math.min(100, e));
+    if (typeof e != "string" || e === "none" || e === "null" || e === "")
+      return null;
     const t = parseInt(e, 10);
     return Number.isNaN(t) ? null : Math.max(1, Math.min(100, t));
   }
@@ -1374,7 +1408,7 @@ class _ {
     } catch {
       return null;
     }
-    const r = s.target;
+    const { target: r } = s;
     if (typeof r != "string")
       return null;
     if (r === "unsupported")
@@ -1419,7 +1453,7 @@ class _ {
     } catch {
       return null;
     }
-    const r = s.intent;
+    const { intent: r } = s;
     if (typeof r != "string" || r === "unsupported" || !U.has(r))
       return null;
     const n = typeof s.arguments == "object" && s.arguments !== null ? s.arguments : {}, i = typeof s.confidence == "number" ? Math.max(0, Math.min(1, s.confidence)) : 0.7;
@@ -1434,8 +1468,10 @@ class _ {
     return typeof e != "string" || e === "none" || e === "null" || e === "" ? null : e;
   }
   parseNullableNumber(e) {
-    if (typeof e == "number") return Math.max(1, Math.min(100, e));
-    if (typeof e != "string" || e === "none" || e === "null" || e === "") return null;
+    if (typeof e == "number")
+      return Math.max(1, Math.min(100, e));
+    if (typeof e != "string" || e === "none" || e === "null" || e === "")
+      return null;
     const t = parseInt(e, 10);
     return Number.isNaN(t) ? null : Math.max(1, Math.min(100, t));
   }
@@ -1503,7 +1539,8 @@ class A {
   }
   async parse(e) {
     const t = e.trim();
-    if (t.length === 0) return null;
+    if (t.length === 0)
+      return null;
     await this.initialize();
     const s = await this.embed(t), r = this.classifyIntent(s);
     if (!r || r.score < this.similarityThreshold)
@@ -1572,7 +1609,8 @@ class A {
   classifyIntent(e) {
     let t = "", s = -1;
     for (const r of this.categories) {
-      if (!r.embedding) continue;
+      if (!r.embedding)
+        continue;
       const n = this.dotProduct(e, r.embedding);
       n > s && (s = n, t = r.name);
     }
@@ -1657,7 +1695,8 @@ class A {
   // ─── Intent Resolvers ───────────────────────────────────────
   resolveFilterByName(e, t) {
     const s = this.findTypesWithNameAttribute();
-    if (s.length === 0) return null;
+    if (s.length === 0)
+      return null;
     const r = s[0];
     let n = null;
     for (const o of t)
@@ -1665,7 +1704,8 @@ class A {
         n = o.typeName;
         break;
       }
-    if (n || (n = this.findTypeWithBelongsTo(r) ?? this.introspection.typeNames[0] ?? null), !n) return null;
+    if (n || (n = this.findTypeWithBelongsTo(r) ?? this.introspection.typeNames[0] ?? null), !n)
+      return null;
     const i = this.extractValueAfterPreposition(e);
     return {
       target: n,
@@ -1680,7 +1720,8 @@ class A {
   }
   resolveFilterByTitle(e, t) {
     const s = this.findTypesWithTitleAttribute();
-    if (s.length === 0) return null;
+    if (s.length === 0)
+      return null;
     const r = s[0];
     let n = null;
     for (const o of t)
@@ -1688,7 +1729,8 @@ class A {
         n = o.typeName;
         break;
       }
-    if (n || (n = this.findTypeWithBelongsTo(r) ?? this.introspection.typeNames[0] ?? null), !n) return null;
+    if (n || (n = this.findTypeWithBelongsTo(r) ?? this.introspection.typeNames[0] ?? null), !n)
+      return null;
     const i = this.extractTitleValue(e, r);
     return {
       target: n,
@@ -1703,7 +1745,8 @@ class A {
   }
   resolveWhoCreated(e, t) {
     const s = this.findTypesWithTitleAttribute(), r = this.findTypesWithNameAttribute();
-    if (s.length === 0 || r.length === 0) return null;
+    if (s.length === 0 || r.length === 0)
+      return null;
     const n = s[0], i = r[0], o = this.extractCreatedValue(e, n);
     return {
       target: i,
@@ -1718,11 +1761,13 @@ class A {
   }
   resolveWhoInteracted(e, t) {
     const s = this.findTypesWithTitleAttribute(), r = this.findTypesWithNameAttribute();
-    if (s.length === 0 || r.length === 0) return null;
+    if (s.length === 0 || r.length === 0)
+      return null;
     const n = s[0], i = r[0];
     let o = null;
     for (const [l, c] of this.introspection.types) {
-      if (l === i || l === n) continue;
+      if (l === i || l === n)
+        continue;
       const p = c.relationships.some(
         (m) => m.kind === "belongsTo" && m.relatedType === i
       ), h = c.relationships.some(
@@ -1747,11 +1792,13 @@ class A {
   }
   resolveMultiHop(e, t) {
     const s = this.findTypesWithNameAttribute();
-    if (s.length === 0) return null;
+    if (s.length === 0)
+      return null;
     const r = s[0];
     let n = null, i = null;
     const o = t[0], a = t[1];
-    if (t.length >= 2 && o && a ? (n = o.typeName, i = a.typeName !== n ? a.typeName : null) : o && (n = o.typeName), n || (n = this.introspection.typeNames.find((c) => c !== r) ?? this.introspection.typeNames[0] ?? null), !n) return null;
+    if (t.length >= 2 && o && a ? (n = o.typeName, i = a.typeName !== n ? a.typeName : null) : o && (n = o.typeName), n || (n = this.introspection.typeNames.find((c) => c !== r) ?? this.introspection.typeNames[0] ?? null), !n)
+      return null;
     const l = this.extractValueAfterPreposition(e);
     return {
       target: n,
@@ -1766,7 +1813,8 @@ class A {
   }
   resolveSearch(e, t) {
     const s = t[0], r = s ? s.typeName : this.introspection.typeNames[0];
-    if (!r) return null;
+    if (!r)
+      return null;
     const n = this.extractSearchText(e);
     return {
       target: r,
@@ -1781,7 +1829,8 @@ class A {
   }
   resolveListRecent(e, t) {
     const s = t[0], r = s ? s.typeName : this.introspection.typeNames[0];
-    if (!r) return null;
+    if (!r)
+      return null;
     const n = this.extractLimit(e);
     return {
       target: r,
@@ -1796,7 +1845,8 @@ class A {
   }
   resolveProfile(e, t) {
     const s = this.findTypesWithNameAttribute();
-    if (s.length === 0) return null;
+    if (s.length === 0)
+      return null;
     const r = t[0], n = r && s.includes(r.typeName) ? r.typeName : s[0], i = this.extractValueAfterPreposition(e);
     return {
       target: n,
@@ -1812,7 +1862,8 @@ class A {
   // ─── Phase 3: Value Extraction ──────────────────────────────
   extractValueAfterPreposition(e) {
     const t = e.replace(/[?!.]+$/, "").trim(), s = /(.+?)'s\s+/i, r = t.match(s);
-    if (r) return r[1].trim();
+    if (r)
+      return r[1].trim();
     const n = /(?:by|from|for|of|on|about|de|del|por)\s+(?:the\s+)?(?:(?:user|post|comment|usuario)\s+)?(.+?)\s*$/i, i = t.match(n);
     return i ? i[1].trim() : this.extractProperNoun(t);
   }
@@ -1877,7 +1928,8 @@ class A {
       `(?:on|about|of)\\s+(?:the\\s+)?(.+?)\\s+(?:${t}|${r})\\s*$`,
       "i"
     ), i = s.match(n);
-    if (i) return i[1].trim();
+    if (i)
+      return i[1].trim();
     const o = /(?:on|about|of|for)\s+(?:the\s+)?(.+?)\s*$/i, a = s.match(o);
     return a ? a[1].trim() : null;
   }
@@ -1886,13 +1938,15 @@ class A {
       `(?:wrote|created|authored|made)\\s+(?:the\\s+)?(.+?)\\s+(?:${t}|${r})\\s*$`,
       "i"
     ), i = s.match(n);
-    if (i) return i[1].trim();
+    if (i)
+      return i[1].trim();
     const o = /(?:wrote|created|authored|made|escribió)\s+(.+?)\s*$/i, a = s.match(o);
     return a ? a[1].trim() : null;
   }
   extractSearchText(e) {
     const t = /(?:about|for|with|containing|sobre|con)\s+(.+?)\s*$/i, s = e.match(t);
-    if (s) return s[1].trim();
+    if (s)
+      return s[1].trim();
     const r = /(?:search|find|buscar?)\s+\S+\s+(.+?)\s*$/i, n = e.match(r);
     return n ? n[1].trim() : null;
   }
@@ -2072,7 +2126,8 @@ class ge {
   }
   async parse(e) {
     const t = e.trim();
-    if (t.length === 0) return null;
+    if (t.length === 0)
+      return null;
     await this.initialize();
     const s = [
       { role: "system", content: this.introspection.systemPrompt },
@@ -2087,9 +2142,11 @@ class ge {
   }
   extractContent(e) {
     var r;
-    if (!Array.isArray(e) || e.length === 0) return null;
+    if (!Array.isArray(e) || e.length === 0)
+      return null;
     const t = (r = e[0]) == null ? void 0 : r.generated_text;
-    if (!Array.isArray(t) || t.length === 0) return null;
+    if (!Array.isArray(t) || t.length === 0)
+      return null;
     const s = t.find(
       (n) => n.role === "assistant"
     );
@@ -2111,8 +2168,9 @@ class ge {
     } catch {
       return null;
     }
-    const r = s.target;
-    if (typeof r != "string") return null;
+    const { target: r } = s;
+    if (typeof r != "string")
+      return null;
     if (r === "unsupported")
       return {
         intent: "unsupported",
@@ -2129,7 +2187,8 @@ class ge {
         originalQuery: t,
         confidence: 0.8
       };
-    if (!new Set(this.introspection.typeNames).has(r)) return null;
+    if (!new Set(this.introspection.typeNames).has(r))
+      return null;
     const i = typeof s.confidence == "number" ? Math.max(0, Math.min(1, s.confidence)) : 0.7, o = {
       target: r,
       filterType: this.parseNullableString(s.filter_type),
@@ -2151,8 +2210,10 @@ class ge {
     return typeof e != "string" || e === "none" || e === "null" || e === "" ? null : e;
   }
   parseNullableNumber(e) {
-    if (typeof e == "number") return Math.max(1, Math.min(100, e));
-    if (typeof e != "string" || e === "none" || e === "null" || e === "") return null;
+    if (typeof e == "number")
+      return Math.max(1, Math.min(100, e));
+    if (typeof e != "string" || e === "none" || e === "null" || e === "")
+      return null;
     const t = parseInt(e, 10);
     return Number.isNaN(t) ? null : Math.max(1, Math.min(100, t));
   }
@@ -2221,7 +2282,8 @@ class ye {
   }
   async parse(e) {
     const t = e.trim();
-    if (t.length === 0) return null;
+    if (t.length === 0)
+      return null;
     await this.initialize();
     const s = await this.embed(t), r = this.classifyByEmbedding(s);
     if (!r || r.confidence < this.fallbackThreshold)
@@ -2233,7 +2295,8 @@ class ye {
       r.category,
       t,
       r.confidence
-    ) : n = await this.fullLlmFallback(t), !n) return null;
+    ) : n = await this.fullLlmFallback(t), !n)
+      return null;
     const i = this.validateAgainstSchema(n);
     return i ? {
       intent: i.target === "unsupported" ? "unsupported" : `generic:${i.target}`,
@@ -2255,7 +2318,8 @@ class ye {
   classifyByEmbedding(e) {
     let t = "", s = -1;
     for (const r of this.categories) {
-      if (!r.embedding) continue;
+      if (!r.embedding)
+        continue;
       const n = this.dotProduct(e, r.embedding);
       n > s && (s = n, t = r.name);
     }
@@ -2418,8 +2482,9 @@ class ye {
     return t ? this.parseFullLlmResponse(t) : null;
   }
   parseFullLlmResponse(e) {
-    const t = e.target;
-    if (typeof t != "string") return null;
+    const { target: t } = e;
+    if (typeof t != "string")
+      return null;
     if (t === "unsupported")
       return {
         target: "unsupported",
@@ -2433,7 +2498,8 @@ class ye {
       };
     new Set(this.introspection.typeNames);
     const s = this.resolveTypeName(t);
-    if (!s) return null;
+    if (!s)
+      return null;
     const r = typeof e.confidence == "number" ? Math.max(0, Math.min(1, e.confidence)) : 0.7;
     return {
       target: s,
@@ -2453,8 +2519,10 @@ class ye {
     return typeof e != "string" || e === "none" || e === "null" || e === "" ? null : e;
   }
   parseNullableNumber(e) {
-    if (typeof e == "number") return Math.max(1, Math.min(100, e));
-    if (typeof e != "string" || e === "none" || e === "null" || e === "") return null;
+    if (typeof e == "number")
+      return Math.max(1, Math.min(100, e));
+    if (typeof e != "string" || e === "none" || e === "null" || e === "")
+      return null;
     const t = parseInt(e, 10);
     return Number.isNaN(t) ? null : Math.max(1, Math.min(100, t));
   }
@@ -2469,7 +2537,8 @@ class ye {
       do_sample: this.temperature > 0,
       return_full_text: !1
     }), n = this.extractLlmContent(r);
-    if (!n) return null;
+    if (!n)
+      return null;
     try {
       const i = JSON.parse(n);
       return typeof i != "object" || i === null ? null : i;
@@ -2479,9 +2548,11 @@ class ye {
   }
   extractLlmContent(e) {
     var r;
-    if (!Array.isArray(e) || e.length === 0) return null;
+    if (!Array.isArray(e) || e.length === 0)
+      return null;
     const t = (r = e[0]) == null ? void 0 : r.generated_text;
-    if (!Array.isArray(t) || t.length === 0) return null;
+    if (!Array.isArray(t) || t.length === 0)
+      return null;
     const s = t.find(
       (n) => n.role === "assistant"
     );
@@ -2562,7 +2633,8 @@ class ye {
   }
   assembleWhoInteracted(e, t) {
     const s = this.findTypeWithAttribute("name"), r = this.findTypeWithAttribute("title");
-    if (!s || !r) return null;
+    if (!s || !r)
+      return null;
     const n = this.findThroughType(s, r);
     return {
       target: s,
@@ -2577,9 +2649,11 @@ class ye {
   }
   assembleMultiHop(e, t) {
     const s = this.resolveTypeName(String(e.target ?? ""));
-    if (!s) return null;
+    if (!s)
+      return null;
     const r = this.findTypeWithAttribute("name");
-    if (!r) return null;
+    if (!r)
+      return null;
     const n = this.resolveTypeName(String(e.through ?? ""));
     return {
       target: s,
@@ -2645,10 +2719,12 @@ class ye {
   }
   // ─── Stage 3: Schema Validation ──────────────────────────────
   validateAgainstSchema(e) {
-    if (e.target === "unsupported") return e;
+    if (e.target === "unsupported")
+      return e;
     if (!this.introspection.typeNames.includes(e.target)) {
       const t = this.resolveTypeName(e.target);
-      if (!t) return null;
+      if (!t)
+        return null;
       e.target = t;
     }
     if (e.filterType && !this.introspection.typeNames.includes(e.filterType)) {
@@ -2670,7 +2746,8 @@ class ye {
   }
   findThroughType(e, t) {
     for (const [s, r] of this.introspection.types) {
-      if (s === e || s === t) continue;
+      if (s === e || s === t)
+        continue;
       const n = r.relationships.some(
         (o) => o.kind === "belongsTo" && o.relatedType === e
       ), i = r.relationships.some(
@@ -2683,7 +2760,8 @@ class ye {
   }
   defaultTargetExcluding(e) {
     for (const t of this.introspection.typeNames) {
-      if (t === e) continue;
+      if (t === e)
+        continue;
       if (this.introspection.types.get(t).relationships.some(
         (r) => r.kind === "belongsTo" && r.relatedType === e
       ))
@@ -2692,15 +2770,18 @@ class ye {
     return this.introspection.typeNames[0] ?? "unknown";
   }
   resolveTypeName(e) {
-    if (!e || e === "none" || e === "null" || e === "") return null;
+    if (!e || e === "none" || e === "null" || e === "")
+      return null;
     const t = e.toLowerCase().trim();
     for (const s of this.introspection.typeNames)
-      if (s.toLowerCase() === t) return s;
+      if (s.toLowerCase() === t)
+        return s;
     for (const s of this.introspection.typeNames)
       if (oe(s).toLowerCase() === t || `${s.toLowerCase()}s` === t)
         return s;
     for (const s of this.introspection.typeNames)
-      if (t.includes(s.toLowerCase())) return s;
+      if (t.includes(s.toLowerCase()))
+        return s;
     return null;
   }
   buildUnsupportedResult(e, t) {
@@ -2785,7 +2866,8 @@ class be {
   }
   async parse(e) {
     const t = e.trim();
-    if (t.length === 0) return null;
+    if (t.length === 0)
+      return null;
     await this.initialize();
     const s = this.correctTypos(t), r = await this.embed(s), n = this.findBestTemplate(r);
     if (!n || n.score < this.similarityThreshold)
@@ -2865,9 +2947,11 @@ class be {
       );
       n && e.push(...this.makeSearchTemplates(t, r, i)), s.attributes.some((a) => a.name === "name") && e.push(...this.makeProfileTemplates(t));
       for (const a of s.relationships) {
-        if (a.kind !== "belongsTo") continue;
+        if (a.kind !== "belongsTo")
+          continue;
         const l = this.introspection.types.get(a.relatedType);
-        if (!l) continue;
+        if (!l)
+          continue;
         const c = l.attributes.some(
           (h) => h.name === "name"
         ), p = l.attributes.some(
@@ -3045,18 +3129,23 @@ class be {
     for (const [t, s] of this.introspection.types) {
       const r = g(t);
       for (const n of s.relationships) {
-        if (n.kind !== "belongsTo") continue;
+        if (n.kind !== "belongsTo")
+          continue;
         const i = n.relatedType, o = this.introspection.types.get(i);
-        if (!o) continue;
+        if (!o)
+          continue;
         const a = g(i);
         for (const l of o.relationships) {
-          if (l.kind !== "belongsTo") continue;
+          if (l.kind !== "belongsTo")
+            continue;
           const c = l.relatedType;
-          if (c === t) continue;
+          if (c === t)
+            continue;
           const p = this.introspection.types.get(c);
           if (!p || !p.attributes.some(
             (d) => d.name === "name"
-          )) continue;
+          ))
+            continue;
           const m = {
             category: "multi_hop",
             target: t,
@@ -3084,11 +3173,13 @@ class be {
     for (const [t, s] of this.introspection.types)
       if (s.attributes.some((n) => n.name === "title"))
         for (const n of s.relationships) {
-          if (n.kind !== "belongsTo") continue;
+          if (n.kind !== "belongsTo")
+            continue;
           const i = this.introspection.types.get(n.relatedType);
           if (!i || !i.attributes.some(
             (l) => l.name === "name"
-          )) continue;
+          ))
+            continue;
           const a = {
             category: "who_created",
             target: n.relatedType,
@@ -3126,13 +3217,15 @@ class be {
             (a) => a.kind === "belongsTo" && a.relatedType === t
           )))
             for (const a of i.relationships) {
-              if (a.kind !== "belongsTo" || a.relatedType === t) continue;
+              if (a.kind !== "belongsTo" || a.relatedType === t)
+                continue;
               const l = this.introspection.types.get(
                 a.relatedType
               );
               if (!l || !l.attributes.some(
                 (m) => m.name === "name"
-              )) continue;
+              ))
+                continue;
               const p = g(n), h = {
                 category: "who_interacted",
                 target: a.relatedType,
@@ -3180,7 +3273,8 @@ class be {
   findBestTemplate(e) {
     let t = null, s = -1;
     for (const r of this.templates) {
-      if (!r.embedding) continue;
+      if (!r.embedding)
+        continue;
       const n = this.dotProduct(e, r.embedding);
       n > s && (s = n, t = r);
     }
@@ -3202,7 +3296,8 @@ class be {
   }
   // ─── NLP Value Extraction ────────────────────────────────────
   extractPersonName(e) {
-    if (!this.nlp) return this.extractProperNounFallback(e);
+    if (!this.nlp)
+      return this.extractProperNounFallback(e);
     const t = this.nlp(e), s = t.people().text();
     if (s && s.trim().length > 0)
       return s.trim().replace(/'s$/i, "");
@@ -3216,11 +3311,13 @@ class be {
   }
   extractTitleValue(e) {
     const t = e.replace(/[?!.]+$/, "").trim(), s = t.match(/["'](.+?)["']/);
-    if (s) return s[1].trim();
+    if (s)
+      return s[1].trim();
     const r = this.stripTrailingTypeWords(t), n = r.match(
       /(?:wrote|authored|created|made)\s+(?:the\s+)?(.+?)\s*$/i
     );
-    if (n) return n[1].trim();
+    if (n)
+      return n[1].trim();
     const i = r.match(
       /(?:on|about|of)\s+(?:the\s+)?(.+?)\s*$/i
     );
@@ -3239,7 +3336,8 @@ class be {
         if (t && (o = o.replace(
           new RegExp(`\\s*by\\s+${this.escapeRegex(t)}\\s*$`, "i"),
           ""
-        ).trim()), o = this.stripTrailingTypeWords(o).trim(), o.length > 0) return o;
+        ).trim()), o = this.stripTrailingTypeWords(o).trim(), o.length > 0)
+          return o;
       }
     }
     return null;
@@ -3260,11 +3358,13 @@ class be {
     const t = this.buildTypeVocabulary(), s = e.split(/(\s+)/);
     for (let r = 0; r < s.length; r++) {
       const n = s[r];
-      if (/^\s+$/.test(n) || /^[A-Z]/.test(n)) continue;
+      if (/^\s+$/.test(n) || /^[A-Z]/.test(n))
+        continue;
       const i = n.toLowerCase().replace(/[^a-z]/g, "");
       if (!(i.length < 3) && !t.has(i))
         for (const o of t) {
-          if (Math.abs(o.length - i.length) > 1) continue;
+          if (Math.abs(o.length - i.length) > 1)
+            continue;
           if (this.damerauLevenshteinDistance(i, o) === 1) {
             s[r] = o;
             break;
@@ -3281,8 +3381,10 @@ class be {
   }
   damerauLevenshteinDistance(e, t) {
     const s = e.length, r = t.length;
-    if (s === 0) return r;
-    if (r === 0) return s;
+    if (s === 0)
+      return r;
+    if (r === 0)
+      return s;
     const n = [];
     for (let i = 0; i <= s; i++)
       n[i] = [i];
@@ -3320,7 +3422,8 @@ class be {
   isLikelyName(e) {
     const t = e.toLowerCase();
     for (const r of this.introspection.typeNames)
-      if (t === r.toLowerCase() || t === g(r).toLowerCase()) return !1;
+      if (t === r.toLowerCase() || t === g(r).toLowerCase())
+        return !1;
     return !(/* @__PURE__ */ new Set([
       "i",
       "me",
@@ -3622,7 +3725,7 @@ class $e {
     else if (e.userName) {
       const c = e.userName.toLowerCase();
       n = r.toArray().find((p) => {
-        const h = p.name;
+        const { name: h } = p;
         return typeof h == "string" && h.toLowerCase() === c;
       });
     }
@@ -3635,7 +3738,10 @@ class $e {
       };
     const i = n.id, a = t.peekAll("post").toArray().filter((c) => {
       const p = c.author;
-      return p && p.id === i ? !0 : c.authorId === i;
+      if (p && p.id === i)
+        return !0;
+      const { authorId: h } = c;
+      return h === i;
     }), l = e.userName ?? e.userId;
     return {
       status: "success",
@@ -3659,7 +3765,7 @@ class Ne {
     else if (e.userName) {
       const n = e.userName.toLowerCase();
       r = t.peekAll("user").toArray().find((o) => {
-        const a = o.name;
+        const { name: a } = o;
         return typeof a == "string" && a.toLowerCase() === n;
       }) ?? null;
     }
@@ -3689,7 +3795,7 @@ class _e {
     else if (e.postTitle) {
       const l = e.postTitle.toLowerCase();
       r = t.peekAll("post").toArray().find((p) => {
-        const h = p.title;
+        const { title: h } = p;
         return typeof h == "string" && h.toLowerCase().includes(l);
       }) ?? null;
     }

@@ -38,7 +38,9 @@
 import {
   singleton, inject, injectable,
 } from 'tsyringe';
-import { runInAction, observable, computed, makeObservable } from 'mobx';
+import {
+  runInAction, observable, computed, makeObservable,
+} from 'mobx';
 import {
   SchemaService,
   type RelationshipDef,
@@ -331,7 +333,7 @@ export class Store implements ModelStoreLike {
       return null;
     }
     const direct = this.identityMap.get(modelName, key) as T | null;
-    if (direct) return direct;
+    if (direct) { return direct; }
 
     const root = this.schema.polymorphicRootFor(modelName);
     if (root) {
@@ -1405,7 +1407,7 @@ export class Store implements ModelStoreLike {
 
     runInAction(() => {
       for (const key of Object.keys(optimisticAttributes)) {
-        if (key === '__proto__' || key === 'constructor' || key === 'prototype') continue;
+        if (key === '__proto__' || key === 'constructor' || key === 'prototype') { continue; }
         internal._data[key] = optimisticAttributes[key];
       }
     });

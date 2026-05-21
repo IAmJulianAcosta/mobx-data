@@ -196,7 +196,7 @@ export class ODataAdapter extends RestAdapter {
     const body: Record<string, unknown> = {};
     if (data) {
       for (const key of Object.keys(data)) {
-        if (key === '__proto__' || key === 'constructor' || key === 'prototype') continue;
+        if (key === '__proto__' || key === 'constructor' || key === 'prototype') { continue; }
         body[key] = data[key];
       }
     }

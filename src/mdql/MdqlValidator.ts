@@ -106,7 +106,7 @@ export class MdqlValidator {
   ): { name: string; type: string | null } | null {
     const parts = field.split('.');
     if (parts.length === 1) {
-      if (field === 'id') return { name: 'id', type: 'string' };
+      if (field === 'id') { return { name: 'id', type: 'string' }; }
       const attributes = schema.attributesDefinitionFor(modelName);
       return attributes.get(field) ?? null;
     }
@@ -115,9 +115,9 @@ export class MdqlValidator {
     for (let index = 0; index < parts.length - 1; index++) {
       const relationships = schema.relationshipsDefinitionFor(currentModel);
       const rel = relationships.get(parts[index]!);
-      if (!rel) return null;
+      if (!rel) { return null; }
       currentModel = rel.type;
-      if (!schema.doesTypeExist(currentModel)) return null;
+      if (!schema.doesTypeExist(currentModel)) { return null; }
     }
 
     const lastPart = parts[parts.length - 1]!;
@@ -136,9 +136,7 @@ export class MdqlValidator {
     modelName: string,
   ): void {
     if (node.kind === 'condition') {
-      const attributeDefinition = MdqlValidator.resolveFieldAttribute(
-        node.field, modelName, schema,
-      );
+      const attributeDefinition = MdqlValidator.resolveFieldAttribute(node.field, modelName, schema);
 
       if (!attributeDefinition) {
         const message = node.field.includes('.')
