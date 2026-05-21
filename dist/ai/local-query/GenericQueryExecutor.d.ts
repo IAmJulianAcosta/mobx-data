@@ -11,6 +11,7 @@ export declare class GenericQueryExecutor {
     private executeTraversal;
     private findByAttribute;
     private followRelationship;
+    private reverseScan;
     private findPath;
     private deduplicateRecords;
     private resolveRecords;

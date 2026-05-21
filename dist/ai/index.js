@@ -346,11 +346,15 @@ class I {
     };
   }
   findByAttribute(e, t, s) {
-    const r = s.toLowerCase();
-    return e.find((n) => {
-      const o = n[t];
-      return typeof o == "string" ? o.toLowerCase() === r : String(o) === s;
-    });
+    const r = s.toLowerCase(), n = (i, o) => {
+      const l = i[t];
+      if (typeof l == "string") {
+        const c = l.toLowerCase();
+        return o ? c === r : c.includes(r) || r.includes(c);
+      }
+      return o && String(l) === s;
+    };
+    return e.find((i) => n(i, !0)) ?? e.find((i) => n(i, !1));
   }
   followRelationship(e, t, s) {
     const r = e, n = r[t.relationshipName];
@@ -365,7 +369,20 @@ class I {
       const o = s.peekRecord(t.toType, i);
       return o ? [o] : [];
     }
-    return [];
+    return this.reverseScan(e, t, s);
+  }
+  reverseScan(e, t, s) {
+    const r = e.id;
+    if (!r) return [];
+    const n = (this.introspection.relationshipGraph.get(t.toType) ?? []).filter((o) => o.relatedType === t.fromType);
+    return n.length === 0 ? [] : s.peekAll(t.toType).toArray().filter((o) => {
+      const a = o;
+      for (const l of n) {
+        const c = a[l.relationshipName];
+        if (c && typeof c == "object" && "id" in c && c.id === r || a[`${l.relationshipName}Id`] === r) return !0;
+      }
+      return !1;
+    });
   }
   findPath(e, t, s) {
     const r = this.introspection.relationshipGraph, n = [{ type: e, path: [] }], i = /* @__PURE__ */ new Set([e]), o = [];
