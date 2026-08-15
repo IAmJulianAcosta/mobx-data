@@ -34,7 +34,7 @@
  * Adapters and serializers are looked up first by exact model name, then by
  * the special `'application'` fallback.
  */
-import { SchemaService, type RelationshipDef, type AttributeDef } from '@mobx-data/schema';
+import { SchemaService, type ModelMeta, type RelationshipDef, type AttributeDef } from '@mobx-data/schema';
 import { Model, type RelationshipRef, type ModelStoreLike, type SaveOptions } from '@mobx-data/model';
 import type { CacheLike } from '../cache/types.js';
 import { IdentityMap } from './IdentityMap.js';
@@ -59,12 +59,18 @@ export interface AdapterLike {
     /** When `true` the store coalesces multiple `findRecord` calls into one `findMany`. */
     coalesceFindRequests?: boolean;
 }
-/** Minimal serializer interface the Store depends on. */
+/**
+ * Minimal serializer interface the Store depends on.
+ *
+ * `modelClass` is the schema view returned by `SchemaService.metaFor()`, never
+ * a model constructor: serializers iterate `attributes` / `relationships`,
+ * which exist only on that view.
+ */
 export interface SerializerLike {
-    normalize(store: Store, modelClass: unknown, payload: unknown, prop?: string): unknown;
-    normalizeResponse(store: Store, modelClass: unknown, payload: unknown, id: string | null, requestType: string): unknown;
+    normalize(store: Store, modelClass: ModelMeta, payload: unknown, prop?: string): unknown;
+    normalizeResponse(store: Store, modelClass: ModelMeta, payload: unknown, id: string | null, requestType: string): unknown;
     serialize(snapshot: unknown, options?: Record<string, unknown>): unknown;
-    extractErrors?(store: Store, modelClass: unknown, payload: unknown, id: string | null): Record<string, string[]>;
+    extractErrors?(store: Store, modelClass: ModelMeta, payload: unknown, id: string | null): Record<string, string[]>;
 }
 /** Options for `findRecord` and `findAll`. */
 export interface FindOptions {

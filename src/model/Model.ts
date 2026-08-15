@@ -41,6 +41,7 @@ import {
   type AttributeDef,
   type RelationshipDef,
 } from '@mobx-data/schema';
+import { observableRef, observableShallow } from '../mobxCompatibility.js';
 import { Errors } from './Errors.js';
 import { StateMachine, type RecordState, type RecordEvent } from './StateMachine.js';
 import { Snapshot } from './Snapshot.js';
@@ -291,9 +292,9 @@ export abstract class Model {
     | '_applyServerData'
     | '_setState'
     >(this, {
-      _data: observable.shallow,
-      _originalData: observable.ref,
-      _relationships: observable.shallow,
+      _data: observableShallow,
+      _originalData: observableRef,
+      _relationships: observableShallow,
       _id: observable,
       id: computed,
       uniqueId: computed,

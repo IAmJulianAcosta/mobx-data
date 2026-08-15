@@ -17,6 +17,7 @@
 
 import { makeObservable, observable, action } from 'mobx';
 import type { Model } from '@mobx-data/model';
+import { observableShallow } from '../mobxCompatibility.js';
 
 export class IdentityMap {
   /** @internal */
@@ -24,7 +25,7 @@ export class IdentityMap {
 
   constructor() {
     makeObservable<this, '_buckets'>(this, {
-      _buckets: observable.shallow,
+      _buckets: observableShallow,
       set: action,
       delete: action,
       clear: action,

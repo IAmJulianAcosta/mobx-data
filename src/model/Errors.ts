@@ -16,8 +16,9 @@
 
 import { injectable } from 'tsyringe';
 import {
-  makeObservable, observable, computed, action,
+  makeObservable, computed, action,
 } from 'mobx';
+import { observableShallow } from '../mobxCompatibility.js';
 
 /** A single validation error for one attribute. */
 export interface ErrorMessage {
@@ -33,7 +34,7 @@ export class Errors implements Iterable<[string, ErrorMessage[]]> {
 
   constructor() {
     makeObservable<this, '_errors'>(this, {
-      _errors: observable.shallow,
+      _errors: observableShallow,
       isEmpty: computed,
       length: computed,
       add: action,

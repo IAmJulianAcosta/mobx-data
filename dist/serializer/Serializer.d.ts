@@ -114,6 +114,19 @@ export interface ModelClassMeta {
     /** Merged relationship definitions. */
     relationships: Map<string, RelationshipDef>;
 }
+/**
+ * Resolves the schema view for `modelName` from the store.
+ *
+ * Serializers that normalize *secondary* resources — REST sideloads, embedded
+ * records — only know the related type by name, not the `ModelClassMeta` the
+ * store handed them for the primary type.  Looking the type up keeps their
+ * attributes and relationships from being silently dropped.
+ *
+ * Falls back to an empty view when the store is absent (serializers are often
+ * exercised standalone) or the type was never registered, which preserves the
+ * previous behaviour rather than throwing on an unknown payload key.
+ */
+export declare function resolveModelClassMeta(store: unknown, modelName: string): ModelClassMeta;
 export declare abstract class Serializer {
     /** Name of the field used as the primary key in raw payloads.  Default: `'id'`. */
     primaryKey: string;

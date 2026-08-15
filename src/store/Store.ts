@@ -43,6 +43,7 @@ import {
 } from 'mobx';
 import {
   SchemaService,
+  type ModelMeta,
   type RelationshipDef,
   type AttributeDef,
 } from '@mobx-data/schema';
@@ -130,17 +131,23 @@ export interface AdapterLike {
   coalesceFindRequests?: boolean;
 }
 
-/** Minimal serializer interface the Store depends on. */
+/**
+ * Minimal serializer interface the Store depends on.
+ *
+ * `modelClass` is the schema view returned by `SchemaService.metaFor()`, never
+ * a model constructor: serializers iterate `attributes` / `relationships`,
+ * which exist only on that view.
+ */
 export interface SerializerLike {
   normalize(
     store: Store,
-    modelClass: unknown,
+    modelClass: ModelMeta,
     payload: unknown,
     prop?: string,
   ): unknown;
   normalizeResponse(
     store: Store,
-    modelClass: unknown,
+    modelClass: ModelMeta,
     payload: unknown,
     id: string | null,
     requestType: string,
@@ -148,7 +155,7 @@ export interface SerializerLike {
   serialize(snapshot: unknown, options?: Record<string, unknown>): unknown;
   extractErrors?(
     store: Store,
-    modelClass: unknown,
+    modelClass: ModelMeta,
     payload: unknown,
     id: string | null,
   ): Record<string, string[]>;
@@ -406,7 +413,7 @@ export class Store implements ModelStoreLike {
     const normalized = modelName
       ? this.serializerFor(modelName).normalizeResponse(
         this,
-        this.schema.modelFor(modelName),
+        this.schema.metaFor(modelName),
         body,
         null,
         'pushPayload',
@@ -422,7 +429,7 @@ export class Store implements ModelStoreLike {
   normalize(modelName: string, payload: unknown): NormalizedDocument {
     return this.serializerFor(modelName).normalizeResponse(
       this,
-      this.schema.modelFor(modelName),
+      this.schema.metaFor(modelName),
       payload,
       null,
       'normalize',
@@ -683,7 +690,7 @@ export class Store implements ModelStoreLike {
     const responseHeaders = extractResponseHeaders(response);
     const doc = this.serializerFor(modelName).normalizeResponse(
       this,
-      this.schema.modelFor(modelName),
+      this.schema.metaFor(modelName),
       response,
       id,
       'findRecord',
@@ -718,7 +725,7 @@ export class Store implements ModelStoreLike {
     const responseHeaders = extractResponseHeaders(response);
     const doc = this.serializerFor(modelName).normalizeResponse(
       this,
-      this.schema.modelFor(modelName),
+      this.schema.metaFor(modelName),
       response,
       null,
       'findAll',
@@ -770,7 +777,7 @@ export class Store implements ModelStoreLike {
     const response = await adapter.query(this, modelName, params, array);
     const doc = this.serializerFor(modelName).normalizeResponse(
       this,
-      this.schema.modelFor(modelName),
+      this.schema.metaFor(modelName),
       response,
       null,
       'query',
@@ -804,7 +811,7 @@ export class Store implements ModelStoreLike {
     const response = await adapter.queryRecord(this, modelName, params);
     const doc = this.serializerFor(modelName).normalizeResponse(
       this,
-      this.schema.modelFor(modelName),
+      this.schema.metaFor(modelName),
       response,
       null,
       'queryRecord',
@@ -846,7 +853,7 @@ export class Store implements ModelStoreLike {
     }
     const doc = this.serializerFor(record.modelName).normalizeResponse(
       this,
-      this.schema.modelFor(record.modelName),
+      this.schema.metaFor(record.modelName),
       response,
       record.id,
       isNew ? 'createRecord' : 'updateRecord',
@@ -919,7 +926,7 @@ export class Store implements ModelStoreLike {
     const response = await adapter.findRecord(this, record.modelName, record.id, snapshot);
     const doc = this.serializerFor(record.modelName).normalizeResponse(
       this,
-      this.schema.modelFor(record.modelName),
+      this.schema.metaFor(record.modelName),
       response,
       record.id,
       'findRecord',
@@ -1312,7 +1319,7 @@ export class Store implements ModelStoreLike {
       const response = await adapter.findMany!(this, modelName, ids, snapshots);
       const doc = this.serializerFor(modelName).normalizeResponse(
         this,
-        this.schema.modelFor(modelName),
+        this.schema.metaFor(modelName),
         response,
         null,
         'findMany',

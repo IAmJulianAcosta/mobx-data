@@ -127,6 +127,41 @@ export interface ModelClassMeta {
   relationships: Map<string, RelationshipDef>;
 }
 
+/** Minimal view of the store a serializer needs to reach the schema registry. */
+interface SchemaCapableStore {
+  schema?: {
+    doesTypeExist?(modelName: string): boolean;
+    metaFor?(modelName: string): ModelClassMeta;
+  };
+}
+
+/**
+ * Resolves the schema view for `modelName` from the store.
+ *
+ * Serializers that normalize *secondary* resources — REST sideloads, embedded
+ * records — only know the related type by name, not the `ModelClassMeta` the
+ * store handed them for the primary type.  Looking the type up keeps their
+ * attributes and relationships from being silently dropped.
+ *
+ * Falls back to an empty view when the store is absent (serializers are often
+ * exercised standalone) or the type was never registered, which preserves the
+ * previous behaviour rather than throwing on an unknown payload key.
+ */
+export function resolveModelClassMeta(
+  store: unknown,
+  modelName: string,
+): ModelClassMeta {
+  const { schema } = (store ?? {}) as SchemaCapableStore;
+  if (schema?.metaFor && schema.doesTypeExist?.(modelName)) {
+    return schema.metaFor(modelName);
+  }
+  return {
+    modelName,
+    attributes: new Map(),
+    relationships: new Map(),
+  };
+}
+
 export abstract class Serializer {
   /** Name of the field used as the primary key in raw payloads.  Default: `'id'`. */
   primaryKey: string = 'id';

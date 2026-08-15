@@ -22,6 +22,7 @@
 
 import { makeObservable, computed, observable } from 'mobx';
 import type { Model } from '@mobx-data/model';
+import { observableRef } from '../mobxCompatibility.js';
 
 /** Constructor options for `RecordArray`. */
 export interface RecordArrayOptions<T extends Model> {
@@ -175,8 +176,8 @@ export class AdapterPopulatedRecordArray<
     this.metaData = opts.meta ?? {};
     this.linksData = opts.links ?? {};
     makeObservable<this, 'metaData' | 'linksData'>(this, {
-      metaData: observable.ref,
-      linksData: observable.ref,
+      metaData: observableRef,
+      linksData: observableRef,
       meta: computed,
       links: computed,
       query: computed,

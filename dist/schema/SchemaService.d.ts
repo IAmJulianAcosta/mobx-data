@@ -12,6 +12,23 @@
  */
 import 'reflect-metadata';
 import { type AttributeDef, type AttributeDefinitionsMap, type DiscriminatorDef, type RelationshipDef, type RelationshipDefinitionsMap } from './types.js';
+/**
+ * Schema view of a registered model, decoupled from its constructor.
+ *
+ * This is the shape serializers consume (`ModelClassMeta` in the serializer
+ * package is structurally identical).  Model constructors do not carry
+ * `attributes` / `relationships` themselves — the definitions live in
+ * reflect-metadata on the prototype chain and are merged here at registration
+ * time — so anything handing a model to a serializer must pass this view.
+ */
+export interface ModelMeta {
+    /** Registered model name. */
+    modelName: string;
+    /** Merged attribute definitions (ancestors → leaf, leaf wins). */
+    attributes: AttributeDefinitionsMap;
+    /** Merged relationship definitions (ancestors → leaf, leaf wins). */
+    relationships: RelationshipDefinitionsMap;
+}
 /** Minimal shape of a model constructor that SchemaService can register. */
 export interface ModelClass {
     modelName?: string;
@@ -20,6 +37,8 @@ export interface ModelClass {
 }
 export declare class SchemaService {
     private entries;
+    /** Memoized `ModelMeta` views, invalidated whenever a model is re-registered. */
+    private metaViews;
     /**
      * Registers a model class under `modelName`.
      *
@@ -38,6 +57,20 @@ export declare class SchemaService {
      * @throws if the model has not been registered.
      */
     modelFor(modelName: string): ModelClass;
+    /**
+     * Returns the serializer-facing schema view for `modelName`.
+     *
+     * Serializers are handed a `ModelMeta`, never the constructor: they iterate
+     * `attributes` / `relationships`, which exist only on this view.  The result
+     * is memoized per model name and reused across calls.
+     *
+     * `@model` options are mirrored onto the view via reflect-metadata so
+     * serializers that read them (e.g. `JsonSerializer` checking for a
+     * polymorphic discriminator) behave the same as when given the constructor.
+     *
+     * @throws if the model has not been registered.
+     */
+    metaFor(modelName: string): ModelMeta;
     /** Returns all registered model names. */
     registeredNames(): string[];
     /** Returns `true` when a model class has been registered for `modelName`. */

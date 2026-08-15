@@ -40,6 +40,7 @@
  */
 
 import type { RelationshipDef } from '@mobx-data/schema';
+import { resolveModelClassMeta } from './Serializer.js';
 import type {
   ModelClassMeta,
   NormalizeRequestType,
@@ -235,7 +236,7 @@ export function EmbeddedRecordsMixin<
 
     /**
      * Normalizes a single embedded resource object using the related model's
-     * type as a placeholder `ModelClassMeta`.
+     * own schema, looked up from the store by relationship type.
      */
     private extractEmbeddedResource(
       store: unknown,
@@ -245,11 +246,7 @@ export function EmbeddedRecordsMixin<
       if (!item || typeof item !== 'object' || Array.isArray(item)) {
         return null;
       }
-      const embeddedClass: ModelClassMeta = {
-        modelName: rel.type,
-        attributes: new Map(),
-        relationships: new Map(),
-      };
+      const embeddedClass = resolveModelClassMeta(store, rel.type);
       return this.normalize(store, embeddedClass, item);
     }
   }

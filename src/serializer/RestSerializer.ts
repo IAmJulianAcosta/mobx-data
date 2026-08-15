@@ -22,6 +22,7 @@
 import { injectable } from 'tsyringe';
 import pluralize from 'pluralize';
 import {
+  resolveModelClassMeta,
   type ModelClassMeta,
   type NormalizeRequestType,
   type NormalizedDocument,
@@ -103,11 +104,7 @@ export class RestSerializer extends JsonSerializer {
         continue;
       }
       const sideloadType = this.modelNameFromPayloadKey(key);
-      const sideloadClass: ModelClassMeta = {
-        modelName: sideloadType,
-        attributes: new Map(),
-        relationships: new Map(),
-      };
+      const sideloadClass = resolveModelClassMeta(store, sideloadType);
       if (Array.isArray(value)) {
         for (const item of value) {
           const normalized = this.normalize(store, sideloadClass, item);

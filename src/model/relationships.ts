@@ -25,6 +25,7 @@ import {
   makeObservable, observable, computed, action, runInAction,
 } from 'mobx';
 import type { RelationshipDef } from '@mobx-data/schema';
+import { observableRef } from '../mobxCompatibility.js';
 import type { Model, ModelStoreLike, RelationshipRef } from './Model.js';
 
 /** Context object shared by all relationship proxy classes. */
@@ -213,8 +214,8 @@ implements PromiseLike<T | null> {
     this.host = host;
     makeObservable<this, 'loadedState' | 'currentValue' | 'error' | 'syncFromCache'>(this, {
       loadedState: observable,
-      currentValue: observable.ref,
-      error: observable.ref,
+      currentValue: observableRef,
+      error: observableRef,
       isPending: computed,
       isFulfilled: computed,
       isRejected: computed,
@@ -362,7 +363,7 @@ implements PromiseLike<ManyArray<T>> {
     this.manyArray = new ManyArray<T>(host);
     makeObservable<this, 'loadedState' | 'error' | 'syncFromCache'>(this, {
       loadedState: observable,
-      error: observable.ref,
+      error: observableRef,
       isPending: computed,
       isFulfilled: computed,
       isRejected: computed,
